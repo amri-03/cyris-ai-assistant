@@ -6,20 +6,30 @@ class BehaviorTracker:
     def analyze_behavior(
             self,
             event: BehaviorEvent
-    ) -> str:
+    ) -> dict:
 
         if event.event_type == "inactivity":
-            return (
-                "Extended inactivity detected. "
-                "Consider starting with a smaller re-entry task."
-            )
+            return {
+                "status": "warning",
+                "message": (
+                    "Extended inactivity detected. "
+                    "Consider starting with a smaller re-entry task."
+                ),
+                "priority_adjustment": "reduce_complexity"
+            }
 
         if event.event_type == "focus_session":
-            return (
-                "Consistent engagement detected. "
-                "Momentum appears stable."
-            )
+            return {
+                "status": "positive",
+                "message": (
+                    "Consistent engagement detected. "
+                    "Momentum appears stable."
+                ),
+                "priority_adjustment": "maintain_progress"
+            }
 
-        return (
-            "Behavior recorded successfully."
-        )
+        return {
+            "status": "neutral",
+            "message": "Behavior recorded successfully.",
+            "priority_adjustment": "none"
+        }

@@ -13,15 +13,29 @@ class AssistantService:
     ) -> str:
 
         if context.energy_level == "low":
+
+            if user.active_focus_areas:
+                return (
+                    f"Energy levels appear low right now. "
+                    f"Consider making small progress in "
+                    f"{user.active_focus_areas[0]} instead of deep work."
+                )
+
             return (
                 "Energy levels appear low right now. "
-                "Focus on a smaller and easier task instead of deep work."
+                "Focus on a smaller and easier task."
             )
 
         if priorities.high_priority:
             return (
-                f"Your current highest priority focus area is: "
-                f"{priorities.high_priority[0]}"
+                f"Your current highest priority focus area is "
+                f"{priorities.high_priority[0]}."
+            )
+
+        if user.long_term_goals:
+            return (
+                f"Your long-term direction remains connected to: "
+                f"{user.long_term_goals[0]}"
             )
 
         return (
