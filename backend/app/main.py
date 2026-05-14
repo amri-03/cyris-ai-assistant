@@ -22,6 +22,17 @@ from app.services.adaptive_guidance_engine import AdaptiveGuidanceEngine
 from app.services.proactive_awareness_service import ProactiveAwarenessService
 from app.services.strategic_planning_service import StrategicPlanningService
 from app.services.reflection_service import ReflectionService
+from app.services.alignment_engine import AlignmentEngine
+from app.services.decision_synthesis_service import DecisionSynthesisService
+from app.services.forecasting_service import ForecastingService
+from app.services.recovery_service import RecoveryService
+from app.services.adaptive_coordination_service import AdaptiveCoordinationService
+from app.services.stability_service import StabilityService
+from app.services.focus_state_service import FocusStateService
+from app.services.priority_cycle_service import PriorityCycleService
+from app.services.continuity_escalation_service import ContinuityEscalationService
+from app.services.behavioral_orchestrator_service import BehavioralOrchestratorService
+
 
 from app.memory.memory_manager import MemoryManager
 from app.context.context_manager import ContextManager
@@ -46,6 +57,15 @@ adaptive_guidance_engine = AdaptiveGuidanceEngine()
 proactive_awareness_service = ProactiveAwarenessService()
 strategic_planning_service = StrategicPlanningService()
 reflection_service = ReflectionService()
+alignment_engine = AlignmentEngine()
+decision_synthesis_service = DecisionSynthesisService()
+recovery_service = RecoveryService()
+adaptive_coordination_service = AdaptiveCoordinationService()
+stability_service = StabilityService()
+focus_state_service = FocusStateService()
+priority_cycle_service = PriorityCycleService()
+continuity_escalation_service = ContinuityEscalationService()
+behavioral_orchestrator_service = BehavioralOrchestratorService()
 
 
 @app.get("/")
@@ -391,3 +411,133 @@ def reflection():
     )
 
     return result
+
+
+@app.get("/alignment")
+def alignment():
+    result = alignment_engine.evaluate_alignment(
+        long_term_goal="Backend Development",
+        current_focus=[
+            "Backend Development",
+            "Cybersecurity",
+            "UI Design",
+            "Blender"
+        ],
+        fragmentation_level="high"
+    )
+
+    return result
+
+
+@app.get("/decision")
+def decision():
+    result = decision_synthesis_service.synthesize_direction(
+        lifecycle_stage="drifting",
+        overload_detected=True,
+        alignment_status="aligned",
+        continuity_score=2
+    )
+
+    return result
+
+
+@app.get("/forecast")
+def forecast():
+    result = forecasting_service.evaluate_risk_forecast(
+        continuity_score=2,
+        overload_detected=True,
+        fragmentation_level="high",
+        inactivity_days=6
+    )
+
+    return result
+
+
+@app.get("/recovery")
+def recovery():
+    result = recovery_service.generate_recovery_strategy(
+        forecast="high_drift_risk",
+        overload_detected=True,
+        continuity_score=1
+    )
+
+    return result
+
+
+@app.get("/adaptive-coordination")
+def adaptive_coordination():
+    result = (
+        adaptive_coordination_service
+        .coordinate_adaptive_response()
+    )
+
+    return result
+
+
+@app.get("/stability")
+def stability():
+    result = stability_service.calculate_stability(
+        continuity_score=3,
+        overload_detected=True,
+        inactivity_days=6,
+        fragmentation_level="high"
+    )
+
+    return result
+
+
+@app.get("/focus-state")
+def focus_state():
+    stability_result = stability_service.calculate_stability(
+        continuity_score=2,
+        overload_detected=True,
+        inactivity_days=6,
+        fragmentation_level="high"
+    )
+
+    result = focus_state_service.evaluate_focus_transition(
+        stability_state=stability_result["stability_state"],
+        continuity_score=2,
+        overload_detected=True
+    )
+
+    return result
+
+
+@app.get("/priority-cycle")
+def priority_cycle():
+    result = priority_cycle_service.cycle_priorities(
+        active_priorities=[
+            "Backend Development",
+            "Cybersecurity",
+            "UI Design",
+            "Blender"
+        ],
+        overload_detected=True,
+        continuity_score=2
+    )
+
+    return result
+
+
+@app.get("/continuity-escalation")
+def continuity_escalation():
+    result = continuity_escalation_service.evaluate_escalation(
+        continuity_score=1,
+        inactivity_days=8,
+        overload_detected=True
+    )
+
+    return result
+
+
+@app.get("/behavioral-orchestrator")
+def behavioral_orchestrator():
+    result = (
+        behavioral_orchestrator_service
+        .orchestrate_behavioral_state()
+    )
+
+    return result
+
+
