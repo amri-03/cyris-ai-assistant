@@ -32,7 +32,10 @@ from app.services.focus_state_service import FocusStateService
 from app.services.priority_cycle_service import PriorityCycleService
 from app.services.continuity_escalation_service import ContinuityEscalationService
 from app.services.behavioral_orchestrator_service import BehavioralOrchestratorService
-
+from app.services.event_service import EventService
+from app.services.event_pipeline_service import EventPipelineService
+from app.services.state_engine_service import StateEngineService
+from app.services.execution_engine_service import ExecutionEngineService
 
 from app.memory.memory_manager import MemoryManager
 from app.context.context_manager import ContextManager
@@ -66,6 +69,10 @@ focus_state_service = FocusStateService()
 priority_cycle_service = PriorityCycleService()
 continuity_escalation_service = ContinuityEscalationService()
 behavioral_orchestrator_service = BehavioralOrchestratorService()
+event_service = EventService()
+event_pipeline_service = EventPipelineService()
+state_engine_service = StateEngineService()
+execution_engine_service = ExecutionEngineService()
 
 
 @app.get("/")
@@ -541,3 +548,49 @@ def behavioral_orchestrator():
     return result
 
 
+@app.get("/event")
+def event():
+    result = event_service.create_event(
+        event_type="continuity_decline",
+        description=(
+            "User inactivity exceeded expected continuity threshold."
+        ),
+        severity="moderate"
+    )
+
+    return result
+
+
+@app.get("/event-pipeline")
+def event_pipeline():
+    result = (
+        event_pipeline_service.process_event(
+            event_type="continuity_decline"
+        )
+    )
+
+    return result
+
+
+@app.get("/system-state")
+def system_state():
+    state_engine_service.update_state(
+        continuity_score=2,
+        overload_detected=True,
+        fragmentation_level="high",
+        inactivity_days=7,
+        focus_state="stabilization",
+        escalation_level="moderate"
+    )
+
+    return state_engine_service.get_state()
+
+
+@app.get("/execution-cycle")
+def execution_cycle():
+    result = (
+        execution_engine_service
+        .execute_runtime_cycle()
+    )
+
+    return result
