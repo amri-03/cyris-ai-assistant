@@ -11,6 +11,17 @@ from app.behavior.priority_engine import PriorityEngine
 from app.services.assistant_service import AssistantService
 from app.services.state_service import StateService
 from app.services.adaptive_session_service import AdaptiveSessionService
+from app.services.lifecycle_service import LifecycleService
+from app.services.pattern_analysis_service import PatternAnalysisService
+from app.services.intervention_service import InterventionService
+from app.services.focus_orchestrator_service import FocusOrchestratorService
+from app.services.recommendation_service import RecommendationService
+from app.services.session_continuity_service import SessionContinuityService
+from app.services.memory_classification_service import MemoryClassificationService
+from app.services.adaptive_guidance_engine import AdaptiveGuidanceEngine
+from app.services.proactive_awareness_service import ProactiveAwarenessService
+from app.services.strategic_planning_service import StrategicPlanningService
+from app.services.reflection_service import ReflectionService
 
 from app.memory.memory_manager import MemoryManager
 from app.context.context_manager import ContextManager
@@ -24,6 +35,17 @@ context_manager = ContextManager()
 priority_engine = PriorityEngine()
 state_service = StateService()
 adaptive_session_service = AdaptiveSessionService()
+lifecycle_service = LifecycleService()
+pattern_analysis_service = PatternAnalysisService()
+intervention_service = InterventionService()
+focus_orchestrator_service = FocusOrchestratorService()
+recommendation_service = RecommendationService()
+session_continuity_service = SessionContinuityService()
+memory_classification_service = MemoryClassificationService()
+adaptive_guidance_engine = AdaptiveGuidanceEngine()
+proactive_awareness_service = ProactiveAwarenessService()
+strategic_planning_service = StrategicPlanningService()
+reflection_service = ReflectionService()
 
 
 @app.get("/")
@@ -174,5 +196,198 @@ def state():
 @app.get("/adaptive-session")
 def adaptive_session():
     result = adaptive_session_service.run_adaptive_session()
+
+    return result
+
+
+@app.get("/lifecycle")
+def lifecycle():
+    result = lifecycle_service.evaluate_lifecycle_state(
+        inactivity_days=6,
+        focus_area="Backend Development"
+    )
+
+    return result
+
+
+@app.get("/patterns")
+def patterns():
+    result = pattern_analysis_service.analyze_patterns(
+        inactivity_events=4,
+        overload_events=2,
+        focus_switches=5
+    )
+
+    return result
+
+
+@app.get("/intervention")
+def intervention():
+    lifecycle_result = lifecycle_service.evaluate_lifecycle_state(
+        inactivity_days=8,
+        focus_area="Backend Development"
+    )
+
+    pattern_result = pattern_analysis_service.analyze_patterns(
+        inactivity_events=4,
+        overload_events=2,
+        focus_switches=5
+    )
+
+    result = intervention_service.evaluate_intervention(
+        lifecycle_stage=lifecycle_result.current_stage,
+        detected_patterns=pattern_result["detected_patterns"]
+    )
+
+    return result
+
+
+@app.get("/focus")
+def focus():
+    result = focus_orchestrator_service.orchestrate_focus(
+        career_urgency="high",
+        energy_level="low",
+        active_focus_areas=[
+            "Backend Development",
+            "Cybersecurity",
+            "Blender",
+            "UI Design"
+        ]
+    )
+
+    return result
+
+
+@app.get("/recommendation")
+def recommendation():
+    focus_result = focus_orchestrator_service.orchestrate_focus(
+        career_urgency="high",
+        energy_level="low",
+        active_focus_areas=[
+            "Backend Development",
+            "Cybersecurity",
+            "Blender"
+        ]
+    )
+
+    primary_focus = focus_result["primary_focus"]
+
+    if isinstance(primary_focus, list):
+        selected_focus = primary_focus[0]
+    else:
+        selected_focus = primary_focus
+
+    result = recommendation_service.generate_recommendation(
+        focus_area=selected_focus,
+        energy_level="low",
+        available_time="short"
+    )
+
+    return result
+
+
+@app.get("/session-continuity")
+def session_continuity():
+    recommendation_result = recommendation_service.generate_recommendation(
+        focus_area="Backend Development",
+        energy_level="low",
+        available_time="short"
+    )
+
+    session_continuity_service.update_session(
+        focus_area="Backend Development",
+        recommendation=recommendation_result["action"],
+        continuity_change=1,
+        status="recovering"
+    )
+
+    return session_continuity_service.get_session_state()
+
+
+@app.get("/memory-classification")
+def memory_classification():
+    result = memory_classification_service.classify_memory(
+        identity_traits=[
+            "Strong interest in adaptive AI systems",
+            "Values long-term growth"
+        ],
+        temporary_states=[
+            "Currently experiencing workload pressure"
+        ],
+        patterns=[
+            "Recurring disengagement during overload periods"
+        ],
+        priorities=[
+            "Backend Development",
+            "Behavioral Intelligence"
+        ]
+    )
+
+    return result
+
+
+@app.get("/adaptive-guidance")
+def adaptive_guidance():
+    memory_result = memory_classification_service.classify_memory(
+        identity_traits=[
+            "Strong interest in adaptive AI systems",
+            "Values long-term growth"
+        ],
+        temporary_states=[
+            "Currently experiencing workload pressure"
+        ],
+        patterns=[
+            "Recurring disengagement during overload periods"
+        ],
+        priorities=[
+            "Backend Development",
+            "Behavioral Intelligence"
+        ]
+    )
+
+    result = adaptive_guidance_engine.generate_adaptive_guidance(
+        persistent_identity=memory_result.persistent_identity,
+        behavioral_patterns=memory_result.behavioral_patterns,
+        adaptive_priorities=memory_result.adaptive_priorities,
+        energy_level="low"
+    )
+
+    return result
+
+
+@app.get("/proactive-awareness")
+def proactive_awareness():
+    result = proactive_awareness_service.evaluate_proactive_state(
+        continuity_score=3,
+        inactivity_days=8,
+        overload_detected=True
+    )
+
+    return result
+
+
+@app.get("/strategy")
+def strategy():
+    result = strategic_planning_service.generate_strategy(
+        career_pressure="high",
+        burnout_risk="high",
+        active_focus_areas=[
+            "Backend Development",
+            "Behavioral Intelligence",
+            "Cybersecurity",
+            "UI Design"
+        ]
+    )
+
+    return result
+
+
+@app.get("/reflection")
+def reflection():
+    result = reflection_service.evaluate_guidance_effectiveness(
+        recommendation_followed=False,
+        continuity_change=-1,
+        overload_detected=True
+    )
 
     return result
