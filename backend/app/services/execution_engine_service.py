@@ -62,46 +62,9 @@ class ExecutionEngineService:
 
         self.runtime_cycles = 0
 
-    def evaluate_runtime_management(
-            self,
-            orchestration,
-            runtime_health,
-            throttle
+    def evaluate_runtime_analysis(
+            self
     ):
-
-        runtime_priority = (
-            self.runtime_priority_service
-            .evaluate_runtime_priority(
-                runtime_health=(
-                    runtime_health[
-                        "runtime_health"
-                    ]
-                ),
-                escalation_level=(
-                    orchestration[
-                        "escalation"
-                    ]["escalation_level"]
-                )
-            )
-        )
-
-        self.runtime_adaptation_service.record_adaptation(
-            runtime_health=(
-                runtime_health[
-                    "runtime_health"
-                ]
-            ),
-            throttle_mode=(
-                throttle[
-                    "throttle_mode"
-                ]
-            ),
-            runtime_priority=(
-                runtime_priority[
-                    "runtime_priority"
-                ]
-            )
-        )
 
         strategy_evaluation = (
             self.runtime_strategy_service
@@ -119,6 +82,31 @@ class ExecutionEngineService:
             )
         )
 
+        runtime_reflection = (
+            self.runtime_reflection_service
+            .reflect_on_runtime_behavior(
+                self.runtime_adaptation_service
+                .get_adaptation_history()
+            )
+        )
+
+        return {
+            "strategy_evaluation": (
+                strategy_evaluation
+            ),
+            "runtime_prediction": (
+                runtime_prediction
+            ),
+            "runtime_reflection": (
+                runtime_reflection
+            )
+        }
+
+    def evaluate_runtime_coordination(
+            self,
+            runtime_prediction
+    ):
+
         runtime_response = (
             self.runtime_response_service
             .evolve_runtime_response(
@@ -127,14 +115,6 @@ class ExecutionEngineService:
                         "runtime_prediction"
                     ]
                 )
-            )
-        )
-
-        runtime_reflection = (
-            self.runtime_reflection_service
-            .reflect_on_runtime_behavior(
-                self.runtime_adaptation_service
-                .get_adaptation_history()
             )
         )
 
@@ -181,43 +161,9 @@ class ExecutionEngineService:
             )
         )
 
-        execution_mode = (
-            "normal_runtime_execution"
-        )
-
-        if (
-                runtime_governance[
-                    "governance_mode"
-                ]
-                == "runtime_rebalancing"
-        ):
-            execution_mode = (
-                "reduced_runtime_execution"
-            )
-
-        if (
-                runtime_governance[
-                    "governance_mode"
-                ]
-                == "protective_runtime_control"
-        ):
-            execution_mode = (
-                "protective_runtime_execution"
-            )
-
         return {
-            "runtime_priority": runtime_priority,
-            "strategy_evaluation": (
-                strategy_evaluation
-            ),
-            "runtime_prediction": (
-                runtime_prediction
-            ),
             "runtime_response": (
                 runtime_response
-            ),
-            "runtime_reflection": (
-                runtime_reflection
             ),
             "runtime_coordination": (
                 runtime_coordination
@@ -230,6 +176,99 @@ class ExecutionEngineService:
             ),
             "runtime_governance": (
                 runtime_governance
+            )
+        }
+
+    def evaluate_runtime_management(
+            self,
+            orchestration,
+            runtime_health,
+            throttle
+    ):
+
+        runtime_priority = (
+            self.runtime_priority_service
+            .evaluate_runtime_priority(
+                runtime_health=(
+                    runtime_health[
+                        "runtime_health"
+                    ]
+                ),
+                escalation_level=(
+                    orchestration[
+                        "escalation"
+                    ]["escalation_level"]
+                )
+            )
+        )
+
+        self.runtime_adaptation_service.record_adaptation(
+            runtime_health=(
+                runtime_health[
+                    "runtime_health"
+                ]
+            ),
+            throttle_mode=(
+                throttle[
+                    "throttle_mode"
+                ]
+            ),
+            runtime_priority=(
+                runtime_priority[
+                    "runtime_priority"
+                ]
+            )
+        )
+
+        runtime_analysis = (
+            self.evaluate_runtime_analysis()
+        )
+
+        runtime_coordination = (
+            self.evaluate_runtime_coordination(
+                runtime_prediction=(
+                    runtime_analysis[
+                        "runtime_prediction"
+                    ]
+                )
+            )
+        )
+
+        execution_mode = (
+            "normal_runtime_execution"
+        )
+
+        if (
+                runtime_coordination[
+                    "runtime_governance"
+                ][
+                    "governance_mode"
+                ]
+                == "runtime_rebalancing"
+        ):
+            execution_mode = (
+                "reduced_runtime_execution"
+            )
+
+        if (
+                runtime_coordination[
+                    "runtime_governance"
+                ][
+                    "governance_mode"
+                ]
+                == "protective_runtime_control"
+        ):
+            execution_mode = (
+                "protective_runtime_execution"
+            )
+
+        return {
+            "runtime_priority": runtime_priority,
+            "runtime_analysis": (
+                runtime_analysis
+            ),
+            "runtime_coordination": (
+                runtime_coordination
             ),
             "execution_mode": execution_mode
         }
