@@ -1,4 +1,15 @@
+from app.services.runtime_governance_memory_service import (
+    RuntimeGovernanceMemoryService
+)
+
+
 class RuntimeGovernanceService:
+
+    def __init__(self):
+
+        self.governance_memory = (
+            RuntimeGovernanceMemoryService()
+        )
 
     def evaluate_runtime_governance(
             self,
@@ -7,10 +18,9 @@ class RuntimeGovernanceService:
     ):
 
         if (
-                equilibrium_state
-                == "overprotective_runtime_behavior"
+                equilibrium_state == "overprotective_runtime_behavior"
         ):
-            return {
+            governance = {
                 "governance_mode": (
                     "runtime_rebalancing"
                 ),
@@ -23,20 +33,30 @@ class RuntimeGovernanceService:
                 runtime_prediction
                 == "high_runtime_instability_risk"
         ):
-            return {
+            governance = {
                 "governance_mode": (
-                    "protective_runtime_control"
+                    "runtime_rebalancing"
                 ),
                 "guidance": (
                     "Increase runtime stabilization governance."
                 )
             }
 
-        return {
+        governance = {
             "governance_mode": (
-                "stable_runtime_governance"
+                "runtime_rebalancing"
             ),
             "guidance": (
                 "Runtime orchestration governance remains stable."
             )
         }
+
+        self.governance_memory.record_governance(
+            governance_mode=(
+                governance["governance_mode"]
+            ),
+            equilibrium_state=equilibrium_state,
+            runtime_prediction=runtime_prediction
+        )
+
+        return governance

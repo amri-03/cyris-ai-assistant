@@ -33,9 +33,6 @@ from app.services.runtime_equilibrium_service import (
 from app.services.runtime_governance_service import (
     RuntimeGovernanceService
 )
-from app.services.runtime_governance_memory_service import (
-    RuntimeGovernanceMemoryService
-)
 
 
 class ExecutionEngineService:
@@ -61,9 +58,6 @@ class ExecutionEngineService:
         )
         self.runtime_governance_service = (
             RuntimeGovernanceService()
-        )
-        self.runtime_governance_memory = (
-            RuntimeGovernanceMemoryService()
         )
 
         self.runtime_cycles = 0
@@ -285,24 +279,6 @@ class ExecutionEngineService:
             )
         )
 
-        self.runtime_governance_memory.record_governance(
-            governance_mode=(
-                runtime_management[
-                    "runtime_governance"
-                ]["governance_mode"]
-            ),
-            equilibrium_state=(
-                runtime_management[
-                    "runtime_equilibrium"
-                ]["equilibrium_state"]
-            ),
-            runtime_prediction=(
-                runtime_management[
-                    "runtime_prediction"
-                ]["runtime_prediction"]
-            )
-        )
-
         return {
             "event": event,
             "pipeline": pipeline_result,
@@ -313,7 +289,8 @@ class ExecutionEngineService:
                 runtime_management
             ),
             "governance_history": (
-                self.runtime_governance_memory
+                self.runtime_governance_service
+                .governance_memory
                 .get_governance_history()
             ),
         }
