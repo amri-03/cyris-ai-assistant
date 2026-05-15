@@ -27,22 +27,33 @@ class OpenAIClient:
         if not self.client:
             return {
                 "status": "failure",
+
                 "error": (
                     "OPENAI_API_KEY not configured."
                 )
             }
 
-        response = (
-            self.client.chat.completions.create(
-                model=model,
+        try:
 
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
+            response = (
+                self.client.chat.completions.create(
+                    model=model,
+
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ]
+                )
             )
-        )
 
-        return response
+            return response
+
+        except Exception as error:
+
+            return {
+                "status": "failure",
+
+                "error": str(error)
+            }

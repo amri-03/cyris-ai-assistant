@@ -627,3 +627,14 @@ def runtime_loop():
     )
 
     return result
+
+
+@app.get("/ai-test")
+def ai_test():
+    response = (
+        ai_provider.generate_ai_response(
+            "Say hello from Cyris AI."
+        )
+    )
+
+    return response

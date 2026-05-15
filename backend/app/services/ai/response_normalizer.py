@@ -5,6 +5,12 @@ class ResponseNormalizer:
             response
     ):
 
+        if isinstance(
+                response,
+                dict
+        ):
+            return response
+
         try:
 
             content = (
