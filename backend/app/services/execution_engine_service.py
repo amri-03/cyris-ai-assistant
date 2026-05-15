@@ -285,7 +285,7 @@ class ExecutionEngineService:
                 "protective_runtime_execution"
             )
 
-        runtime_operational_state = {
+        operational_state = {
             "runtime_priority": (
                 runtime_priority
             ),
@@ -301,7 +301,7 @@ class ExecutionEngineService:
             )
         }
 
-        runtime_analytical_state = {
+        analytical_state = {
             "analysis_state": (
                 analysis_state
             ),
@@ -313,11 +313,11 @@ class ExecutionEngineService:
 
         return {
             "operational_state": (
-                runtime_operational_state
+                operational_state
             ),
 
             "analytical_state": (
-                runtime_analytical_state
+                analytical_state
             )
         }
 
