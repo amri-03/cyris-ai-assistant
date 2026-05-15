@@ -1,160 +1,235 @@
 # Cyris System Layers
 
-## Overview
+---
 
-Cyris AI Assistant is designed as an intelligence-first behavioral support system rather than a traditional productivity application.
+# Purpose
 
-The architecture focuses on:
+This document defines the major architectural layers inside Cyris AI Assistant.
 
-* persistent understanding
-* contextual awareness
-* adaptive prioritization
-* behavioral guidance
-* long-term continuity
+The architecture is designed to remain:
 
-The system is organized into multiple intelligence-oriented layers.
+- adaptive
+- layered
+- maintainable
+- orchestration-oriented
+- continuity-aware
+
+The system intentionally prioritizes:
+
+- intelligence coordination
+- behavioral continuity
+- conversational orchestration
+- adaptive runtime management
+
+instead of traditional productivity-system structures.
 
 ---
 
-# 1. Interaction Layer
+# Current High-Level Architecture
 
-Purpose:
+Cyris currently consists of the following major layers:
 
-* handle user interaction
-* support conversational communication
-* collect contextual updates
-* allow natural progress reporting
-
-This layer should eventually feel lightweight and assistant-oriented rather than dashboard-heavy.
-
-Initial interaction methods may include:
-
-* chat-style interface
-* lightweight desktop UI
-* conversational prompts
+1. Core Runtime Infrastructure
+2. Memory & Persistence Systems
+3. Behavioral Intelligence Systems
+4. Runtime Intelligence Systems
+5. Conversational Coordination Systems
+6. Validation & Observability Systems
+7. Future AI & Interaction Layers
 
 ---
 
-# 2. Context Layer
+# 1. Core Runtime Infrastructure
 
-Purpose:
+Handles:
 
-* maintain awareness of the user's current situation
-* understand temporary priorities
-* track schedule-related context
-* track current workload and availability
+- runtime execution cycles
+- orchestration scheduling
+- execution coordination
+- runtime continuity
+- orchestration flow management
 
-Examples of contextual understanding:
+Main systems:
 
-* college days
-* holidays
-* exams
-* free time
-* busy periods
-* low-energy periods
+- RuntimeLoopService
+- RuntimeSchedulerService
+- ExecutionEngineService
 
-The context layer helps Cyris decide what currently matters most.
+Responsibilities:
 
----
-
-# 3. Memory Layer
-
-Purpose:
-
-* maintain persistent long-term understanding
-* store evolving user information
-* track recurring interests and priorities
-* preserve behavioral continuity
-
-The memory layer should gradually understand:
-
-* what the user consistently returns to
-* what repeatedly gets abandoned
-* what long-term goals remain important
-* how motivation changes over time
+- manage runtime orchestration
+- coordinate execution flow
+- maintain persistent runtime cycles
+- stabilize orchestration processing
 
 ---
 
-# 4. Behavioral Intelligence Layer
+# 2. Memory & Persistence Systems
 
-Purpose:
+Handles:
 
-* detect behavioral patterns
-* monitor consistency
-* identify disengagement
-* identify recurring avoidance patterns
-* detect momentum shifts
+- persistence coordination
+- memory continuity
+- state restoration
+- orchestration persistence
 
-Examples:
+Main systems:
 
-* sudden inactivity
-* abandoning important focus areas
-* recurring motivation spikes followed by disappearance
-* productive time windows
+- MemoryManager
+- StorageService
+- RuntimePersistenceService
+- SessionPersistenceService
+- UnifiedRuntimePersistenceService
 
-This layer is central to Cyris.
+Responsibilities:
 
----
-
-# 5. Priority Engine
-
-Purpose:
-
-* dynamically rebalance focus areas
-* rank priorities based on real-world context
-* reduce cognitive overload
-* help users focus realistically
-
-The system should consider:
-
-* deadlines
-* opportunities
-* long-term goals
-* financial pressure
-* consistency history
-* available time
-* current workload
-
-The assistant should avoid overwhelming the user with too many competing priorities.
+- preserve runtime continuity
+- restore orchestration state
+- coordinate persistent storage
+- maintain longitudinal continuity
 
 ---
 
-# 6. Guidance Layer
+# 3. Behavioral Intelligence Systems
 
-Purpose:
+Handles:
 
-* provide calm and practical assistance
-* generate context-aware suggestions
-* surface relevant reminders
-* help users recover from inconsistency
+- behavioral orchestration
+- adaptive priority coordination
+- strategic planning
+- recovery coordination
+- focus-state management
 
-The assistant should intervene selectively rather than constantly.
+Main systems:
 
-Guidance should feel:
+- BehavioralOrchestratorService
+- PriorityEngine
+- StrategicPlanningService
+- RecoveryOrchestratorService
+- ForecastingService
 
-* practical
-* adaptive
-* minimally intrusive
-* context-aware
+Responsibilities:
+
+- coordinate adaptive behavior systems
+- maintain continuity-aware orchestration
+- regulate behavioral priorities
+- support adaptive guidance flow
 
 ---
 
-# Architecture Philosophy
+# 4. Runtime Intelligence Systems
 
-Cyris should remain:
+Handles:
 
-* intelligence-first
-* memory-oriented
-* behavior-aware
-* minimally overwhelming
-* adaptive rather than rigid
+- runtime health monitoring
+- runtime prediction
+- runtime governance
+- orchestration equilibrium
+- runtime adaptation
 
-The goal is not maximum productivity.
+Main systems:
 
-The goal is sustainable alignment between:
+- RuntimeHealthService
+- RuntimePredictionService
+- RuntimeGovernanceService
+- RuntimeEquilibriumService
+- RuntimeValidationService
 
-* priorities
-* ambitions
-* reality
-* available energy
-* long-term direction
+Responsibilities:
+
+- stabilize runtime execution
+- regulate orchestration behavior
+- detect runtime instability
+- coordinate adaptive runtime processing
+
+---
+
+# 5. Conversational Coordination Systems
+
+Handles:
+
+- conversational sessions
+- interaction-state coordination
+- conversational routing
+- runtime-to-conversation integration
+- conversation continuity
+
+Main systems:
+
+- ConversationCoordinator
+- SessionManager
+- InteractionState
+- ContextRouter
+- ConversationRuntimeBridge
+- ConversationValidation
+
+Responsibilities:
+
+- coordinate conversational flow
+- maintain session continuity
+- connect runtime orchestration with conversations
+- manage contextual interaction state
+- validate conversational integrity
+
+---
+
+# 6. Validation & Observability Systems
+
+Handles:
+
+- runtime validation
+- conversational validation
+- orchestration integrity reporting
+- runtime observability
+- conversational observability
+
+Responsibilities:
+
+- verify orchestration stability
+- detect incomplete orchestration flow
+- improve debugging visibility
+- support architecture reliability
+
+---
+
+# 7. Future AI & Interaction Layers
+
+Planned future systems:
+
+- AI reasoning integration
+- contextual prompt orchestration
+- behavioral understanding systems
+- frontend interaction architecture
+- adaptive intervention systems
+- longitudinal behavioral intelligence
+
+These systems are intentionally separated from the current orchestration foundation until the architecture is stable enough for higher-level
+intelligence integration.
+
+---
+
+# Current Architecture Direction
+
+The Cyris architecture is evolving toward:
+
+- adaptive conversational intelligence
+- continuity-aware orchestration
+- behavior-aware runtime coordination
+- layered intelligence systems
+- AI-assisted behavioral support
+
+The project intentionally avoids becoming:
+
+- a traditional task manager
+- a productivity dashboard
+- a CRUD-heavy workflow application
+- a notification-centric productivity system
+
+The long-term direction remains:
+
+- intelligence-first
+- orchestration-oriented
+- minimally intrusive
+- adaptive
+- continuity-aware
+- behavior-focused
