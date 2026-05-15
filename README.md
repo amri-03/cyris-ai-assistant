@@ -36,6 +36,11 @@ Cyris currently supports:
 - longitudinal behavioral memory coordination
 - continuity-aware behavioral interpretation
 - behavioral validation and observability
+- AI provider abstraction
+- contextual prompt orchestration
+- orchestration-safe AI response handling
+- prompt validation and observability
+- failure-safe AI coordination
 
-The project is currently evolving toward adaptive conversational intelligence, memory-aware orchestration, AI-assisted behavioral coordination, and
-long-term continuity-aware interaction systems.
+The project is currently evolving toward adaptive frontend interaction systems, memory-aware orchestration interfaces, contextual AI-assisted
+guidance, and long-term continuity-aware adaptive intelligence coordination.
