@@ -39,6 +39,9 @@ from app.models.runtime_execution_context import (
 from app.services.runtime_validation_service import (
     RuntimeValidationService
 )
+from app.services.conversation.conversation_coordinator import (
+    ConversationCoordinator
+)
 
 
 class ExecutionEngineService:
@@ -67,6 +70,9 @@ class ExecutionEngineService:
         )
         self.runtime_validation_service = (
             RuntimeValidationService()
+        )
+        self.conversation_coordinator = (
+            ConversationCoordinator()
         )
 
         self.runtime_cycles = 0
@@ -428,6 +434,29 @@ class ExecutionEngineService:
             )
         )
 
+        conversation_session = (
+            self.conversation_coordinator
+            .session_manager
+            .create_session()
+        )
+
+        conversation_runtime = (
+            self.conversation_coordinator
+            .coordinate_runtime_conversation(
+                runtime_state
+            )
+        )
+
+        conversation_summary = (
+            self.conversation_coordinator
+            .build_conversation_summary(
+                session=conversation_session,
+                route=(
+                    conversation_runtime["route"]
+                )
+            )
+        )
+
         return {
             "event": event,
             "pipeline": pipeline_result,
@@ -442,6 +471,13 @@ class ExecutionEngineService:
             ),
             "runtime_summary": (
                 runtime_summary
+            ),
+            "conversation_runtime": (
+                conversation_runtime
+            ),
+
+            "conversation_summary": (
+                conversation_summary
             ),
             "governance_history": (
                 self.runtime_governance_service

@@ -10,6 +10,9 @@ from app.services.conversation.context_router import (
 from app.services.conversation.conversation_runtime_bridge import (
     ConversationRuntimeBridge
 )
+from app.services.conversation.conversation_validation import (
+    ConversationValidation
+)
 
 
 class ConversationCoordinator:
@@ -29,6 +32,10 @@ class ConversationCoordinator:
 
         self.runtime_bridge = (
             ConversationRuntimeBridge()
+        )
+
+        self.validation = (
+            ConversationValidation()
         )
 
     def initialize_conversation(self):
@@ -101,4 +108,47 @@ class ConversationCoordinator:
                 self.interaction_state
                 .get_context()
             )
+        }
+
+    def build_conversation_summary(
+            self,
+            session,
+            route
+    ):
+        summary = {
+            "session_id": (
+                session.session_id
+            ),
+
+            "interaction_count": (
+                session.interaction_count
+            ),
+
+            "active_topic": (
+                self.interaction_state
+                .get_context()
+                .active_topic
+            ),
+
+            "conversation_mode": (
+                self.interaction_state
+                .get_context()
+                .conversation_mode
+            ),
+
+            "route": (
+                route["route"]
+            )
+        }
+
+        validation = (
+            self.validation
+            .validate_conversation_flow(
+                summary
+            )
+        )
+
+        return {
+            "summary": summary,
+            "validation": validation
         }
