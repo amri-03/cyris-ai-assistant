@@ -63,30 +63,28 @@ class ExecutionEngineService:
         self.runtime_cycles = 0
 
     def evaluate_runtime_analysis(
-            self
+            self,
+            adaptation_history
     ):
 
         strategy_evaluation = (
             self.runtime_strategy_service
             .evaluate_strategy_effectiveness(
-                self.runtime_adaptation_service
-                .get_adaptation_history()
+                adaptation_history
             )
         )
 
         runtime_prediction = (
             self.runtime_prediction_service
             .predict_runtime_risk(
-                self.runtime_adaptation_service
-                .get_adaptation_history()
+                adaptation_history
             )
         )
 
         runtime_reflection = (
             self.runtime_reflection_service
             .reflect_on_runtime_behavior(
-                self.runtime_adaptation_service
-                .get_adaptation_history()
+                adaptation_history
             )
         )
 
@@ -104,6 +102,7 @@ class ExecutionEngineService:
 
     def evaluate_runtime_coordination(
             self,
+            adaptation_history,
             runtime_prediction
     ):
 
@@ -121,8 +120,7 @@ class ExecutionEngineService:
         runtime_coordination = (
             self.runtime_coordination_service
             .evaluate_coordination_patterns(
-                self.runtime_adaptation_service
-                .get_adaptation_history()
+                adaptation_history
             )
         )
 
@@ -140,8 +138,7 @@ class ExecutionEngineService:
         runtime_equilibrium = (
             self.runtime_equilibrium_service
             .evaluate_runtime_equilibrium(
-                self.runtime_adaptation_service
-                .get_adaptation_history()
+                adaptation_history
             )
         )
 
@@ -220,12 +217,22 @@ class ExecutionEngineService:
             )
         )
 
+        adaptation_history = (
+            self.runtime_adaptation_service
+            .get_adaptation_history()
+        )
+
         runtime_analysis = (
-            self.evaluate_runtime_analysis()
+            self.evaluate_runtime_analysis(
+                adaptation_history
+            )
         )
 
         runtime_coordination = (
             self.evaluate_runtime_coordination(
+                adaptation_history=(
+                    adaptation_history
+                ),
                 runtime_prediction=(
                     runtime_analysis[
                         "runtime_prediction"
