@@ -12,7 +12,7 @@ class SessionManager:
 
     def create_session(self):
         session = ConversationSession(
-            session_id=str(uuid4())
+            session_id=uuid4().hex
         )
 
         self.active_sessions[

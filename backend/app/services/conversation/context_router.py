@@ -5,8 +5,7 @@ class ContextRouter:
             interaction_context
     ):
         if (
-                interaction_context
-                        .runtime_linked
+                interaction_context.runtime_linked
         ):
             return {
                 "route": (
