@@ -10,6 +10,8 @@ from app.services.state_history_service import StateHistoryService
 from app.services.runtime_trend_service import RuntimeTrendService
 from app.services.runtime_optimization_service import RuntimeOptimizationService
 from app.services.runtime_persistence_service import RuntimePersistenceService
+from app.services.session_persistence_service import SessionPersistenceService
+from app.services.unified_runtime_persistence_service import UnifiedRuntimePersistenceService
 
 
 class BehavioralOrchestratorService:
@@ -27,8 +29,22 @@ class BehavioralOrchestratorService:
         self.trend_service = RuntimeTrendService()
         self.optimization_service = RuntimeOptimizationService()
         self.persistence_service = RuntimePersistenceService()
-        stored_history = self.persistence_service.load_runtime_history()
-        self.history_service.restore_history(stored_history)
+        self.session_persistence = SessionPersistenceService()
+        self.unified_persistence = UnifiedRuntimePersistenceService()
+
+        restored_runtime = (
+            self.unified_persistence
+            .restore_runtime_state()
+        )
+
+        self.history_service.restore_history(
+            restored_runtime["history"]
+        )
+
+        if restored_runtime["session_state"]:
+            self.state_engine.restore_state(
+                restored_runtime["session_state"]
+            )
 
     def orchestrate_behavioral_state(self):
         self.state_engine.update_state(
@@ -60,8 +76,11 @@ class BehavioralOrchestratorService:
             overload_detected=current_state.overload_detected
         )
 
-        self.persistence_service.save_runtime_history(
-            self.history_service.get_history()
+        self.unified_persistence.persist_runtime_state(
+            runtime_history=(
+                self.history_service.get_history()
+            ),
+            system_state=current_state
         )
 
         trend_analysis = (

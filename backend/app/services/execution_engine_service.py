@@ -1,20 +1,244 @@
 from app.services.event_service import EventService
 from app.services.event_pipeline_service import EventPipelineService
-from app.services.behavioral_orchestrator_service import BehavioralOrchestratorService
+from app.services.behavioral_orchestrator_service import (
+    BehavioralOrchestratorService
+)
+from app.services.runtime_health_service import RuntimeHealthService
+from app.services.runtime_throttle_service import RuntimeThrottleService
+from app.services.runtime_priority_service import RuntimePriorityService
+from app.services.runtime_adaptation_service import (
+    RuntimeAdaptationService
+)
+from app.services.runtime_strategy_service import (
+    RuntimeStrategyService
+)
+from app.services.runtime_prediction_service import (
+    RuntimePredictionService
+)
+from app.services.runtime_response_service import (
+    RuntimeResponseService
+)
+from app.services.runtime_reflection_service import (
+    RuntimeReflectionService
+)
+from app.services.runtime_coordination_service import (
+    RuntimeCoordinationService
+)
+from app.services.runtime_decision_service import (
+    RuntimeDecisionService
+)
+from app.services.runtime_equilibrium_service import (
+    RuntimeEquilibriumService
+)
+from app.services.runtime_governance_service import (
+    RuntimeGovernanceService
+)
+from app.services.runtime_governance_memory_service import (
+    RuntimeGovernanceMemoryService
+)
 
 
 class ExecutionEngineService:
 
     def __init__(self):
         self.event_service = EventService()
-
-        self.pipeline_service = (
-            EventPipelineService()
+        self.pipeline_service = EventPipelineService()
+        self.orchestrator_service = BehavioralOrchestratorService()
+        self.runtime_health_service = RuntimeHealthService()
+        self.runtime_throttle_service = RuntimeThrottleService()
+        self.runtime_priority_service = RuntimePriorityService()
+        self.runtime_adaptation_service = RuntimeAdaptationService()
+        self.runtime_strategy_service = RuntimeStrategyService()
+        self.runtime_prediction_service = RuntimePredictionService()
+        self.runtime_response_service = RuntimeResponseService()
+        self.runtime_reflection_service = RuntimeReflectionService()
+        self.runtime_coordination_service = RuntimeCoordinationService()
+        self.runtime_decision_service = (
+            RuntimeDecisionService()
+        )
+        self.runtime_equilibrium_service = (
+            RuntimeEquilibriumService()
+        )
+        self.runtime_governance_service = (
+            RuntimeGovernanceService()
+        )
+        self.runtime_governance_memory = (
+            RuntimeGovernanceMemoryService()
         )
 
-        self.orchestrator_service = (
-            BehavioralOrchestratorService()
+        self.runtime_cycles = 0
+
+    def evaluate_runtime_management(
+            self,
+            orchestration,
+            runtime_health,
+            throttle
+    ):
+
+        runtime_priority = (
+            self.runtime_priority_service
+            .evaluate_runtime_priority(
+                runtime_health=(
+                    runtime_health[
+                        "runtime_health"
+                    ]
+                ),
+                escalation_level=(
+                    orchestration[
+                        "escalation"
+                    ]["escalation_level"]
+                )
+            )
         )
+
+        self.runtime_adaptation_service.record_adaptation(
+            runtime_health=(
+                runtime_health[
+                    "runtime_health"
+                ]
+            ),
+            throttle_mode=(
+                throttle[
+                    "throttle_mode"
+                ]
+            ),
+            runtime_priority=(
+                runtime_priority[
+                    "runtime_priority"
+                ]
+            )
+        )
+
+        strategy_evaluation = (
+            self.runtime_strategy_service
+            .evaluate_strategy_effectiveness(
+                self.runtime_adaptation_service
+                .get_adaptation_history()
+            )
+        )
+
+        runtime_prediction = (
+            self.runtime_prediction_service
+            .predict_runtime_risk(
+                self.runtime_adaptation_service
+                .get_adaptation_history()
+            )
+        )
+
+        runtime_response = (
+            self.runtime_response_service
+            .evolve_runtime_response(
+                runtime_prediction=(
+                    runtime_prediction[
+                        "runtime_prediction"
+                    ]
+                )
+            )
+        )
+
+        runtime_reflection = (
+            self.runtime_reflection_service
+            .reflect_on_runtime_behavior(
+                self.runtime_adaptation_service
+                .get_adaptation_history()
+            )
+        )
+
+        runtime_coordination = (
+            self.runtime_coordination_service
+            .evaluate_coordination_patterns(
+                self.runtime_adaptation_service
+                .get_adaptation_history()
+            )
+        )
+
+        runtime_decision = (
+            self.runtime_decision_service
+            .evolve_runtime_decision(
+                dominant_runtime_pattern=(
+                    runtime_coordination[
+                        "dominant_runtime_pattern"
+                    ]
+                )
+            )
+        )
+
+        runtime_equilibrium = (
+            self.runtime_equilibrium_service
+            .evaluate_runtime_equilibrium(
+                self.runtime_adaptation_service
+                .get_adaptation_history()
+            )
+        )
+
+        runtime_governance = (
+            self.runtime_governance_service
+            .evaluate_runtime_governance(
+                equilibrium_state=(
+                    runtime_equilibrium[
+                        "equilibrium_state"
+                    ]
+                ),
+                runtime_prediction=(
+                    runtime_prediction[
+                        "runtime_prediction"
+                    ]
+                )
+            )
+        )
+
+        execution_mode = (
+            "normal_runtime_execution"
+        )
+
+        if (
+                runtime_governance[
+                    "governance_mode"
+                ]
+                == "runtime_rebalancing"
+        ):
+            execution_mode = (
+                "reduced_runtime_execution"
+            )
+
+        if (
+                runtime_governance[
+                    "governance_mode"
+                ]
+                == "protective_runtime_control"
+        ):
+            execution_mode = (
+                "protective_runtime_execution"
+            )
+
+        return {
+            "runtime_priority": runtime_priority,
+            "strategy_evaluation": (
+                strategy_evaluation
+            ),
+            "runtime_prediction": (
+                runtime_prediction
+            ),
+            "runtime_response": (
+                runtime_response
+            ),
+            "runtime_reflection": (
+                runtime_reflection
+            ),
+            "runtime_coordination": (
+                runtime_coordination
+            ),
+            "runtime_decision": (
+                runtime_decision
+            ),
+            "runtime_equilibrium": (
+                runtime_equilibrium
+            ),
+            "runtime_governance": (
+                runtime_governance
+            ),
+            "execution_mode": execution_mode
+        }
 
     def execute_runtime_cycle(self):
         event = self.event_service.create_event(
@@ -24,6 +248,8 @@ class ExecutionEngineService:
             ),
             severity="moderate"
         )
+
+        self.runtime_cycles += 1
 
         pipeline_result = (
             self.pipeline_service.process_event(
@@ -36,8 +262,58 @@ class ExecutionEngineService:
             .orchestrate_behavioral_state()
         )
 
+        runtime_health = (
+            self.runtime_health_service
+            .evaluate_runtime_health(
+                total_runtime_cycles=self.runtime_cycles,
+                overload_detected=True
+            )
+        )
+
+        throttle = (
+            self.runtime_throttle_service
+            .evaluate_throttle(
+                runtime_health=runtime_health["runtime_health"]
+            )
+        )
+
+        runtime_management = (
+            self.evaluate_runtime_management(
+                orchestration=orchestration,
+                runtime_health=runtime_health,
+                throttle=throttle
+            )
+        )
+
+        self.runtime_governance_memory.record_governance(
+            governance_mode=(
+                runtime_management[
+                    "runtime_governance"
+                ]["governance_mode"]
+            ),
+            equilibrium_state=(
+                runtime_management[
+                    "runtime_equilibrium"
+                ]["equilibrium_state"]
+            ),
+            runtime_prediction=(
+                runtime_management[
+                    "runtime_prediction"
+                ]["runtime_prediction"]
+            )
+        )
+
         return {
             "event": event,
             "pipeline": pipeline_result,
-            "orchestration": orchestration
+            "orchestration": orchestration,
+            "runtime_health": runtime_health,
+            "runtime_throttle": throttle,
+            "runtime_management": (
+                runtime_management
+            ),
+            "governance_history": (
+                self.runtime_governance_memory
+                .get_governance_history()
+            ),
         }

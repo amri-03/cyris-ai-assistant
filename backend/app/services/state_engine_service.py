@@ -41,3 +41,11 @@ class StateEngineService:
 
     def get_state(self):
         return self.system_state
+
+    def restore_state(
+            self,
+            stored_state: dict
+    ):
+        self.system_state = (
+            SystemState(**stored_state)
+        )
