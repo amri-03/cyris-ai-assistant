@@ -42,6 +42,11 @@ from app.services.runtime_loop_service import RuntimeLoopService
 from app.memory.memory_manager import MemoryManager
 from app.context.context_manager import ContextManager
 
+from app.services.ai.ai_provider_manager import (
+    AIProviderManager
+)
+
+
 app = FastAPI()
 
 assistant = AssistantService()
@@ -77,6 +82,9 @@ state_engine_service = StateEngineService()
 execution_engine_service = ExecutionEngineService()
 runtime_scheduler_service = RuntimeSchedulerService()
 runtime_loop_service = RuntimeLoopService()
+
+
+ai_provider = AIProviderManager()
 
 
 @app.get("/")
