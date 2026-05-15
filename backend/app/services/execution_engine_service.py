@@ -36,6 +36,9 @@ from app.services.runtime_governance_service import (
 from app.models.runtime_execution_context import (
     RuntimeExecutionContext
 )
+from app.services.runtime_validation_service import (
+    RuntimeValidationService
+)
 
 
 class ExecutionEngineService:
@@ -61,6 +64,9 @@ class ExecutionEngineService:
         )
         self.runtime_governance_service = (
             RuntimeGovernanceService()
+        )
+        self.runtime_validation_service = (
+            RuntimeValidationService()
         )
 
         self.runtime_cycles = 0
@@ -409,6 +415,13 @@ class ExecutionEngineService:
             )
         )
 
+        runtime_validation = (
+            self.runtime_validation_service
+            .validate_runtime_state(
+                runtime_state
+            )
+        )
+
         runtime_summary = (
             self.build_runtime_summary(
                 runtime_state
@@ -423,6 +436,9 @@ class ExecutionEngineService:
             "runtime_throttle": throttle,
             "runtime_state": (
                 runtime_state
+            ),
+            "runtime_validation": (
+                runtime_validation
             ),
             "runtime_summary": (
                 runtime_summary
