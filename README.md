@@ -25,5 +25,11 @@ Cyris currently supports:
 - orchestration continuity
 - layered runtime-state coordination
 - runtime validation and observability
+- conversational session management
+- interaction-state coordination
+- runtime-to-conversation orchestration
+- conversational context routing
+- conversation-aware runtime integration
 
-The project is currently transitioning toward higher-level adaptive intelligence and long-term orchestration evolution.
+The project is currently evolving toward adaptive conversational intelligence, behavioral understanding, AI-assisted orchestration, and long-term
+continuity-aware interaction systems.
