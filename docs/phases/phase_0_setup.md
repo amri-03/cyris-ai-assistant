@@ -2,7 +2,7 @@
 
 ## Objective
 
-Establish a clean, organized, and scalable foundation for the Axis AI Assistant project before implementation begins.
+Establish a clean, organized, and scalable foundation for the Cyris AI Assistant project before implementation begins.
 
 ## Completed Setup
 
@@ -40,7 +40,7 @@ Establish a clean, organized, and scalable foundation for the Axis AI Assistant 
 
 ## Important Decisions
 
-* Axis will follow an intelligence-first architecture
+* Cyris will follow an intelligence-first architecture
 * The system should avoid becoming a traditional productivity app
 * Development will remain highly structured and phase-based
 * Documentation continuity is considered critical for long-term consistency

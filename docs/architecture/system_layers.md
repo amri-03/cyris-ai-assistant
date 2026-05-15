@@ -1,8 +1,8 @@
-# Axis System Layers
+# Cyris System Layers
 
 ## Overview
 
-Axis AI Assistant is designed as an intelligence-first behavioral support system rather than a traditional productivity application.
+Cyris AI Assistant is designed as an intelligence-first behavioral support system rather than a traditional productivity application.
 
 The architecture focuses on:
 
@@ -53,7 +53,7 @@ Examples of contextual understanding:
 * busy periods
 * low-energy periods
 
-The context layer helps Axis decide what currently matters most.
+The context layer helps Cyris decide what currently matters most.
 
 ---
 
@@ -92,7 +92,7 @@ Examples:
 * recurring motivation spikes followed by disappearance
 * productive time windows
 
-This layer is central to Axis.
+This layer is central to Cyris.
 
 ---
 
@@ -141,7 +141,7 @@ Guidance should feel:
 
 # Architecture Philosophy
 
-Axis should remain:
+Cyris should remain:
 
 * intelligence-first
 * memory-oriented

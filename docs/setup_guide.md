@@ -1,8 +1,8 @@
-# Axis AI Assistant — Setup Guide
+# Cyris AI Assistant — Setup Guide
 
 ## Project Root
 
-axis-ai-assistant
+cyris-ai-assistant
 
 ## Backend Environment Setup
 
@@ -49,5 +49,5 @@ app = FastAPI()
 
 @app.get("/")
 def root():
-    return {"message": "Axis AI Assistant backend is running"}
+    return {"message": "Cyris AI Assistant backend is running"}
 ```

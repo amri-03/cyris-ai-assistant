@@ -1,8 +1,8 @@
-# Axis AI Assistant
+# Cyris AI Assistant
 
 ## Vision
 
-Axis AI Assistant is an AI-assisted personal direction and behavioral support system designed to help users stay aligned with what matters most in
+Cyris AI Assistant is an AI-assisted personal direction and behavioral support system designed to help users stay aligned with what matters most in
 their lives.
 
 The system focuses on:
@@ -14,7 +14,7 @@ The system focuses on:
 * long-term memory
 * reducing cognitive overload
 
-Axis is NOT intended to become:
+Cyris is NOT intended to become:
 
 * a traditional productivity app
 * a task manager
@@ -40,7 +40,7 @@ The assistant should feel:
 * intelligence-first
 * behavior-aware
 
-Axis should help users:
+Cyris should help users:
 
 * prioritize multiple interests realistically
 * reduce direction drift
@@ -48,6 +48,6 @@ Axis should help users:
 * stay aligned with long-term goals
 * reduce mental overload from self-management
 
-The philosophy behind Axis is:
+The philosophy behind Cyris is:
 
 "Do not force humans to adapt to rigid productivity systems. Build a system that adapts intelligently to the human."

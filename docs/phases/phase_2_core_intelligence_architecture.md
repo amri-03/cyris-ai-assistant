@@ -2,7 +2,7 @@
 
 ## Objective
 
-Define the foundational intelligence architecture of Axis AI Assistant before deeper implementation begins.
+Define the foundational intelligence architecture of Cyris AI Assistant before deeper implementation begins.
 
 This phase focused on:
 
@@ -56,7 +56,7 @@ This phase focused on:
 
 ## Important Decisions
 
-* Axis should remain intelligence-first rather than UI-first
+* Cyris should remain intelligence-first rather than UI-first
 * Behavioral orchestration is more important than automation complexity
 * Guidance should remain calm, selective, and minimally intrusive
 * The assistant should adapt to human behavior rather than forcing rigid systems

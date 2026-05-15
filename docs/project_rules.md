@@ -1,8 +1,8 @@
-# Axis Project Rules
+# Cyris Project Rules
 
 ## Development Philosophy
 
-Axis should be developed:
+Cyris should be developed:
 
 * sequentially
 * in small achievable phases

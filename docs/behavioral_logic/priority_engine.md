@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Priority Engine is responsible for helping Axis determine what should matter most at a given moment.
+The Priority Engine is responsible for helping Cyris determine what should matter most at a given moment.
 
 The system should help users manage multiple ambitions realistically instead of forcing them into rigid productivity systems.
 
@@ -22,7 +22,7 @@ The priority system should:
 
 # Priority Factors
 
-Axis may eventually consider:
+Cyris may eventually consider:
 
 * deadlines
 * career opportunities
@@ -81,4 +81,4 @@ The priority engine should avoid:
 * excessive intervention
 * rigid scheduling behavior
 
-Axis should remain adaptive and supportive rather than controlling.
+Cyris should remain adaptive and supportive rather than controlling.

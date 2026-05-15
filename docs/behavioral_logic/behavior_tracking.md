@@ -2,7 +2,7 @@
 
 ## Overview
 
-Axis AI Assistant should gradually understand how the user behaves over time instead of relying only on manually entered tasks or schedules.
+Cyris AI Assistant should gradually understand how the user behaves over time instead of relying only on manually entered tasks or schedules.
 
 The goal is to identify patterns that affect:
 
@@ -61,7 +61,7 @@ Track:
 
 # Behavioral Goals
 
-The behavioral system should help Axis:
+The behavioral system should help Cyris:
 
 * detect disengagement early
 * reduce direction drift
@@ -73,7 +73,7 @@ The behavioral system should help Axis:
 
 # Intervention Philosophy
 
-Axis should avoid:
+Cyris should avoid:
 
 * excessive notifications
 * aggressive productivity pressure

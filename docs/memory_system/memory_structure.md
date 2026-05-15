@@ -1,8 +1,8 @@
-# Axis Memory Structure
+# Cyris Memory Structure
 
 ## Overview
 
-The memory system is one of the core foundations of Axis AI Assistant.
+The memory system is one of the core foundations of Cyris AI Assistant.
 
 The purpose of memory is not simply storing information, but gradually building a persistent understanding of the user's:
 
@@ -14,7 +14,7 @@ The purpose of memory is not simply storing information, but gradually building 
 * consistency cycles
 * long-term goals
 
-Axis should behave as a system that remembers and adapts over time.
+Cyris should behave as a system that remembers and adapts over time.
 
 ---
 
@@ -74,7 +74,7 @@ Stores:
 * momentum cycles
 * focus windows
 
-This memory helps Axis understand behavioral trends.
+This memory helps Cyris understand behavioral trends.
 
 Examples:
 
@@ -108,4 +108,4 @@ The memory system should avoid:
 * storing meaningless information
 * overwhelming the user
 
-Axis should prioritize useful understanding rather than maximum data collection.
+Cyris should prioritize useful understanding rather than maximum data collection.
