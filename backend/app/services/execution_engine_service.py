@@ -290,6 +290,47 @@ class ExecutionEngineService:
             "execution_mode": execution_mode
         }
 
+    def build_runtime_summary(
+            self,
+            runtime_management
+    ):
+
+        return {
+            "runtime_priority": (
+                runtime_management[
+                    "runtime_priority"
+                ][
+                    "runtime_priority"
+                ]
+            ),
+
+            "runtime_prediction": (
+                runtime_management[
+                    "runtime_analysis"
+                ][
+                    "runtime_prediction"
+                ][
+                    "runtime_prediction"
+                ]
+            ),
+
+            "runtime_governance": (
+                runtime_management[
+                    "runtime_coordination"
+                ][
+                    "runtime_governance"
+                ][
+                    "governance_mode"
+                ]
+            ),
+
+            "execution_mode": (
+                runtime_management[
+                    "execution_mode"
+                ]
+            )
+        }
+
     def execute_runtime_cycle(self):
         event = self.event_service.create_event(
             event_type="continuity_decline",
@@ -335,6 +376,12 @@ class ExecutionEngineService:
             )
         )
 
+        runtime_summary = (
+            self.build_runtime_summary(
+                runtime_management
+            )
+        )
+
         return {
             "event": event,
             "pipeline": pipeline_result,
@@ -343,6 +390,9 @@ class ExecutionEngineService:
             "runtime_throttle": throttle,
             "runtime_management": (
                 runtime_management
+            ),
+            "runtime_summary": (
+                runtime_summary
             ),
             "governance_history": (
                 self.runtime_governance_service
