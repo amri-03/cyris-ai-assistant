@@ -22,11 +22,26 @@ class RuntimeValidationService:
         if missing_sections:
             return {
                 "valid": False,
+
+                "runtime_integrity": (
+                    "runtime_state_incomplete"
+                ),
+
                 "missing_sections": (
                     missing_sections
+                ),
+
+                "guidance": (
+                    "Runtime orchestration structure is incomplete."
                 )
             }
 
         return {
-            "valid": True
+            "valid": True,
+            "runtime_integrity": (
+                "runtime_state_stable"
+            ),
+            "guidance": (
+                "Runtime orchestration structure validated successfully."
+            )
         }
