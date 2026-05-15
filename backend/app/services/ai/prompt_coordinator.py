@@ -6,6 +6,10 @@ from app.services.ai.prompt_builder import (
     PromptBuilder
 )
 
+from app.services.ai.prompt_validation import (
+    PromptValidation
+)
+
 
 class PromptCoordinator:
 
@@ -16,6 +20,10 @@ class PromptCoordinator:
 
         self.prompt_builder = (
             PromptBuilder()
+        )
+
+        self.validation = (
+            PromptValidation()
         )
 
     def coordinate_prompt(
@@ -56,7 +64,45 @@ class PromptCoordinator:
             )
         )
 
+        validation = (
+            self.validation
+            .validate_prompt(
+                prompt
+            )
+        )
+
         return {
             "context": context,
-            "prompt": prompt
+
+            "prompt": prompt,
+
+            "validation": validation
+        }
+
+    def build_prompt_summary(
+            self,
+            coordinated_prompt
+    ):
+        return {
+            "prompt_integrity": (
+                coordinated_prompt[
+                    "validation"
+                ][
+                    "prompt_integrity"
+                ]
+            ),
+
+            "context_sections": (
+                list(
+                    coordinated_prompt[
+                        "context"
+                    ].keys()
+                )
+            ),
+
+            "prompt_preview": (
+                coordinated_prompt[
+                    "prompt"
+                ][:120]
+            )
         }
