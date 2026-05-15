@@ -279,15 +279,40 @@ class ExecutionEngineService:
                 "protective_runtime_execution"
             )
 
-        return {
-            "runtime_priority": runtime_priority,
+        runtime_operational_state = {
+            "runtime_priority": (
+                runtime_priority
+            ),
+
+            "execution_mode": (
+                execution_mode
+            ),
+
+            "runtime_governance": (
+                runtime_coordination[
+                    "runtime_governance"
+                ]
+            )
+        }
+
+        runtime_analytical_state = {
             "runtime_analysis": (
                 runtime_analysis
             ),
+
             "runtime_coordination": (
                 runtime_coordination
+            )
+        }
+
+        return {
+            "operational_state": (
+                runtime_operational_state
             ),
-            "execution_mode": execution_mode
+
+            "analytical_state": (
+                runtime_analytical_state
+            )
         }
 
     def build_runtime_summary(
@@ -298,6 +323,8 @@ class ExecutionEngineService:
         return {
             "runtime_priority": (
                 runtime_management[
+                    "operational_state"
+                ][
                     "runtime_priority"
                 ][
                     "runtime_priority"
@@ -306,6 +333,8 @@ class ExecutionEngineService:
 
             "runtime_prediction": (
                 runtime_management[
+                    "analytical_state"
+                ][
                     "runtime_analysis"
                 ][
                     "runtime_prediction"
@@ -316,6 +345,8 @@ class ExecutionEngineService:
 
             "runtime_governance": (
                 runtime_management[
+                    "analytical_state"
+                ][
                     "runtime_coordination"
                 ][
                     "runtime_governance"
@@ -326,6 +357,8 @@ class ExecutionEngineService:
 
             "execution_mode": (
                 runtime_management[
+                    "operational_state"
+                ][
                     "execution_mode"
                 ]
             )
