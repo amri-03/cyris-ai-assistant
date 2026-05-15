@@ -9,6 +9,7 @@ from app.services.state_transition_service import StateTransitionService
 from app.services.state_history_service import StateHistoryService
 from app.services.runtime_trend_service import RuntimeTrendService
 from app.services.runtime_optimization_service import RuntimeOptimizationService
+from app.services.runtime_persistence_service import RuntimePersistenceService
 
 
 class BehavioralOrchestratorService:
@@ -25,6 +26,9 @@ class BehavioralOrchestratorService:
         self.history_service = StateHistoryService()
         self.trend_service = RuntimeTrendService()
         self.optimization_service = RuntimeOptimizationService()
+        self.persistence_service = RuntimePersistenceService()
+        stored_history = self.persistence_service.load_runtime_history()
+        self.history_service.restore_history(stored_history)
 
     def orchestrate_behavioral_state(self):
         self.state_engine.update_state(
@@ -54,6 +58,10 @@ class BehavioralOrchestratorService:
             focus_state=current_state.current_focus_state,
             continuity_score=current_state.continuity_score,
             overload_detected=current_state.overload_detected
+        )
+
+        self.persistence_service.save_runtime_history(
+            self.history_service.get_history()
         )
 
         trend_analysis = (

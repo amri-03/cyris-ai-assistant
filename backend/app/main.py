@@ -36,6 +36,8 @@ from app.services.event_service import EventService
 from app.services.event_pipeline_service import EventPipelineService
 from app.services.state_engine_service import StateEngineService
 from app.services.execution_engine_service import ExecutionEngineService
+from app.services.runtime_scheduler_service import RuntimeSchedulerService
+from app.services.runtime_loop_service import RuntimeLoopService
 
 from app.memory.memory_manager import MemoryManager
 from app.context.context_manager import ContextManager
@@ -73,11 +75,13 @@ event_service = EventService()
 event_pipeline_service = EventPipelineService()
 state_engine_service = StateEngineService()
 execution_engine_service = ExecutionEngineService()
+runtime_scheduler_service = RuntimeSchedulerService()
+runtime_loop_service = RuntimeLoopService()
 
 
 @app.get("/")
 def root():
-    return {"message": "Axis AI Assistant backend is running"}
+    return {"message": "Cyris AI Assistant backend is running"}
 
 
 @app.get("/guidance")
@@ -591,6 +595,27 @@ def execution_cycle():
     result = (
         execution_engine_service
         .execute_runtime_cycle()
+    )
+
+    return result
+
+
+@app.get("/runtime-scheduler")
+def runtime_scheduler():
+    result = (
+        runtime_scheduler_service
+        .schedule_runtime_cycle()
+    )
+
+    return result
+
+
+@app.get("/runtime-loop")
+def runtime_loop():
+    result = (
+        runtime_loop_service.execute_loop(
+            cycles=3
+        )
     )
 
     return result

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 
 from app.models.behavior_event import BehaviorEvent
 
@@ -14,6 +14,6 @@ class EventService:
         return BehaviorEvent(
             event_type=event_type,
             description=description,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             severity=severity
         )
