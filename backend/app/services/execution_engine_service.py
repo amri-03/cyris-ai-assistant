@@ -234,17 +234,17 @@ class ExecutionEngineService:
             )
         )
 
-        runtime_analysis = (
+        analysis_state = (
             self.evaluate_runtime_analysis(
                 runtime_context
             )
         )
 
-        runtime_coordination = (
+        coordination_state = (
             self.evaluate_runtime_coordination(
                 runtime_context=runtime_context,
                 runtime_prediction=(
-                    runtime_analysis[
+                    analysis_state[
                         "runtime_prediction"
                     ]
                 )
@@ -256,7 +256,7 @@ class ExecutionEngineService:
         )
 
         if (
-                runtime_coordination[
+                coordination_state[
                     "runtime_governance"
                 ][
                     "governance_mode"
@@ -268,7 +268,7 @@ class ExecutionEngineService:
             )
 
         if (
-                runtime_coordination[
+                coordination_state[
                     "runtime_governance"
                 ][
                     "governance_mode"
@@ -289,19 +289,19 @@ class ExecutionEngineService:
             ),
 
             "runtime_governance": (
-                runtime_coordination[
+                coordination_state[
                     "runtime_governance"
                 ]
             )
         }
 
         runtime_analytical_state = {
-            "runtime_analysis": (
-                runtime_analysis
+            "analysis_state": (
+                analysis_state
             ),
 
-            "runtime_coordination": (
-                runtime_coordination
+            "coordination_state": (
+                coordination_state
             )
         }
 
@@ -317,12 +317,12 @@ class ExecutionEngineService:
 
     def build_runtime_summary(
             self,
-            runtime_management
+            runtime_state
     ):
 
         return {
             "runtime_priority": (
-                runtime_management[
+                runtime_state[
                     "operational_state"
                 ][
                     "runtime_priority"
@@ -332,10 +332,10 @@ class ExecutionEngineService:
             ),
 
             "runtime_prediction": (
-                runtime_management[
+                runtime_state[
                     "analytical_state"
                 ][
-                    "runtime_analysis"
+                    "analysis_state"
                 ][
                     "runtime_prediction"
                 ][
@@ -344,10 +344,10 @@ class ExecutionEngineService:
             ),
 
             "runtime_governance": (
-                runtime_management[
+                runtime_state[
                     "analytical_state"
                 ][
-                    "runtime_coordination"
+                    "coordination_state"
                 ][
                     "runtime_governance"
                 ][
@@ -356,7 +356,7 @@ class ExecutionEngineService:
             ),
 
             "execution_mode": (
-                runtime_management[
+                runtime_state[
                     "operational_state"
                 ][
                     "execution_mode"
@@ -401,7 +401,7 @@ class ExecutionEngineService:
             )
         )
 
-        runtime_management = (
+        runtime_state = (
             self.evaluate_runtime_management(
                 orchestration=orchestration,
                 runtime_health=runtime_health,
@@ -411,7 +411,7 @@ class ExecutionEngineService:
 
         runtime_summary = (
             self.build_runtime_summary(
-                runtime_management
+                runtime_state
             )
         )
 
@@ -421,8 +421,8 @@ class ExecutionEngineService:
             "orchestration": orchestration,
             "runtime_health": runtime_health,
             "runtime_throttle": throttle,
-            "runtime_management": (
-                runtime_management
+            "runtime_state": (
+                runtime_state
             ),
             "runtime_summary": (
                 runtime_summary
