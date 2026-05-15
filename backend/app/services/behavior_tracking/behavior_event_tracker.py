@@ -2,11 +2,18 @@ from app.models.behavior_tracking_models import (
     BehaviorSignal
 )
 
+from app.services.behavior_tracking.behavior_memory_manager import (
+    BehaviorMemoryManager
+)
+
 
 class BehaviorEventTracker:
 
     def __init__(self):
         self.behavior_signals = []
+        self.memory_manager = (
+            BehaviorMemoryManager()
+        )
 
     def record_signal(
             self,
@@ -21,6 +28,10 @@ class BehaviorEventTracker:
         )
 
         self.behavior_signals.append(
+            signal
+        )
+
+        self.memory_manager.store_behavior_signal(
             signal
         )
 
