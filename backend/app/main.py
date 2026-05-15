@@ -637,4 +637,12 @@ def ai_test():
         )
     )
 
-    return response
+    return {
+        "response": (
+            response["response"]
+        ),
+
+        "summary": (
+            response["summary"]
+        )
+    }
