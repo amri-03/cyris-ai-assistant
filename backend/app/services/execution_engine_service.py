@@ -33,6 +33,9 @@ from app.services.runtime_equilibrium_service import (
 from app.services.runtime_governance_service import (
     RuntimeGovernanceService
 )
+from app.models.runtime_execution_context import (
+    RuntimeExecutionContext
+)
 
 
 class ExecutionEngineService:
@@ -64,27 +67,27 @@ class ExecutionEngineService:
 
     def evaluate_runtime_analysis(
             self,
-            adaptation_history
+            runtime_context
     ):
 
         strategy_evaluation = (
             self.runtime_strategy_service
             .evaluate_strategy_effectiveness(
-                adaptation_history
+                runtime_context.adaptation_history
             )
         )
 
         runtime_prediction = (
             self.runtime_prediction_service
             .predict_runtime_risk(
-                adaptation_history
+                runtime_context.adaptation_history
             )
         )
 
         runtime_reflection = (
             self.runtime_reflection_service
             .reflect_on_runtime_behavior(
-                adaptation_history
+                runtime_context.adaptation_history
             )
         )
 
@@ -102,7 +105,7 @@ class ExecutionEngineService:
 
     def evaluate_runtime_coordination(
             self,
-            adaptation_history,
+            runtime_context,
             runtime_prediction
     ):
 
@@ -120,7 +123,7 @@ class ExecutionEngineService:
         runtime_coordination = (
             self.runtime_coordination_service
             .evaluate_coordination_patterns(
-                adaptation_history
+                runtime_context.adaptation_history
             )
         )
 
@@ -138,7 +141,7 @@ class ExecutionEngineService:
         runtime_equilibrium = (
             self.runtime_equilibrium_service
             .evaluate_runtime_equilibrium(
-                adaptation_history
+                runtime_context.adaptation_history
             )
         )
 
@@ -222,17 +225,24 @@ class ExecutionEngineService:
             .get_adaptation_history()
         )
 
+        runtime_context = (
+            RuntimeExecutionContext(
+                orchestration=orchestration,
+                runtime_health=runtime_health,
+                throttle=throttle,
+                adaptation_history=adaptation_history
+            )
+        )
+
         runtime_analysis = (
             self.evaluate_runtime_analysis(
-                adaptation_history
+                runtime_context
             )
         )
 
         runtime_coordination = (
             self.evaluate_runtime_coordination(
-                adaptation_history=(
-                    adaptation_history
-                ),
+                runtime_context=runtime_context,
                 runtime_prediction=(
                     runtime_analysis[
                         "runtime_prediction"
