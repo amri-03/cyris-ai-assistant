@@ -6,6 +6,10 @@ from app.services.ai.response_normalizer import (
     ResponseNormalizer
 )
 
+from app.services.ai.response_coordinator import (
+    ResponseCoordinator
+)
+
 
 class AIProviderManager:
 
@@ -16,6 +20,10 @@ class AIProviderManager:
 
         self.normalizer = (
             ResponseNormalizer()
+        )
+
+        self.response_coordinator = (
+            ResponseCoordinator()
         )
 
     def generate_ai_response(
@@ -36,4 +44,11 @@ class AIProviderManager:
             )
         )
 
-        return normalized_response
+        coordinated_response = (
+            self.response_coordinator
+            .coordinate_response(
+                normalized_response
+            )
+        )
+
+        return coordinated_response
