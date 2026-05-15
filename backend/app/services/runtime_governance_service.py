@@ -18,8 +18,10 @@ class RuntimeGovernanceService:
     ):
 
         if (
-                equilibrium_state == "overprotective_runtime_behavior"
+                equilibrium_state
+                == "overprotective_runtime_behavior"
         ):
+
             governance = {
                 "governance_mode": (
                     "runtime_rebalancing"
@@ -29,27 +31,30 @@ class RuntimeGovernanceService:
                 )
             }
 
-        if (
+        elif (
                 runtime_prediction
                 == "high_runtime_instability_risk"
         ):
+
             governance = {
                 "governance_mode": (
-                    "runtime_rebalancing"
+                    "protective_runtime_control"
                 ),
                 "guidance": (
                     "Increase runtime stabilization governance."
                 )
             }
 
-        governance = {
-            "governance_mode": (
-                "runtime_rebalancing"
-            ),
-            "guidance": (
-                "Runtime orchestration governance remains stable."
-            )
-        }
+        else:
+
+            governance = {
+                "governance_mode": (
+                    "stable_runtime_governance"
+                ),
+                "guidance": (
+                    "Runtime orchestration governance remains stable."
+                )
+            }
 
         self.governance_memory.record_governance(
             governance_mode=(
