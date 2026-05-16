@@ -1,3 +1,7 @@
+import AdaptiveResponseCard
+    from "./AdaptiveResponseCard";
+
+
 export default function InteractionTimeline({
                                                 responses
                                             }) {
@@ -17,9 +21,10 @@ export default function InteractionTimeline({
                         index
                     ) => (
 
-                        <p key={index}>
-                            {response}
-                        </p>
+                        <AdaptiveResponseCard
+                            key={index}
+                            response={response}
+                        />
                     )
                 )
             }

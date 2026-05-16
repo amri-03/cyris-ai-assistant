@@ -44,6 +44,9 @@ import EnvironmentStatusCard
 import SystemHealthOverview
     from "../components/SystemHealthOverview";
 
+import InteractionHeader
+    from "../components/InteractionHeader";
+
 
 export default function Home() {
 
@@ -114,12 +117,23 @@ export default function Home() {
     const systemHealth =
         "adaptive_system_stable";
 
+    const interactionTitle =
+        "Cyris Adaptive Interaction";
+
+    const interactionSubtitle =
+        "Continuity-aware adaptive orchestration environment.";
+
     return (
         <div>
 
             <h1>
                 Cyris AI Assistant
             </h1>
+
+            <InteractionHeader
+                title={interactionTitle}
+                subtitle={interactionSubtitle}
+            />
 
             <SectionContainer
                 title="System Coordination"
