@@ -20,6 +20,12 @@ import SystemStatusBar
 import InteractionTimeline
     from "../components/InteractionTimeline";
 
+import ContinuityPanel
+    from "../components/ContinuityPanel";
+
+import AdaptiveContextCard
+    from "../components/AdaptiveContextCard";
+
 
 export default function Home() {
 
@@ -69,6 +75,12 @@ export default function Home() {
     const interactionStatus =
         "adaptive_interaction_active";
 
+    const continuityState =
+        "continuity_stable";
+
+    const adaptiveContext =
+        "Adaptive orchestration context active.";
+
     return (
         <div>
 
@@ -80,6 +92,18 @@ export default function Home() {
                 runtimeStatus={runtimeStatus}
                 interactionStatus={
                     interactionStatus
+                }
+            />
+
+            <ContinuityPanel
+                continuityState={
+                    continuityState
+                }
+            />
+
+            <AdaptiveContextCard
+                contextSummary={
+                    adaptiveContext
                 }
             />
 
