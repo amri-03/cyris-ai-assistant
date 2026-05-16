@@ -50,6 +50,12 @@ import InteractionHeader
 import ValidationStatusCard
     from "../components/ValidationStatusCard";
 
+import InteractionFooter
+    from "../components/InteractionFooter";
+
+import OperationalSummaryCard
+    from "../components/OperationalSummaryCard";
+
 
 export default function Home() {
 
@@ -128,6 +134,9 @@ export default function Home() {
 
     const validationStatus =
         "adaptive_validation_stable";
+
+    const operationalSummary =
+        "Adaptive orchestration systems operating within stable MVP parameters.";
 
     return (
         <div>
@@ -225,6 +234,18 @@ export default function Home() {
             </SectionContainer>
 
             <SectionContainer
+                title="Operational Coordination"
+            >
+
+                <OperationalSummaryCard
+                    summary={
+                        operationalSummary
+                    }
+                />
+
+            </SectionContainer>
+
+            <SectionContainer
                 title="MVP Status"
             >
 
@@ -253,6 +274,8 @@ export default function Home() {
                 />
 
             </SectionContainer>
+
+            <InteractionFooter/>
 
         </div>
     );
