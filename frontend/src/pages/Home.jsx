@@ -47,6 +47,9 @@ import SystemHealthOverview
 import InteractionHeader
     from "../components/InteractionHeader";
 
+import ValidationStatusCard
+    from "../components/ValidationStatusCard";
+
 
 export default function Home() {
 
@@ -122,6 +125,9 @@ export default function Home() {
 
     const interactionSubtitle =
         "Continuity-aware adaptive orchestration environment.";
+
+    const validationStatus =
+        "adaptive_validation_stable";
 
     return (
         <div>
@@ -201,6 +207,18 @@ export default function Home() {
                 <SystemHealthOverview
                     systemHealth={
                         systemHealth
+                    }
+                />
+
+            </SectionContainer>
+
+            <SectionContainer
+                title="Validation Coordination"
+            >
+
+                <ValidationStatusCard
+                    validationStatus={
+                        validationStatus
                     }
                 />
 
