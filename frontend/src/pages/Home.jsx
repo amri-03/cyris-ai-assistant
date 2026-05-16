@@ -35,6 +35,9 @@ import CoordinationOverview
 import MVPStatusPanel
     from "../components/MVPStatusPanel";
 
+import SectionContainer
+    from "../components/SectionContainer";
+
 
 export default function Home() {
 
@@ -106,40 +109,68 @@ export default function Home() {
                 Cyris AI Assistant
             </h1>
 
-            <SystemStatusBar
-                runtimeStatus={runtimeStatus}
-                interactionStatus={
-                    interactionStatus
-                }
-            />
+            <SectionContainer
+                title="System Coordination"
+            >
 
-            <ContinuityPanel
-                continuityState={
-                    continuityState
-                }
-            />
+                <SystemStatusBar
+                    runtimeStatus={runtimeStatus}
+                    interactionStatus={
+                        interactionStatus
+                    }
+                />
 
-            <AdaptiveContextCard
-                contextSummary={
-                    adaptiveContext
-                }
-            />
+                <InteractionStatusCard
+                    status={interactionStatus}
+                />
 
-            <OrchestrationStateCard
-                orchestrationState={
-                    orchestrationState
-                }
-            />
+            </SectionContainer>
 
-            <CoordinationOverview
-                coordinationSummary={
-                    coordinationOverview
-                }
-            />
+            <SectionContainer
+                title="Adaptive Continuity"
+            >
 
-            <MVPStatusPanel
-                mvpState={mvpState}
-            />
+                <ContinuityPanel
+                    continuityState={
+                        continuityState
+                    }
+                />
+
+                <AdaptiveContextCard
+                    contextSummary={
+                        adaptiveContext
+                    }
+                />
+
+            </SectionContainer>
+
+            <SectionContainer
+                title="Orchestration Overview"
+            >
+
+                <OrchestrationStateCard
+                    orchestrationState={
+                        orchestrationState
+                    }
+                />
+
+                <CoordinationOverview
+                    coordinationSummary={
+                        coordinationOverview
+                    }
+                />
+
+            </SectionContainer>
+
+            <SectionContainer
+                title="MVP Status"
+            >
+
+                <MVPStatusPanel
+                    mvpState={mvpState}
+                />
+
+            </SectionContainer>
 
             <InteractionStatusCard
                 status={interactionStatus}
@@ -147,13 +178,19 @@ export default function Home() {
 
             <SystemOverview/>
 
-            <InteractionTimeline
-                responses={responses}
-            />
+            <SectionContainer
+                title="Adaptive Interaction"
+            >
 
-            <ConversationInput
-                onSend={handleSend}
-            />
+                <InteractionTimeline
+                    responses={responses}
+                />
+
+                <ConversationInput
+                    onSend={handleSend}
+                />
+
+            </SectionContainer>
 
         </div>
     );
