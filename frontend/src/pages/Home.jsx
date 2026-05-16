@@ -26,6 +26,12 @@ import ContinuityPanel
 import AdaptiveContextCard
     from "../components/AdaptiveContextCard";
 
+import OrchestrationStateCard
+    from "../components/OrchestrationStateCard";
+
+import CoordinationOverview
+    from "../components/CoordinationOverview";
+
 
 export default function Home() {
 
@@ -81,6 +87,12 @@ export default function Home() {
     const adaptiveContext =
         "Adaptive orchestration context active.";
 
+    const orchestrationState =
+        "adaptive_orchestration_stable";
+
+    const coordinationOverview =
+        "Runtime, behavioral, and AI coordination synchronized.";
+
     return (
         <div>
 
@@ -104,6 +116,18 @@ export default function Home() {
             <AdaptiveContextCard
                 contextSummary={
                     adaptiveContext
+                }
+            />
+
+            <OrchestrationStateCard
+                orchestrationState={
+                    orchestrationState
+                }
+            />
+
+            <CoordinationOverview
+                coordinationSummary={
+                    coordinationOverview
                 }
             />
 
