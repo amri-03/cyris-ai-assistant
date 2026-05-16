@@ -8,6 +8,9 @@ import ConversationInput
 import ConversationView
     from "../components/ConversationView";
 
+import SystemOverview
+    from "../components/SystemOverview";
+
 
 export default function Home() {
 
@@ -57,6 +60,8 @@ export default function Home() {
             <h1>
                 Cyris AI Assistant
             </h1>
+
+            <SystemOverview/>
 
             <ConversationView
                 responses={responses}
