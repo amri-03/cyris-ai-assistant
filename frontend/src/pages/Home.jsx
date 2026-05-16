@@ -14,6 +14,12 @@ import SystemOverview
 import InteractionStatusCard
     from "../components/InteractionStatusCard";
 
+import SystemStatusBar
+    from "../components/SystemStatusBar";
+
+import InteractionTimeline
+    from "../components/InteractionTimeline";
+
 
 export default function Home() {
 
@@ -57,6 +63,9 @@ export default function Home() {
         }
     };
 
+    const runtimeStatus =
+        "runtime_stable";
+
     const interactionStatus =
         "adaptive_interaction_active";
 
@@ -67,13 +76,20 @@ export default function Home() {
                 Cyris AI Assistant
             </h1>
 
+            <SystemStatusBar
+                runtimeStatus={runtimeStatus}
+                interactionStatus={
+                    interactionStatus
+                }
+            />
+
             <InteractionStatusCard
                 status={interactionStatus}
             />
 
             <SystemOverview/>
 
-            <ConversationView
+            <InteractionTimeline
                 responses={responses}
             />
 
