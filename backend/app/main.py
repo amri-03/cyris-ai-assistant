@@ -38,6 +38,7 @@ from app.services.state_engine_service import StateEngineService
 from app.services.execution_engine_service import ExecutionEngineService
 from app.services.runtime_scheduler_service import RuntimeSchedulerService
 from app.services.runtime_loop_service import RuntimeLoopService
+from app.services.system_startup_validator import SystemStartupValidator
 
 from app.memory.memory_manager import MemoryManager
 from app.context.context_manager import ContextManager
@@ -83,6 +84,7 @@ execution_engine_service = ExecutionEngineService()
 runtime_scheduler_service = RuntimeSchedulerService()
 runtime_loop_service = RuntimeLoopService()
 
+startup_validator = SystemStartupValidator()
 
 ai_provider = AIProviderManager()
 
@@ -646,3 +648,11 @@ def ai_test():
             response["summary"]
         )
     }
+
+
+@app.get("/system-status")
+def system_status():
+    return (
+        startup_validator
+        .validate_environment()
+    )

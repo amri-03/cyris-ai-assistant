@@ -38,6 +38,9 @@ import MVPStatusPanel
 import SectionContainer
     from "../components/SectionContainer";
 
+import EnvironmentStatusCard
+    from "../components/EnvironmentStatusCard";
+
 
 export default function Home() {
 
@@ -102,6 +105,9 @@ export default function Home() {
     const mvpState =
         "adaptive_mvp_foundation_stable";
 
+    const environmentStatus =
+        "environment_ready";
+
     return (
         <div>
 
@@ -165,6 +171,18 @@ export default function Home() {
             <SectionContainer
                 title="MVP Status"
             >
+
+                <SectionContainer
+                    title="Deployment Readiness"
+                >
+
+                    <EnvironmentStatusCard
+                        environmentStatus={
+                            environmentStatus
+                        }
+                    />
+
+                </SectionContainer>
 
                 <MVPStatusPanel
                     mvpState={mvpState}
