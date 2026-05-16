@@ -42,3 +42,15 @@ button {
     background-color: #1f2937;
     color: white;
 }
+
+h2 {
+    margin-bottom: 12px;
+}
+
+div {
+    box-sizing: border-box;
+}
+
+button:hover {
+    opacity: 0.9;
+}

@@ -41,6 +41,9 @@ import SectionContainer
 import EnvironmentStatusCard
     from "../components/EnvironmentStatusCard";
 
+import SystemHealthOverview
+    from "../components/SystemHealthOverview";
+
 
 export default function Home() {
 
@@ -108,6 +111,9 @@ export default function Home() {
     const environmentStatus =
         "environment_ready";
 
+    const systemHealth =
+        "adaptive_system_stable";
+
     return (
         <div>
 
@@ -169,20 +175,26 @@ export default function Home() {
             </SectionContainer>
 
             <SectionContainer
-                title="MVP Status"
+                title="Deployment Readiness"
             >
 
-                <SectionContainer
-                    title="Deployment Readiness"
-                >
+                <EnvironmentStatusCard
+                    environmentStatus={
+                        environmentStatus
+                    }
+                />
 
-                    <EnvironmentStatusCard
-                        environmentStatus={
-                            environmentStatus
-                        }
-                    />
+                <SystemHealthOverview
+                    systemHealth={
+                        systemHealth
+                    }
+                />
 
-                </SectionContainer>
+            </SectionContainer>
+
+            <SectionContainer
+                title="MVP Status"
+            >
 
                 <MVPStatusPanel
                     mvpState={mvpState}
