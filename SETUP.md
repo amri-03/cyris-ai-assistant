@@ -1,7 +1,5 @@
 # Cyris AI Assistant — Setup Guide
 
----
-
 ## About
 
 This guide explains how to locally set up and run the Cyris AI Assistant MVP environment.
@@ -34,7 +32,6 @@ Install:
 cd backend
 ```
 
----
 
 ### 2. Create virtual environment
 
@@ -42,7 +39,6 @@ cd backend
 python -m venv venv
 ```
 
----
 
 ### 3. Activate virtual environment
 
@@ -58,7 +54,6 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
----
 
 ### 4. Install dependencies
 
@@ -66,7 +61,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
----
 
 ### 5. Configure environment variables
 
@@ -88,7 +82,6 @@ Add:
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
----
 
 ### 6. Run backend server
 
@@ -112,7 +105,6 @@ http://127.0.0.1:8000
 cd frontend
 ```
 
----
 
 ### 2. Install dependencies
 
@@ -120,7 +112,6 @@ cd frontend
 npm install
 ```
 
----
 
 ### 3. Run frontend
 
