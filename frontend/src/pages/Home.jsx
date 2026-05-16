@@ -32,6 +32,9 @@ import OrchestrationStateCard
 import CoordinationOverview
     from "../components/CoordinationOverview";
 
+import MVPStatusPanel
+    from "../components/MVPStatusPanel";
+
 
 export default function Home() {
 
@@ -93,6 +96,9 @@ export default function Home() {
     const coordinationOverview =
         "Runtime, behavioral, and AI coordination synchronized.";
 
+    const mvpState =
+        "adaptive_mvp_foundation_stable";
+
     return (
         <div>
 
@@ -129,6 +135,10 @@ export default function Home() {
                 coordinationSummary={
                     coordinationOverview
                 }
+            />
+
+            <MVPStatusPanel
+                mvpState={mvpState}
             />
 
             <InteractionStatusCard

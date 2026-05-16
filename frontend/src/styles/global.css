@@ -21,3 +21,24 @@ button {
     padding: 10px 16px;
     cursor: pointer;
 }
+
+h1,h3 {
+    color: #1f2937;
+}
+
+p {
+    line-height: 1.5;
+}
+
+textarea {
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+button {
+    border: none;
+    border-radius: 6px;
+    background-color: #1f2937;
+    color: white;
+}
