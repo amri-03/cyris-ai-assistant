@@ -11,6 +11,9 @@ import ConversationView
 import SystemOverview
     from "../components/SystemOverview";
 
+import InteractionStatusCard
+    from "../components/InteractionStatusCard";
+
 
 export default function Home() {
 
@@ -54,12 +57,19 @@ export default function Home() {
         }
     };
 
+    const interactionStatus =
+        "adaptive_interaction_active";
+
     return (
         <div>
 
             <h1>
                 Cyris AI Assistant
             </h1>
+
+            <InteractionStatusCard
+                status={interactionStatus}
+            />
 
             <SystemOverview/>
 
