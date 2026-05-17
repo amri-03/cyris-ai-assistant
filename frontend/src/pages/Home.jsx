@@ -56,6 +56,9 @@ import InteractionFooter
 import OperationalSummaryCard
     from "../components/OperationalSummaryCard";
 
+import AdaptiveSystemBanner
+    from "../components/AdaptiveSystemBanner";
+
 
 export default function Home() {
 
@@ -138,6 +141,9 @@ export default function Home() {
     const operationalSummary =
         "Adaptive orchestration systems operating within stable MVP parameters.";
 
+    const adaptiveBannerMessage =
+        "Cyris is operating within stable adaptive coordination parameters.";
+
     return (
         <div>
 
@@ -148,6 +154,12 @@ export default function Home() {
             <InteractionHeader
                 title={interactionTitle}
                 subtitle={interactionSubtitle}
+            />
+
+            <AdaptiveSystemBanner
+                message={
+                    adaptiveBannerMessage
+                }
             />
 
             <SectionContainer
