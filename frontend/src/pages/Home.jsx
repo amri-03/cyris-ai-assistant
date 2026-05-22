@@ -72,14 +72,15 @@ export default function Home() {
         try {
 
             const response =
-                await api.get (
-                    "/ai-test"
+                await api.post (
+                    "/ai-test",
+                    {prompt: message}
                 );
 
             const content =
-                response.data.response?.content
+                response.data.response?.response
                 ||
-                response.data.error
+                response.data.response?.error
                 ||
                 "No response available.";
 
