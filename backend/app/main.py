@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 from app.models.user_profile import UserProfile
 from app.models.context_state import ContextState
 from app.models.priority_state import PriorityState
@@ -50,6 +53,14 @@ from app.services.ai.ai_provider_manager import (
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 assistant = AssistantService()
 behavior_tracker = BehaviorTracker()
@@ -633,11 +644,17 @@ def runtime_loop():
     return result
 
 
-@app.get("/ai-test")
-def ai_test():
+class PromptRequest(BaseModel):
+    prompt: str
+
+
+@app.post("/ai-test")
+def ai_test(
+        request: PromptRequest
+):
     response = (
         ai_provider.generate_ai_response(
-            "Say hello from Cyris AI."
+            request.prompt
         )
     )
 

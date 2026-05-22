@@ -14,7 +14,7 @@ class ResponseSummaryBuilder:
             "response_preview": (
                 str(
                     response.get(
-                        "content",
+                        "response",
                         ""
                     )
                 )[:120]
