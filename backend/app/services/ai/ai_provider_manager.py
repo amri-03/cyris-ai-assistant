@@ -1,5 +1,11 @@
-from app.services.ai.openai_client import (
-    OpenAIClient
+import os
+
+from app.services.ai.gemini_client import (
+    GeminiClient
+)
+
+from app.services.ai.groq_client import (
+    GroqClient
 )
 
 from app.services.ai.response_normalizer import (
@@ -14,9 +20,14 @@ from app.services.ai.response_coordinator import (
 class AIProviderManager:
 
     def __init__(self):
-        self.openai_client = (
-            OpenAIClient()
-        )
+        provider = os.getenv(
+            "AI_PROVIDER", "groq"
+        ).lower()
+
+        if provider == "gemini":
+            self.ai_client = GeminiClient()
+        else:
+            self.ai_client = GroqClient()
 
         self.normalizer = (
             ResponseNormalizer()
@@ -31,7 +42,7 @@ class AIProviderManager:
             prompt: str
     ):
         raw_response = (
-            self.openai_client
+            self.ai_client
             .generate_response(
                 prompt
             )
