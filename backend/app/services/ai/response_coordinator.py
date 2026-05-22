@@ -6,6 +6,9 @@ from app.services.ai.response_summary_builder import (
     ResponseSummaryBuilder
 )
 
+from app.services.adaptive_response_refiner import (
+    AdaptiveResponseRefiner
+)
 
 class ResponseCoordinator:
 
@@ -18,28 +21,47 @@ class ResponseCoordinator:
             ResponseSummaryBuilder()
         )
 
+        self.refiner = (
+            AdaptiveResponseRefiner()
+        )
+
     def coordinate_response(
             self,
             response
     ):
-        validation = (
-            self.validator
-            .validate_response(
-                response
-            )
-        )
+        if (
+                response["status"]
+                != "success"
+        ):
+            return {
+                "response": response,
+                "summary": {
+                    "response_status":
+                        "failure",
 
-        summary = (
-            self.summary_builder
-            .build_summary(
-                response
+                    "response_preview":
+                        ""
+                }
+            }
+
+        refined_response = (
+            self.refiner
+            .refine_response(
+                response["response"]
             )
         )
 
         return {
-            "response": response,
+            "response": {
+                "status": "success",
+                "response": refined_response
+            },
 
-            "validation": validation,
+            "summary": {
+                "response_status":
+                    "success",
 
-            "summary": summary
+                "response_preview":
+                    refined_response[:80]
+            }
         }
