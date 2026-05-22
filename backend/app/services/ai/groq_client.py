@@ -5,6 +5,14 @@ from app.services.ai.system_prompt_manager import (
     SystemPromptManager
 )
 
+from app.services.memory.conversation_memory_service import (
+    ConversationMemoryService
+)
+
+from app.memory.continuity_memory_service import (
+    ContinuityMemoryService
+)
+
 
 class GroqClient:
 
@@ -15,6 +23,14 @@ class GroqClient:
 
         self.system_prompt_manager = (
             SystemPromptManager()
+        )
+
+        self.memory_service = (
+            ConversationMemoryService()
+        )
+
+        self.continuity_memory = (
+            ContinuityMemoryService()
         )
 
         self.client = None
@@ -38,6 +54,11 @@ class GroqClient:
             }
 
         try:
+            memory_context = (
+                self.continuity_memory
+                .build_continuity_context()
+            )
+
             response = (
                 self.client.chat.completions.create(
                     model=model,
@@ -50,11 +71,39 @@ class GroqClient:
                             )
                         },
                         {
+                            "role": "system",
+                            "content": (
+                                "Previous conversation context:\n"
+                                f"{memory_context}"
+                            )
+                        },
+                        {
                             "role": "user",
                             "content": prompt
                         }
                     ]
                 )
+            )
+
+            content = (
+                response
+                .choices[0]
+                .message
+                .content
+            )
+
+            self.memory_service.save_message(
+                "user",
+                prompt
+            )
+
+            self.continuity_memory.save_continuity(
+                prompt
+            )
+
+            self.memory_service.save_message(
+                "assistant",
+                content
             )
 
             return response
