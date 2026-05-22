@@ -1,12 +1,20 @@
 import os
 from groq import Groq
 
+from app.services.ai.system_prompt_manager import (
+    SystemPromptManager
+)
+
 
 class GroqClient:
 
     def __init__(self):
         self.api_key = os.getenv(
             "GROQ_API_KEY"
+        )
+
+        self.system_prompt_manager = (
+            SystemPromptManager()
         )
 
         self.client = None
@@ -34,6 +42,13 @@ class GroqClient:
                 self.client.chat.completions.create(
                     model=model,
                     messages=[
+                        {
+                            "role": "system",
+                            "content": (
+                                self.system_prompt_manager
+                                .build_system_prompt()
+                            )
+                        },
                         {
                             "role": "user",
                             "content": prompt
