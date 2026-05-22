@@ -98,6 +98,7 @@ class GroqClient:
             )
 
             self.continuity_memory.save_continuity(
+                self.client,
                 prompt
             )
 

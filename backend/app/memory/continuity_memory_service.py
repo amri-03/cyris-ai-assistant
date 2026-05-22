@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-from app.memory.continuity_extractor import (
-    ContinuityExtractor
+from app.services.ai.continuity_ai_extractor import (
+    ContinuityAIExtractor
 )
 
 
@@ -17,7 +17,7 @@ class ContinuityMemoryService:
         )
 
         self.extractor = (
-            ContinuityExtractor()
+            ContinuityAIExtractor()
         )
 
     def load_memory(self):
@@ -39,17 +39,22 @@ class ContinuityMemoryService:
 
     def save_continuity(
             self,
+            ai_client,
             message: str
     ):
 
         extracted = (
             self.extractor
-            .extract_continuity(
+            .extract_structured_continuity(
+                ai_client,
                 message
             )
         )
 
-        if not extracted:
+        if (
+                extracted["identity"]
+                is None
+        ):
             return
 
         memory = (
@@ -63,8 +68,8 @@ class ContinuityMemoryService:
         ]:
 
             if (
-                    item["content"]
-                    == extracted["content"]
+                    item["identity"]
+                    == extracted["identity"]
             ):
                 existing_item = item
                 break
@@ -73,27 +78,39 @@ class ContinuityMemoryService:
 
             existing_item["priority"] += 1
 
+            existing_item["content"] = (
+                extracted["content"]
+            )
+
+            existing_item["importance"] = (
+                extracted["importance"]
+            )
+
         else:
 
             memory[
                 "continuity_items"
             ].append(
                 {
+                    "identity":
+                        extracted["identity"],
+
+                    "type":
+                        extracted["type"],
+
                     "content":
                         extracted["content"],
 
-                    "topics":
-                        extracted["topics"],
+                    "importance":
+                        extracted[
+                            "importance"
+                        ],
 
                     "priority": 1
                 }
             )
 
-        with open(
-                self.memory_file,
-                "w"
-        ) as file:
-
+        with open(self.memory_file, "w") as file:
             json.dump(
                 memory,
                 file,
