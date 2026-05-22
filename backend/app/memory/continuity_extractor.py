@@ -1,19 +1,28 @@
 class ContinuityExtractor:
-    KEYWORDS = [
-        "working",
-        "project",
-        "goal",
-        "improve",
-        "learning",
-        "studying",
-        "focus",
-        "resume",
-        "internship",
+    CONTINUITY_TOPICS = [
         "frontend",
         "backend",
+        "resume",
+        "internship",
         "career",
-        "problem",
-        "struggling"
+        "project",
+        "projects",
+        "study",
+        "studies",
+        "academic",
+        "academics",
+        "sem",
+        "semester",
+        "design",
+        "designing",
+        "cybersecurity",
+        "learning",
+        "improve",
+        "improving",
+        "skills",
+        "focus",
+        "goal",
+        "freelancing"
     ]
 
     def extract_continuity(
@@ -25,9 +34,21 @@ class ContinuityExtractor:
             message.lower()
         )
 
-        for keyword in self.KEYWORDS:
+        matched_topics = []
 
-            if keyword in lowered_message:
-                return message
+        for topic in (
+                self.CONTINUITY_TOPICS
+        ):
 
-        return None
+            if topic in lowered_message:
+                matched_topics.append(
+                    topic
+                )
+
+        if not matched_topics:
+            return None
+
+        return {
+            "content": message,
+            "topics": matched_topics
+        }

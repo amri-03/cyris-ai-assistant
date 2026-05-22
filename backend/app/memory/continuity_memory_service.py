@@ -56,16 +56,37 @@ class ContinuityMemoryService:
             self.load_memory()
         )
 
-        if (
-                extracted
-                not in memory[
+        existing_item = None
+
+        for item in memory[
             "continuity_items"
-        ]
-        ):
+        ]:
+
+            if (
+                    item["content"]
+                    == extracted["content"]
+            ):
+                existing_item = item
+                break
+
+        if existing_item:
+
+            existing_item["priority"] += 1
+
+        else:
+
             memory[
                 "continuity_items"
             ].append(
-                extracted
+                {
+                    "content":
+                        extracted["content"],
+
+                    "topics":
+                        extracted["topics"],
+
+                    "priority": 1
+                }
             )
 
         with open(
@@ -85,16 +106,24 @@ class ContinuityMemoryService:
             self.load_memory()
         )
 
-        items = (
+        items = sorted(
             memory[
                 "continuity_items"
-            ][-10:]
-        )
+            ],
+            key=lambda item:
+            item["priority"],
+            reverse=True
+        )[:10]
 
         if not items:
             return ""
 
-        formatted = "\n".join(items)
+        formatted = "\n".join(
+            [
+                item["content"]
+                for item in items
+            ]
+        )
 
         return (
             "Known user continuity:\n"

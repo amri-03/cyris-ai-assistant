@@ -41,5 +41,7 @@ class SystemPromptManager:
         Only reference remembered continuity that is explicitly present in the provided memory context.
 
         Do not invent projects, goals, events, conversations, or struggles that are not directly mentioned in memory.
+        
+        Prioritize continuity items that appear repeatedly, since they likely represent ongoing important areas in the user's life.
 
         """
