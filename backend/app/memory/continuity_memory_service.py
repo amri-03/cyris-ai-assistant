@@ -135,11 +135,19 @@ class ContinuityMemoryService:
         if not items:
             return ""
 
+        formatted_items = []
+
+        for item in items:
+            formatted_items.append(
+                (
+                    f'- {item["content"]} '
+                    f'(importance: '
+                    f'{item["importance"]})'
+                )
+            )
+
         formatted = "\n".join(
-            [
-                item["content"]
-                for item in items
-            ]
+            formatted_items
         )
 
         return (

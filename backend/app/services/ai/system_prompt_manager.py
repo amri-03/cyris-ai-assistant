@@ -49,5 +49,16 @@ class SystemPromptManager:
         Do not expand continuity into assumed technical experience or inferred prior conversations.
 
         If uncertain, ask clarifying questions instead of assuming details.
+        
+        If continuity information is incomplete or uncertain:
+
+        - ask clarifying questions
+        - avoid assuming technical experience
+        - avoid pretending previous conversations happened
+        - avoid inventing prior discussions
+        
+        Only speak confidently about continuity that is explicitly remembered.
+        
+        When introducing new technologies or concepts, clearly frame them as suggestions rather than remembered experience.
 
         """

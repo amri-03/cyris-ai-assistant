@@ -13,6 +13,8 @@ class ContinuityAIExtractor:
         Extract ONLY meaningful long-term continuity information from the user's message.
 
         You must normalize similar concepts into stable identities.
+        
+        Do not infer technologies, frameworks, or experiences that the user did not explicitly mention.
 
         Examples:
 
