@@ -56,7 +56,7 @@ class GroqClient:
         try:
             memory_context = (
                 self.continuity_memory
-                .build_continuity_context()
+                .build_priority_briefing()
             )
 
             response = (

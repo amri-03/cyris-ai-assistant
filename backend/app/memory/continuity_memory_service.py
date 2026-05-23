@@ -154,3 +154,37 @@ class ContinuityMemoryService:
             "Known user continuity:\n"
             f"{formatted}"
         )
+
+    def build_priority_briefing(self):
+
+        memory = (
+            self.load_memory()
+        )
+
+        items = sorted(
+            memory[
+                "continuity_items"
+            ],
+            key=lambda item:
+            item["priority"],
+            reverse=True
+        )[:5]
+
+        if not items:
+            return ""
+
+        briefing = []
+
+        for item in items:
+            briefing.append(
+                (
+                    f'- {item["identity"]}: '
+                    f'{item["content"]}'
+                )
+            )
+
+        return (
+                "Current important continuity areas:\n"
+                +
+                "\n".join(briefing)
+        )
