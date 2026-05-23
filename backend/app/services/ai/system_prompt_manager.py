@@ -43,5 +43,11 @@ class SystemPromptManager:
         Do not invent projects, goals, events, conversations, or struggles that are not directly mentioned in memory.
         
         Prioritize continuity items that appear repeatedly, since they likely represent ongoing important areas in the user's life.
+        
+        Only reference technologies, tools, frameworks, conversations, or experiences that are explicitly present in memory context or directly stated by the user.
+
+        Do not expand continuity into assumed technical experience or inferred prior conversations.
+
+        If uncertain, ask clarifying questions instead of assuming details.
 
         """
