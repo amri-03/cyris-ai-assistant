@@ -46,6 +46,8 @@ class ContinuityAIExtractor:
         - struggle
         - interest
         - project
+        - academic_context
+        - career_direction
 
         Return ONLY valid JSON.
         
@@ -71,6 +73,17 @@ class ContinuityAIExtractor:
         
         If nothing clearly important exists,
         return empty continuity.
+        
+        Information related to:
+        - long-term learning goals
+        - career direction
+        - recurring struggles
+        - academic direction
+        - internship preparation
+        - stable technical interests
+        - repeated productivity challenges
+        
+        SHOULD usually be extracted.
 
         Format:
         {{
