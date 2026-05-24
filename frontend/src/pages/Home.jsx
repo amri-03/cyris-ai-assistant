@@ -5,59 +5,8 @@ import api from "../services/api";
 import ConversationInput
     from "../components/ConversationInput";
 
-import ConversationView
-    from "../components/ConversationView";
-
-import SystemOverview
-    from "../components/SystemOverview";
-
-import InteractionStatusCard
-    from "../components/InteractionStatusCard";
-
-import SystemStatusBar
-    from "../components/SystemStatusBar";
-
 import InteractionTimeline
     from "../components/InteractionTimeline";
-
-import ContinuityPanel
-    from "../components/ContinuityPanel";
-
-import AdaptiveContextCard
-    from "../components/AdaptiveContextCard";
-
-import OrchestrationStateCard
-    from "../components/OrchestrationStateCard";
-
-import CoordinationOverview
-    from "../components/CoordinationOverview";
-
-import MVPStatusPanel
-    from "../components/MVPStatusPanel";
-
-import SectionContainer
-    from "../components/SectionContainer";
-
-import EnvironmentStatusCard
-    from "../components/EnvironmentStatusCard";
-
-import SystemHealthOverview
-    from "../components/SystemHealthOverview";
-
-import InteractionHeader
-    from "../components/InteractionHeader";
-
-import ValidationStatusCard
-    from "../components/ValidationStatusCard";
-
-import InteractionFooter
-    from "../components/InteractionFooter";
-
-import OperationalSummaryCard
-    from "../components/OperationalSummaryCard";
-
-import AdaptiveSystemBanner
-    from "../components/AdaptiveSystemBanner";
 
 
 export default function Home() {
@@ -103,75 +52,48 @@ export default function Home() {
         }
     };
 
-    const runtimeStatus =
-        "runtime_stable";
-
-    const interactionStatus =
-        "adaptive_interaction_active";
-
-    const continuityState =
-        "continuity_stable";
-
-    const adaptiveContext =
-        "Adaptive orchestration context active.";
-
-    const orchestrationState =
-        "adaptive_orchestration_stable";
-
-    const coordinationOverview =
-        "Runtime, behavioral, and AI coordination synchronized.";
-
-    const mvpState =
-        "adaptive_mvp_foundation_stable";
-
-    const environmentStatus =
-        "environment_ready";
-
-    const systemHealth =
-        "adaptive_system_stable";
-
-    const interactionTitle =
-        "Cyris Adaptive Interaction";
-
-    const interactionSubtitle =
-        "Continuity-aware adaptive orchestration environment.";
-
-    const validationStatus =
-        "adaptive_validation_stable";
-
-    const operationalSummary =
-        "Adaptive orchestration systems operating within stable MVP parameters.";
-
-    const adaptiveBannerMessage =
-        "Cyris is operating within stable adaptive coordination parameters.";
-
     return (
-        <div>
+        <div
+            className="min-h-screen bg-black text-white flex flex-col"
+        >
 
-            <h1>
-                Cyris AI Assistant
-            </h1>
+            <div
+                className="px-6 py-6 border-b border-neutral-800"
+            >
 
-            <InteractionHeader
-                title={interactionTitle}
-                subtitle={interactionSubtitle}
-            />
+                <h1
+                    className="text-3xl font-semibold"
+                >
+                    Cyris
+                </h1>
 
-            <SectionContainer
-                title="Adaptive Interaction"
+                <p
+                    className="text-neutral-400 mt-1"
+                >
+                    Your adaptive assistant
+                </p>
+
+            </div>
+
+            <div
+                className="flex-1 overflow-y-auto px-6 py-6"
             >
 
                 <InteractionTimeline
                     responses={responses}
                 />
 
+            </div>
+
+            <div
+                className="border-t border-neutral-800 px-6 py-4"
+            >
+
                 <ConversationInput
                     onSend={handleSend}
                 />
 
-            </SectionContainer>
-
-            <InteractionFooter/>
+            </div>
 
         </div>
     );
