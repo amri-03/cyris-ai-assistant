@@ -107,7 +107,10 @@ class ContinuityMemoryService:
                                 "importance"
                             ],
 
-                        "priority": 1
+                        "priority": self.calculate_priority(
+                            extracted["type"],
+                            extracted["importance"]
+                        )
                     }
                 )
 
@@ -191,4 +194,51 @@ class ContinuityMemoryService:
                 "Current important continuity areas:\n"
                 +
                 "\n".join(briefing)
+        )
+
+    def calculate_priority(
+            self,
+            continuity_type,
+            importance
+    ):
+
+        priority_map = {
+
+            "career_direction": 5,
+            "goal": 4,
+            "focus_area": 4,
+            "project": 4,
+            "academic_context": 3,
+            "struggle": 5,
+            "interest": 2
+        }
+
+        importance_bonus = {
+
+            "high": 1,
+            "medium": 0,
+            "low": -1
+        }
+
+        base_priority = (
+            priority_map.get(
+                continuity_type,
+                1
+            )
+        )
+
+        adjustment = (
+            importance_bonus.get(
+                importance,
+                0
+            )
+        )
+
+        final_priority = (
+                base_priority + adjustment
+        )
+
+        return max(
+            1,
+            min(final_priority, 5)
         )
