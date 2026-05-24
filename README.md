@@ -1,5 +1,46 @@
 # Cyris AI Assistant
 
+Adaptive AI assistant focused on:
+
+- conversational continuity
+- contextual memory
+- grounded long-term interaction
+
+---
+
+## Current Features
+
+- persistent conversation history
+- continuity-aware memory system
+- Groq + Gemini AI provider support
+- grounded conversational behavior
+- adaptive context handling
+- frontend ↔ backend AI interaction loop
+
+---
+
+## Tech Stack
+
+- FastAPI
+- Python
+- React
+- Vite
+- Groq API
+- Gemini API
+
+---
+
+## Current Focus
+
+Improving:
+
+- conversational grounding
+- memory relevance
+- continuity realism
+- adaptive interaction quality
+
+---
+
 ## Development Progress
 
 * ✅ Phase 0 — Project Initialization & Foundation Setup *( 2.5 hrs )*
@@ -21,61 +62,6 @@
 * 🔄 Phase 16 — Real-World MVP Testing & Interaction Validation *( in progress )*
 
 ---
-
-## Current Architecture Status
-
-Cyris currently supports:
-
-- adaptive behavioral orchestration
-- persistent runtime intelligence
-- runtime governance systems
-- orchestration continuity
-- layered runtime-state coordination
-- runtime validation and observability
-- conversational session management
-- interaction-state coordination
-- runtime-to-conversation orchestration
-- conversational context routing
-- conversation-aware runtime integration
-- behavioral signal tracking
-- longitudinal behavioral memory coordination
-- continuity-aware behavioral interpretation
-- behavioral validation and observability
-- AI provider abstraction
-- contextual prompt orchestration
-- orchestration-safe AI response handling
-- prompt validation and observability
-- failure-safe AI coordination
-- adaptive frontend interaction
-- conversational AI interaction flow
-- runtime visibility systems
-- behavioral visibility systems
-- orchestration-aware frontend rendering
-- backend/frontend synchronization
-- adaptive interaction cohesion
-- continuity-aware frontend coordination
-- orchestration visibility refinement
-- adaptive context rendering
-- MVP-level interaction stability
-- deployment-readiness coordination
-- startup validation systems
-- operational environment consistency
-- lightweight operational observability
-- reproducible MVP setup coordination
-- adaptive interaction maturity refinement
-- operational validation coordination
-- lightweight production interaction refinement
-- realistic adaptive usability systems
-- assistant-oriented frontend interaction
-- multi-provider AI integration
-- Groq and Gemini provider support
-- provider-switching via environment configuration
-- normalized cross-provider response handling
-- dynamic prompt routing from frontend to AI provider
-- end-to-end interaction loop validation
-- CORS-enabled frontend-backend communication
-- real-time adaptive conversational interaction
-- first successful end-to-end Cyris AI interaction
 
 The project has achieved its first complete end-to-end interaction loop and is
 now entering Phase 16 — real-world MVP testing, interaction realism refinement,
