@@ -8,26 +8,59 @@ export default function InteractionTimeline({
 
     return (
 
-        <div>
+        <div className="flex flex-col gap-4">
 
-            <h3>
-                Interaction Timeline
-            </h3>
+            {responses.map (
+                (message, index) => {
 
-            {
-                responses.map (
-                    (
-                        response,
-                        index
-                    ) => (
+                    const isUser =
+                        message.startsWith ( "User:" );
 
-                        <AdaptiveResponseCard
+                    return (
+
+                        <div
                             key={index}
-                            response={response}
-                        />
-                    )
-                )
-            }
+                            className={
+                                `flex ${
+                                    isUser
+                                        ? "justify-end"
+                                        : "justify-start"
+                                }`
+                            }
+                        >
+
+                            <div
+                                className={
+                                    `
+                            max-w-[75%]
+                            px-4
+                            py-3
+                            rounded-2xl
+                            whitespace-pre-wrap
+                            text-sm
+                            leading-relaxed
+                            ${
+                                        isUser
+                                            ? "bg-indigo-600 text-white"
+                                            : "bg-neutral-900 text-neutral-100"
+                                    }
+                            `
+                                }
+                            >
+
+                                {
+                                    message.replace (
+                                        /^User:\s?|^Cyris:\s?/,
+                                        ""
+                                    )
+                                }
+
+                            </div>
+
+                        </div>
+                    );
+                }
+            )}
 
         </div>
     );
