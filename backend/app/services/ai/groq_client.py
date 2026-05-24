@@ -13,6 +13,10 @@ from app.memory.continuity_memory_service import (
     ContinuityMemoryService
 )
 
+from app.memory.conversation_history_service import (
+    ConversationHistoryService
+)
+
 
 class GroqClient:
 
@@ -31,6 +35,10 @@ class GroqClient:
 
         self.continuity_memory = (
             ContinuityMemoryService()
+        )
+
+        self.history_service = (
+            ConversationHistoryService()
         )
 
         self.client = None
@@ -59,29 +67,41 @@ class GroqClient:
                 .build_priority_briefing()
             )
 
+            history = (
+                self.history_service
+                .get_messages()
+            )
+
+            messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        self.system_prompt_manager
+                        .build_system_prompt()
+                    )
+                },
+                {
+                    "role": "system",
+                    "content": (
+                        "Important continuity context:\n"
+                        f"{memory_context}"
+                    )
+                }
+            ]
+
+            messages.extend(history)
+
+            messages.append(
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            )
+
             response = (
                 self.client.chat.completions.create(
                     model=model,
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": (
-                                self.system_prompt_manager
-                                .build_system_prompt()
-                            )
-                        },
-                        {
-                            "role": "system",
-                            "content": (
-                                "Previous conversation context:\n"
-                                f"{memory_context}"
-                            )
-                        },
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                    ]
+                    messages=messages
                 )
             )
 
@@ -90,6 +110,16 @@ class GroqClient:
                 .choices[0]
                 .message
                 .content
+            )
+
+            self.history_service.add_message(
+                "user",
+                prompt
+            )
+
+            self.history_service.add_message(
+                "assistant",
+                content
             )
 
             self.memory_service.save_message(

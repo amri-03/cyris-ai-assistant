@@ -43,79 +43,83 @@ class ContinuityMemoryService:
             message: str
     ):
 
-        extracted = (
-            self.extractor
-            .extract_structured_continuity(
-                ai_client,
-                message
+        try:
+            extracted = (
+                self.extractor
+                .extract_structured_continuity(
+                    ai_client,
+                    message
+                )
             )
-        )
-
-        if (
-                extracted["identity"]
-                is None
-        ):
-            return
-
-        memory = (
-            self.load_memory()
-        )
-
-        existing_item = None
-
-        for item in memory[
-            "continuity_items"
-        ]:
 
             if (
-                    item["identity"]
-                    == extracted["identity"]
+                    extracted["identity"]
+                    is None
             ):
-                existing_item = item
-                break
+                return
 
-        if existing_item:
-
-            existing_item["priority"] += 1
-
-            existing_item["content"] = (
-                extracted["content"]
+            memory = (
+                self.load_memory()
             )
 
-            existing_item["importance"] = (
-                extracted["importance"]
-            )
+            existing_item = None
 
-        else:
-
-            memory[
+            for item in memory[
                 "continuity_items"
-            ].append(
-                {
-                    "identity":
-                        extracted["identity"],
+            ]:
 
-                    "type":
-                        extracted["type"],
+                if (
+                        item["identity"]
+                        == extracted["identity"]
+                ):
+                    existing_item = item
+                    break
 
-                    "content":
-                        extracted["content"],
+            if existing_item:
 
-                    "importance":
-                        extracted[
-                            "importance"
-                        ],
+                existing_item["priority"] += 1
 
-                    "priority": 1
-                }
-            )
+                existing_item["content"] = (
+                    extracted["content"]
+                )
 
-        with open(self.memory_file, "w") as file:
-            json.dump(
-                memory,
-                file,
-                indent=4
-            )
+                existing_item["importance"] = (
+                    extracted["importance"]
+                )
+
+            else:
+
+                memory[
+                    "continuity_items"
+                ].append(
+                    {
+                        "identity":
+                            extracted["identity"],
+
+                        "type":
+                            extracted["type"],
+
+                        "content":
+                            extracted["content"],
+
+                        "importance":
+                            extracted[
+                                "importance"
+                            ],
+
+                        "priority": 1
+                    }
+                )
+
+            with open(self.memory_file, "w") as file:
+                json.dump(
+                    memory,
+                    file,
+                    indent=4
+                )
+
+        except Exception:
+            return
 
     def build_continuity_context(self):
 
