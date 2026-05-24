@@ -37,6 +37,8 @@ class ContinuityAIExtractor:
 
         should become:
         "resume_building"
+        
+        Do not create new abstract identities unless the user's intent is very clear and repeatedly reinforced.
 
         Valid continuity types:
         - goal
@@ -46,6 +48,29 @@ class ContinuityAIExtractor:
         - project
 
         Return ONLY valid JSON.
+        
+        Only extract information that appears to be:
+        - long-term
+        - repeatedly important
+        - identity-relevant
+        - directionally meaningful
+        
+        The information should likely remain relevant across multiple future conversations.
+        
+        Do NOT extract:
+        - temporary thoughts
+        - speculative interests
+        - casual mentions
+        - passing curiosities
+        - one-time ideas
+        - emotional reactions without long-term significance
+        - temporary confusion
+        - exploratory thinking
+        - hypothetical interests
+        - broad career uncertainty without stable direction
+        
+        If nothing clearly important exists,
+        return empty continuity.
 
         Format:
         {{
@@ -99,12 +124,19 @@ class ContinuityAIExtractor:
 
         try:
 
-            parsed = json.loads(content)
+            cleaned = (
+                content
+                .replace("```json", "")
+                .replace("```", "")
+                .strip()
+            )
+
+            parsed = json.loads(cleaned)
 
             return parsed
 
         except Exception:
 
             return {
-                "type": None
+                "identity": None
             }
