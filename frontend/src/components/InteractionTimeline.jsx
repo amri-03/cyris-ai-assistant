@@ -1,10 +1,35 @@
+import {useEffect, useRef} from "react";
+
 import AdaptiveResponseCard
     from "./AdaptiveResponseCard";
 
 
 export default function InteractionTimeline({
-                                                responses
-                                            }) {
+    responses
+}) {
+
+    const bottomRef = useRef ( null );
+
+    useEffect ( () => {
+        bottomRef.current?.scrollIntoView ( {
+            behavior: "smooth",
+        } );
+    }, [responses] );
+
+
+    if (responses.length === 0) {
+        return (
+            <div
+                className="
+                    text-neutral-600
+                    text-sm
+                    pt-10
+                "
+            >
+                Start a conversation with Cyris.
+            </div>
+        );
+    }
 
     return (
 
@@ -32,16 +57,16 @@ export default function InteractionTimeline({
                             <div
                                 className={
                                     `
-                            max-w-[75%]
+                            max-w-[70%]
                             px-4
                             py-3
-                            rounded-2xl
+                            rounded-3xl
                             whitespace-pre-wrap
-                            text-sm
+                            text-[15px]
                             leading-relaxed
                             ${
                                         isUser
-                                            ? "bg-indigo-600 text-white"
+                                            ? "bg-indigo-500 text-white"
                                             : "bg-neutral-900 text-neutral-100"
                                     }
                             `
@@ -62,6 +87,9 @@ export default function InteractionTimeline({
                 }
             )}
 
+            <div ref={bottomRef}/>
+
         </div>
+
     );
 }

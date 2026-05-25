@@ -54,29 +54,64 @@ export default function Home() {
 
     return (
         <div
-            className="min-h-screen bg-black text-white flex flex-col"
+            className="
+                min-h-screen
+                bg-black
+                text-white
+                flex
+                flex-col
+            "
         >
 
             <div
-                className="px-6 py-6 border-b border-neutral-800"
+                className="
+                    w-full
+                    border-b
+                    border-neutral-900
+                "
             >
-
-                <h1
-                    className="text-3xl font-semibold"
+                <div
+                    className="
+                        max-w-4xl
+                        mx-auto
+                        px-6
+                        py-5
+                    "
                 >
-                    Cyris
-                </h1>
 
-                <p
-                    className="text-neutral-400 mt-1"
-                >
-                    Your adaptive assistant
-                </p>
+                    <h1
+                        className="
+                            text-4xl
+                            font-semibold
+                            tracking-tight
+                        "
+                    >
+                        Cyris
+                    </h1>
 
+                    <p
+                        className="
+                            text-neutral-500
+                            mt-2
+                            text-sm
+                        "
+                    >
+                        Your adaptive assistant
+                    </p>
+
+                </div>
             </div>
 
             <div
-                className="flex-1 overflow-y-auto px-6 py-6"
+                className="
+                    flex-1
+                    overflow-y-auto
+                    px-6
+                    py-8
+                    max-w-4xl
+                    w-full
+                    mx-auto
+                "
             >
 
                 <InteractionTimeline
@@ -86,13 +121,26 @@ export default function Home() {
             </div>
 
             <div
-                className="border-t border-neutral-800 px-6 py-4"
+                className="
+                    border-t
+                    border-neutral-900
+                "
             >
+                <div
+                    className="
+                        max-w-4xl
+                        mx-auto
+                        px-6
+                        py-5
+                    "
+                >
 
                 <ConversationInput
                     onSend={handleSend}
                 />
 
+                </div>
+                
             </div>
 
         </div>
