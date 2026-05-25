@@ -1,21 +1,20 @@
 # Cyris AI Assistant
 
-Adaptive AI assistant focused on:
+Cyris is a continuity-aware adaptive AI assistant focused on long-term behavioral understanding, grounded conversational memory, and calm contextual
+guidance.
 
-- conversational continuity
-- contextual memory
-- grounded long-term interaction
+Unlike traditional productivity systems, Cyris is designed to adapt to the human instead of forcing the human to adapt to rigid systems.
 
 ---
 
-## Current Features
+## Current MVP Capabilities
 
-- persistent conversation history
-- continuity-aware memory system
-- Groq + Gemini AI provider support
-- grounded conversational behavior
-- adaptive context handling
-- frontend ↔ backend AI interaction loop
+- conversational continuity across sessions
+- grounded memory recall
+- adaptive conversational interaction
+- long-term continuity extraction
+- continuity-aware response generation
+- minimal conversational interface
 
 ---
 
@@ -25,19 +24,29 @@ Adaptive AI assistant focused on:
 - Python
 - React
 - Vite
+- TailwindCSS
 - Groq API
 - Gemini API
 
 ---
 
-## Current Focus
+## Current State
 
-Improving:
+Cyris is currently in active MVP development focused on:
 
 - conversational grounding
-- memory relevance
-- continuity realism
-- adaptive interaction quality
+- continuity stabilization
+- adaptive interaction systems
+- memory prioritization architecture
+
+---
+
+## Documentation
+
+See:
+
+- `SETUP.md`
+- `docs/`
 
 ---
 
