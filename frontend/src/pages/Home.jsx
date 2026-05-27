@@ -1,146 +1,141 @@
 import {useState} from "react";
-
 import api from "../services/api";
-
-import ConversationInput
-    from "../components/ConversationInput";
-
-import InteractionTimeline
-    from "../components/InteractionTimeline";
-
+import Header from "../components/Header";
+import ConversationThread from "../components/ConversationThread";
+import MessageInput from "../components/MessageInput";
 
 export default function Home() {
+    const [messages, setMessages] = useState ( [] );
+    const [isThinking, setIsThinking] = useState ( false );
+    const [isConnected, setIsConnected] = useState ( true );
 
-    const [responses, setResponses] =
-        useState ( [] );
-
-    const handleSend = async (
-        message
-    ) => {
+    const handleSend = async (text) => {
+        // Optimistically add user message
+        const userMessage = {role: "user", content: text};
+        setMessages ( (prev) => [...prev, userMessage] );
+        setIsThinking ( true );
 
         try {
-
-            const response =
-                await api.post (
-                    "/ai-test",
-                    {prompt: message}
-                );
+            const response = await api.post ( "/ai-test", {
+                prompt: text,
+            } );
 
             const content =
-                response.data.response?.response
-                ||
-                response.data.response?.error
-                ||
+                response.data.response?.response ||
+                response.data.response?.error ||
                 "No response available.";
 
-            setResponses (
-                (previous) => [
-                    ...previous,
-                    `User: ${message}`,
-                    `Cyris: ${content}`
-                ]
-            );
+            setMessages ( (prev) => [
+                ...prev,
+                {role: "assistant", content},
+            ] );
 
+            setIsConnected ( true );
         } catch (error) {
-
-            setResponses (
-                (previous) => [
-                    ...previous,
-                    "Cyris: Backend connection failed."
-                ]
-            );
+            setMessages ( (prev) => [
+                ...prev,
+                {
+                    role: "assistant",
+                    content:
+                        "I wasn't able to reach the backend. Please check that the server is running.",
+                },
+            ] );
+            setIsConnected ( false );
+        } finally {
+            setIsThinking ( false );
         }
     };
 
     return (
         <div
-            className="
-                min-h-screen
-                bg-black
-                text-white
-                flex
-                flex-col
-            "
+            style={{
+                height: "100vh",
+                background: "var(--bg-base)",
+                overflow: "hidden",
+                position: "relative",
+            }}
         >
 
+            {/* FIXED HEADER */}
             <div
-                className="
-                    w-full
-                    border-b
-                    border-neutral-900
-                "
+                style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    zIndex: 100,
+                    background: "var(--bg-base)",
+                }}
             >
                 <div
-                    className="
-                        max-w-4xl
-                        mx-auto
-                        px-6
-                        py-5
-                    "
+                    style={{
+                        width: "100%",
+                        maxWidth: "1400px",
+                        margin: "0 auto",
+                        padding: "0 48px",
+                    }}
+                >
+                    <Header isConnected={isConnected}/>
+                </div>
+            </div>
+
+            {/* SCROLLABLE THREAD */}
+            <div
+                style={{
+                    height: "100%",
+                    overflowY: "auto",
+                    paddingTop: "92px",
+                    paddingBottom: "140px",
+                }}
+            >
+                <div
+                    style={{
+                        width: "100%",
+                        maxWidth: "760px",
+                        margin: "0 auto",
+                        minHeight: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent:
+                            messages.length === 0
+                                ? "center"
+                                : "flex-start",
+                    }}
                 >
 
-                    <h1
-                        className="
-                            text-4xl
-                            font-semibold
-                            tracking-tight
-                        "
-                    >
-                        Cyris
-                    </h1>
-
-                    <p
-                        className="
-                            text-neutral-500
-                            mt-2
-                            text-sm
-                        "
-                    >
-                        Your adaptive assistant
-                    </p>
+                    <ConversationThread
+                        messages={messages}
+                        isThinking={isThinking}
+                    />
 
                 </div>
             </div>
 
+            {/* FIXED INPUT */}
             <div
-                className="
-                    flex-1
-                    overflow-y-auto
-                    px-6
-                    py-8
-                    max-w-4xl
-                    w-full
-                    mx-auto
-                "
-            >
-
-                <InteractionTimeline
-                    responses={responses}
-                />
-
-            </div>
-
-            <div
-                className="
-                    border-t
-                    border-neutral-900
-                "
+                style={{
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    width: "100%",
+                    zIndex: 100,
+                    background:
+                        "linear-gradient(to top, var(--bg-base) 70%, transparent)",
+                    paddingTop: "24px",
+                }}
             >
                 <div
-                    className="
-                        max-w-4xl
-                        mx-auto
-                        px-6
-                        py-5
-                    "
+                    style={{
+                        width: "100%",
+                        maxWidth: "760px",
+                        margin: "0 auto",
+                    }}
                 >
-
-                <ConversationInput
-                    onSend={handleSend}
-                />
-
+                    <MessageInput
+                        onSend={handleSend}
+                        isDisabled={isThinking}
+                    />
                 </div>
-                
             </div>
 
         </div>

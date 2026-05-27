@@ -54,10 +54,11 @@ class ConversationMemoryService:
             }
         )
 
-        with open(
-                self.memory_file,
-                "w"
-        ) as file:
+        memory["messages"] = (
+            memory["messages"][-50:]
+        )
+
+        with open(self.memory_file, "w") as file:
             json.dump(
                 memory,
                 file,
