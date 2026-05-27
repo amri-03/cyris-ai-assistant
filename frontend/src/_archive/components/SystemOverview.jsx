@@ -1,8 +1,8 @@
 import RuntimeSummaryCard
-    from "./RuntimeSummaryCard.jsx";
+    from "../../components/RuntimeSummaryCard.jsx";
 
 import BehaviorSummaryCard
-    from "./BehaviorSummaryCard.jsx";
+    from "../../components/BehaviorSummaryCard.jsx";
 
 
 export default function SystemOverview() {

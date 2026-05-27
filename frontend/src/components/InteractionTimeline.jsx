@@ -1,7 +1,7 @@
 import {useEffect, useRef} from "react";
 
 import AdaptiveResponseCard
-    from "./AdaptiveResponseCard.jsx";
+    from "./AdaptiveResponseCard";
 
 
 export default function InteractionTimeline({

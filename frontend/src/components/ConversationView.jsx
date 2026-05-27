@@ -1,4 +1,4 @@
-import ResponseCard from "./ResponseCard.jsx";
+import ResponseCard from "./ResponseCard";
 
 export default function ConversationView({
                                              responses

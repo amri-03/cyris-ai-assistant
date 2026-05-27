@@ -1,86 +1,148 @@
 import {useState} from "react";
+
 import api from "../services/api";
-import Header from "../components/Header";
-import ConversationThread from "../components/ConversationThread";
-import MessageInput from "../components/MessageInput";
+
+import ConversationInput
+    from "../components/ConversationInput";
+
+import InteractionTimeline
+    from "../components/InteractionTimeline";
+
 
 export default function Home() {
-    const [messages, setMessages] = useState ( [] );
-    const [isThinking, setIsThinking] = useState ( false );
-    const [isConnected, setIsConnected] = useState ( true );
 
-    const handleSend = async (text) => {
-        // Optimistically add user message
-        const userMessage = {role: "user", content: text};
-        setMessages ( (prev) => [...prev, userMessage] );
-        setIsThinking ( true );
+    const [responses, setResponses] =
+        useState ( [] );
+
+    const handleSend = async (
+        message
+    ) => {
 
         try {
-            const response = await api.post ( "/ai-test", {
-                prompt: text,
-            } );
+
+            const response =
+                await api.post (
+                    "/ai-test",
+                    {prompt: message}
+                );
 
             const content =
-                response.data.response?.response ||
-                response.data.response?.error ||
+                response.data.response?.response
+                ||
+                response.data.response?.error
+                ||
                 "No response available.";
 
-            setMessages ( (prev) => [
-                ...prev,
-                {role: "assistant", content},
-            ] );
+            setResponses (
+                (previous) => [
+                    ...previous,
+                    `User: ${message}`,
+                    `Cyris: ${content}`
+                ]
+            );
 
-            setIsConnected ( true );
         } catch (error) {
-            setMessages ( (prev) => [
-                ...prev,
-                {
-                    role: "assistant",
-                    content:
-                        "I wasn't able to reach the backend. Please check that the server is running.",
-                },
-            ] );
-            setIsConnected ( false );
-        } finally {
-            setIsThinking ( false );
+
+            setResponses (
+                (previous) => [
+                    ...previous,
+                    "Cyris: Backend connection failed."
+                ]
+            );
         }
     };
 
     return (
         <div
-            style={{
-                height: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                background: "var(--bg-base)",
-                position: "relative",
-            }}
+            className="
+                min-h-screen
+                bg-black
+                text-white
+                flex
+                flex-col
+            "
         >
-            {/* Constrained content column */}
+
             <div
-                style={{
-                    flex: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    width: "100%",
-                    maxWidth: "720px",
-                    margin: "0 auto",
-                    padding: "0 24px",
-                    minHeight: 0,
-                }}
+                className="
+                    w-full
+                    border-b
+                    border-neutral-900
+                "
             >
-                <Header isConnected={isConnected}/>
+                <div
+                    className="
+                        max-w-4xl
+                        mx-auto
+                        px-6
+                        py-5
+                    "
+                >
 
-                <ConversationThread
-                    messages={messages}
-                    isThinking={isThinking}
-                />
+                    <h1
+                        className="
+                            text-4xl
+                            font-semibold
+                            tracking-tight
+                        "
+                    >
+                        Cyris
+                    </h1>
 
-                <MessageInput
-                    onSend={handleSend}
-                    isDisabled={isThinking}
-                />
+                    <p
+                        className="
+                            text-neutral-500
+                            mt-2
+                            text-sm
+                        "
+                    >
+                        Your adaptive assistant
+                    </p>
+
+                </div>
             </div>
+
+            <div
+                className="
+                    flex-1
+                    overflow-y-auto
+                    px-6
+                    py-8
+                    max-w-4xl
+                    w-full
+                    mx-auto
+                "
+            >
+
+                <InteractionTimeline
+                    responses={responses}
+                />
+
+            </div>
+
+            <div
+                className="
+                    border-t
+                    border-neutral-900
+                "
+            >
+                <div
+                    className="
+                        max-w-4xl
+                        mx-auto
+                        px-6
+                        py-5
+                    "
+                >
+
+                <ConversationInput
+                    onSend={handleSend}
+                />
+
+                </div>
+                
+            </div>
+
         </div>
     );
 }
