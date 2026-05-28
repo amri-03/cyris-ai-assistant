@@ -45,12 +45,11 @@ from app.services.system_startup_validator import SystemStartupValidator
 from app.services.runtime_validation_summary_service import RuntimeValidationSummaryService
 
 from app.memory.memory_manager import MemoryManager
+from app.memory.continuity_memory_service import ContinuityMemoryService
+
 from app.context.context_manager import ContextManager
 
-from app.services.ai.ai_provider_manager import (
-    AIProviderManager
-)
-
+from app.services.ai.ai_provider_manager import AIProviderManager
 
 app = FastAPI()
 
@@ -98,6 +97,7 @@ runtime_loop_service = RuntimeLoopService()
 
 startup_validator = SystemStartupValidator()
 validation_summary_service = RuntimeValidationSummaryService()
+continuity_memory = ContinuityMemoryService()
 
 ai_provider = AIProviderManager()
 
@@ -683,3 +683,19 @@ def validation_summary():
         validation_summary_service
         .generate_summary()
     )
+
+
+@app.get("/memory-status")
+def memory_status():
+    memory = (
+        continuity_memory
+        .load_memory()
+    )
+
+    return {
+        "continuity_items":
+            memory.get(
+                "continuity_items",
+                []
+            )
+    }
