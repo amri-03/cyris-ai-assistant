@@ -34,7 +34,13 @@ export default function MessageBubble({
             return;
         }
 
-        const words = content.split ( " " );
+        const safeContent =
+            typeof content === "string"
+                ? content
+                : JSON.stringify ( content );
+
+        const words =
+            safeContent.split ( " " );
 
         let index = 0;
 
@@ -59,6 +65,11 @@ export default function MessageBubble({
     }, [content, role] );
 
     const isUser = role === "user";
+
+    const safeContent =
+        typeof content === "string"
+            ? content
+            : JSON.stringify ( content );
 
     return (
 
@@ -124,7 +135,7 @@ export default function MessageBubble({
                                 "0 0 20px rgba(123, 108, 255, 0.06)",
                         }}
                     >
-                        {content}
+                        {safeContent}
                     </div>
 
                 ) : (

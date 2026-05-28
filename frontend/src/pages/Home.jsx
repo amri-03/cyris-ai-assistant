@@ -50,13 +50,12 @@ export default function Home() {
         setIsThinking ( true );
 
         try {
-            const response = await api.post ( "/ai-test", {
+            const response = await api.post ( "/chat", {
                 prompt: text,
             } );
 
             const content =
-                response.data.response?.response ||
-                response.data.response?.error ||
+                response.data.response ||
                 "No response available.";
 
             setMessages ( (prev) => [

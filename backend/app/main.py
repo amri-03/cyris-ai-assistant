@@ -669,6 +669,37 @@ def ai_test(
     }
 
 
+@app.post("/chat")
+def chat(request: PromptRequest):
+    ai_response = (
+        ai_provider.generate_ai_response(
+            request.prompt
+        )
+    )
+
+    if isinstance(ai_response, dict):
+
+        content = (
+                ai_response.get("response")
+                or ai_response.get("content")
+        )
+
+        if isinstance(content, dict):
+            content = (
+                    content.get("response")
+                    or content.get("content")
+            )
+
+    else:
+
+        content = ai_response
+
+    return {
+        "response": str(content),
+        "session_id": "default-session"
+    }
+
+
 @app.get("/system-status")
 def system_status():
     return (
