@@ -220,3 +220,7 @@ __marimo__/
 
 # PyCharm
 .idea/
+
+# Avoid personal conversations
+
+backend/data/
