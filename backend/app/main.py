@@ -699,3 +699,42 @@ def memory_status():
                 []
             )
     }
+
+
+@app.get("/session-start")
+def session_start():
+    continuity = (
+        continuity_memory
+        .load_memory()
+    )
+
+    items = continuity.get(
+        "continuity_items",
+        []
+    )
+
+    if not items:
+        return {
+            "message":
+                (
+                    "Hello. I'm Cyris. "
+                    "Tell me a little about yourself "
+                    "and what matters to you right now."
+                )
+        }
+
+    latest = items[-1]
+
+    content = latest.get(
+        "content",
+        "something important"
+    )
+
+    return {
+        "message":
+            (
+                "Welcome back. "
+                f"Last time we were discussing {content}. "
+                "Would you like to continue from there?"
+            )
+    }

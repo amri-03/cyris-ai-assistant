@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import api from "../services/api";
 import Header from "../components/Header";
 import ConversationThread from "../components/ConversationThread";
@@ -8,6 +8,40 @@ export default function Home() {
     const [messages, setMessages] = useState ( [] );
     const [isThinking, setIsThinking] = useState ( false );
     const [isConnected, setIsConnected] = useState ( true );
+
+    useEffect ( () => {
+
+        const loadSession = async () => {
+
+            try {
+
+                const response =
+                    await api.get (
+                        "/session-start"
+                    );
+
+                const message =
+                    response.data.message;
+
+                setMessages ( [
+                    {
+                        role: "assistant",
+                        content: message,
+                    }
+                ] );
+
+            } catch (error) {
+
+                console.error (
+                    "Session start failed",
+                    error
+                );
+            }
+        };
+
+        loadSession();
+
+    }, [] );
 
     const handleSend = async (text) => {
         // Optimistically add user message
