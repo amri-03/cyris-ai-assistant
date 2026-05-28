@@ -81,7 +81,7 @@ export default function MessageInput({onSend, isDisabled}) {
                         fontFamily: "var(--font-sans)",
                         fontSize: "16px",
                         fontWeight: 300,
-                        lineHeight: "16px",
+                        lineHeight: "1.6",
                         padding: 0,
                         margin: 0,
                         caretColor: "var(--accent-primary)",

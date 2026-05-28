@@ -16,6 +16,10 @@ from app.services.ai.response_coordinator import (
     ResponseCoordinator
 )
 
+from app.services.ai.response_cleaner import (
+    ResponseCleaner
+)
+
 
 class AIProviderManager:
 
@@ -35,6 +39,10 @@ class AIProviderManager:
 
         self.response_coordinator = (
             ResponseCoordinator()
+        )
+
+        self.response_cleaner = (
+            ResponseCleaner()
         )
 
     def generate_ai_response(
@@ -62,4 +70,30 @@ class AIProviderManager:
             )
         )
 
-        return coordinated_response
+        if isinstance(coordinated_response, dict):
+
+            final_response = (
+                coordinated_response.get("response")
+            )
+
+            if isinstance(final_response, dict):
+                final_response = (
+                        final_response.get("response")
+                        or final_response.get("content")
+                        or str(final_response)
+                )
+
+        else:
+
+            final_response = str(
+                coordinated_response
+            )
+
+        cleaned_response = (
+            self.response_cleaner
+            .clean_response(
+                final_response
+            )
+        )
+
+        return cleaned_response
