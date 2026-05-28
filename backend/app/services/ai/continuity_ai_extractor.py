@@ -48,23 +48,32 @@ class ContinuityAIExtractor:
         - project
         - academic_context
         - career_direction
+        
+        Extract ONLY information the user personally claims,
+        owns, is actively pursuing,
+        or clearly identifies with.
+        
+        Only extract direct user ownership statements such as:
+        - "I am learning..."
+        - "I want to improve..."
+        - "I am working on..."
+        - "My project is..."
+        - "I struggle with..."
+        - "I am in semester..."
 
         Return ONLY valid JSON.
-        
-        Only extract information that appears to be:
-        - long-term
-        - repeatedly important
-        - identity-relevant
-        - directionally meaningful
         
         The information should likely remain relevant across multiple future conversations.
         
         Do NOT extract:
-        - temporary thoughts
+        - hypothetical discussions
+        - examples
+        - technologies mentioned casually
+        - things the user rejected
+        - things the user said they don't know
+        - assistant suggestions
+        - temporary conversational filler
         - speculative interests
-        - casual mentions
-        - passing curiosities
-        - one-time ideas
         - emotional reactions without long-term significance
         - temporary confusion
         - exploratory thinking
@@ -145,6 +154,11 @@ class ContinuityAIExtractor:
             )
 
             parsed = json.loads(cleaned)
+
+            if not parsed.get("identity"):
+                return {
+                    "identity": None
+                }
 
             return parsed
 
