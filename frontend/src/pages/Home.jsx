@@ -64,7 +64,7 @@ export default function Home() {
             ] );
 
             setIsConnected ( true );
-        } catch (error) {
+        } catch {
             setMessages ( (prev) => [
                 ...prev,
                 {

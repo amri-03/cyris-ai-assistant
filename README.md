@@ -1,52 +1,61 @@
 # Cyris AI Assistant
 
-Cyris is a continuity-aware adaptive AI assistant focused on long-term behavioral understanding, grounded conversational memory, and calm contextual
-guidance.
+A continuity-aware AI assistant designed to maintain conversational context, long-term direction, and adaptive interaction over time.
 
-Unlike traditional productivity systems, Cyris is designed to adapt to the human instead of forcing the human to adapt to rigid systems.
+Cyris remembers important conversational continuity between sessions and helps users continue meaningful discussions naturally instead of restarting
+from scratch each time.
 
 ---
 
-## Current MVP Capabilities
+## Features
 
-- conversational continuity across sessions
-- grounded memory recall
-- adaptive conversational interaction
-- long-term continuity extraction
-- continuity-aware response generation
-- minimal conversational interface
+- Persistent conversational memory
+- Continuity-aware responses
+- Adaptive conversational behavior
+- Session restoration
+- Lightweight long-term memory extraction
+- Calm conversational UI
+- Local JSON-based memory system
 
 ---
 
 ## Tech Stack
 
-- FastAPI
-- Python
+Frontend:
+
 - React
 - Vite
-- TailwindCSS
+
+Backend:
+
+- FastAPI
+- Python
+
+AI:
+
 - Groq API
-- Gemini API
+- Gemini API (optional)
+
+Storage:
+
+- JSON-based local memory persistence
 
 ---
 
-## Current State
+## Current Status
 
-Cyris is currently in active MVP development focused on:
+Cyris is currently an evolving MVP focused on:
 
-- conversational grounding
-- continuity stabilization
-- adaptive interaction systems
-- memory prioritization architecture
+- continuity-aware conversations
+- persistent contextual memory
+- adaptive interaction behavior
+
 
 ---
 
-## Documentation
+## Setup
 
-See:
-
-- `SETUP.md`
-- `docs/`
+See `SETUP.md` for installation and local development instructions.
 
 ---
 
@@ -69,9 +78,12 @@ See:
 * ✅ Phase 14 — Deployment Readiness & Real-World Stabilization *( 2+ hrs )*
 * ✅ Phase 15 — Real-World MVP Refinement & Validation *( 7+ hrs )*
 * 🔄 Phase 16 — Real-World MVP Testing & Interaction Validation *( in progress )*
+  └── A — Conversation loop stabilization ✅
+  └── B — Frontend redesign ✅
+  └── C — Memory reliability ✅
+  └── D — Conversation quality ✅
+  └── E — Polish & portfolio prep ✅
 
 ---
 
-The project has achieved its first complete end-to-end interaction loop and is
-now entering Phase 16 — real-world MVP testing, interaction realism refinement,
-adaptive intelligence validation, and continuity-aware conversational evolution.
+The project is actively being refined and expanded toward more advanced long-term memory and behavioral intelligence systems.
