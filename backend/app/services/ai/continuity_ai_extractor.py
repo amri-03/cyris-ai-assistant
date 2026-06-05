@@ -156,7 +156,7 @@ class ContinuityAIExtractor:
             try:
                 import google.generativeai as genai
                 genai.configure(api_key=gemini_key)
-                model = genai.GenerativeModel("gemini-flash-latest")
+                model = genai.GenerativeModel("gemini-2.0-flash")
                 response = model.generate_content(extraction_prompt)
                 content = response.text
             except Exception as gemini_err:
