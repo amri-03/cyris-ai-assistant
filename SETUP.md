@@ -1,36 +1,57 @@
-# Cyris Setup Guide
+# ⚙️ Cyris Setup & Installation Guide
+
+Follow these steps to set up and run Cyris on your local development machine.
+
+---
 
 ## 1. Clone the Repository
 
+Open your terminal and clone the repository, then navigate to the root directory:
+
 ```bash
-git clone <repo-url>
+git clone <your-repo-url>
 cd cyris-ai-assistant
 ```
 
 ---
 
-## 2. Backend Setup
+## 2. Backend Setup (FastAPI)
+
+Navigate to the `backend` directory:
 
 ```bash
 cd backend
-python -m venv venv
 ```
 
-### Activate Virtual Environment
+### Create a Python Virtual Environment
 
-Windows:
+* **Windows (PowerShell/CMD)**:
+  ```bash
+  python -m venv venv
+  ```
+* **macOS / Linux**:
+  ```bash
+  python3 -m venv venv
+  ```
 
-```bash
-venv\Scripts\activate
-```
+### Activate the Virtual Environment
 
-Mac/Linux:
+* **Windows (PowerShell)**:
+  ```powershell
+  .\venv\Scripts\Activate.ps1
+  ```
+* **Windows (CMD)**:
+  ```cmd
+  .\venv\Scripts\activate.bat
+  ```
+* **macOS / Linux**:
+  ```bash
+  source venv/bin/activate
+  ```
 
-```bash
-source venv/bin/activate
-```
+### Install Python Dependencies
 
-### Install Dependencies
+Make sure your virtual environment is active (you should see `(venv)` in your terminal prompt), then run:
 
 ```bash
 pip install -r requirements.txt
@@ -40,43 +61,45 @@ pip install -r requirements.txt
 
 ## 3. Configure Environment Variables
 
-Create a `.env` file inside the `backend/` directory.
+Create a file named `.env` in the `backend/` folder:
 
-Copy values from `.env.example`.
+```bash
+# On Windows (CMD/PowerShell) or macOS/Linux:
+# Copy the example file to get started
+cp .env.example .env
+```
 
-Required:
-
-* `GROQ_API_KEY`
-
-Optional:
-
-* `GEMINI_API_KEY`
-
-Set provider:
+Open the `.env` file and configure your API keys and provider selection:
 
 ```env
-AI_PROVIDER=groq
+# Choose your main chat provider: "gemini" or "groq"
+AI_PROVIDER=gemini
+
+# If using Gemini (highly recommended for both Chat and Memory extraction)
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# If using Groq (Llama models)
+GROQ_API_KEY=your_groq_api_key_here
 ```
 
 ---
 
-## 4. Start Backend
+## 4. Run the Backend Server
+
+Start the FastAPI application by executing `run.py`:
 
 ```bash
 python run.py
 ```
 
-Backend runs at:
-
-```text
-http://127.0.0.1:8000
-```
+The backend API server will start up with auto-reload enabled at:
+👉 **`http://127.0.0.1:8000`**
 
 ---
 
-## 5. Frontend Setup
+## 5. Frontend Setup (React + Vite)
 
-Open a new terminal:
+Open a **new terminal window**, navigate to the `frontend` folder, install the Node packages, and run the development server:
 
 ```bash
 cd frontend
@@ -84,14 +107,13 @@ npm install
 npm run dev
 ```
 
-Frontend runs at:
-
-```text
-http://localhost:5173
-```
+The frontend client will start running at:
+👉 **`http://localhost:5173`**
 
 ---
 
-## 6. Start Using Cyris
+## 6. Access Cyris AI Assistant
 
-Open the frontend in your browser and begin chatting with Cyris.
+Open your web browser and navigate to **`http://localhost:5173`** to begin chatting with Cyris!
+* Click the **🧠 Memory** button in the top right header to toggle open the memory dashboard panel.
+* Chat naturally, and Cyris will extract goals/struggles and automatically update your profile.
