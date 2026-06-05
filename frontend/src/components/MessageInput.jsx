@@ -46,7 +46,7 @@ export default function MessageInput({onSend, isDisabled}) {
                 onClick={() => textareaRef.current?.focus ()}
                 style={{
                     display: "flex",
-                    alignItems: "flex-end",
+                    alignItems: "center",
                     gap: "12px",
                     background: "var(--bg-input)",
                     border: `1px solid ${
@@ -85,7 +85,7 @@ export default function MessageInput({onSend, isDisabled}) {
                         padding: 0,
                         margin: 0,
                         caretColor: "var(--accent-primary)",
-                        minHeight: "24px",
+                        minHeight: "26px",
                         maxHeight: "200px",
                         overflowY: "auto",
                         display: "block",
