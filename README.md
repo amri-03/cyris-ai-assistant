@@ -20,7 +20,7 @@ Unlike traditional checklist apps or cheerleading motivational assistants, Cyris
 
 * **Frontend**: React, Vite, styled with custom Vanilla CSS variables and TailwindCSS.
 * **Backend**: FastAPI (Python), Python Dotenv.
-* **AI Providers**: Gemini API (`gemini-1.5-flash`), Groq API (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`).
+* **AI Providers**: Gemini API (`gemini-flash-latest`), Groq API (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`).
 * **Persistence**: Local JSON-based serialization.
 
 ---
