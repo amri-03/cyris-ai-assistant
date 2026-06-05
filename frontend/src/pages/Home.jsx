@@ -3,11 +3,23 @@ import api from "../services/api";
 import Header from "../components/Header";
 import ConversationThread from "../components/ConversationThread";
 import MessageInput from "../components/MessageInput";
+import MemoryPanel from "../components/MemoryPanel";
 
 export default function Home() {
     const [messages, setMessages] = useState ( [] );
     const [isThinking, setIsThinking] = useState ( false );
     const [isConnected, setIsConnected] = useState ( true );
+    const [isMemoryOpen, setIsMemoryOpen] = useState(false);
+    const [memoryItems, setMemoryItems] = useState([]);
+
+    const fetchMemoryItems = async () => {
+        try {
+            const response = await api.get("/memory-status");
+            setMemoryItems(response.data.continuity_items || []);
+        } catch (error) {
+            console.error("Failed to fetch memory items", error);
+        }
+    };
 
     useEffect ( () => {
 
@@ -40,6 +52,7 @@ export default function Home() {
         };
 
         loadSession();
+        fetchMemoryItems();
 
     }, [] );
 
@@ -64,6 +77,9 @@ export default function Home() {
             ] );
 
             setIsConnected ( true );
+            
+            // Refresh memory items automatically after response is received
+            fetchMemoryItems();
         } catch {
             setMessages ( (prev) => [
                 ...prev,
@@ -76,6 +92,15 @@ export default function Home() {
             setIsConnected ( false );
         } finally {
             setIsThinking ( false );
+        }
+    };
+
+    const handleDeleteMemoryItem = async (identity) => {
+        try {
+            await api.delete(`/memory/${identity}`);
+            setMemoryItems((prev) => prev.filter((item) => item.identity !== identity));
+        } catch (error) {
+            console.error("Failed to delete memory item", error);
         }
     };
 
@@ -108,7 +133,10 @@ export default function Home() {
                         padding: "0 48px",
                     }}
                 >
-                    <Header isConnected={isConnected}/>
+                    <Header 
+                        isConnected={isConnected}
+                        onOpenMemory={() => setIsMemoryOpen(true)}
+                    />
                 </div>
             </div>
 
@@ -171,6 +199,15 @@ export default function Home() {
                 </div>
             </div>
 
+            {/* INTERACTIVE MEMORY DRAWER */}
+            <MemoryPanel
+                isOpen={isMemoryOpen}
+                onClose={() => setIsMemoryOpen(false)}
+                items={memoryItems}
+                onDelete={handleDeleteMemoryItem}
+                onReconcile={fetchMemoryItems}
+            />
+
         </div>
     );
-}
+}

@@ -1,4 +1,4 @@
-export default function Header({isConnected}) {
+export default function Header({isConnected, onOpenMemory}) {
     return (
         <div
             style={{
@@ -41,42 +41,81 @@ export default function Header({isConnected}) {
                 </span>
             </div>
 
-            {/* Connection status */}
+            {/* Action buttons & Connection status */}
             <div
                 style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "7px",
+                    gap: "24px",
                 }}
             >
-                <span
+                {/* Memory panel button */}
+                <button
+                    onClick={onOpenMemory}
                     style={{
-                        width: "6px",
-                        height: "6px",
-                        borderRadius: "50%",
-                        background: isConnected
-                            ? "#4ade80"
-                            : "var(--text-muted)",
-                        boxShadow: isConnected
-                            ? "0 0 8px rgba(74, 222, 128, 0.6)"
-                            : "none",
-                        transition: "all var(--transition)",
-                    }}
-                />
-                <span
-                    style={{
+                        background: "transparent",
+                        border: "1px solid var(--border-subtle)",
+                        borderRadius: "var(--radius-sm)",
+                        padding: "6px 12px",
+                        color: "var(--text-secondary)",
                         fontFamily: "var(--font-mono)",
                         fontSize: "10px",
-                        letterSpacing: "0.12em",
+                        letterSpacing: "0.08em",
                         textTransform: "uppercase",
-                        color: isConnected
-                            ? "var(--text-secondary)"
-                            : "var(--text-muted)",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        transition: "all var(--transition)",
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = "var(--user-border)";
+                        e.currentTarget.style.color = "var(--text-primary)";
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = "var(--border-subtle)";
+                        e.currentTarget.style.color = "var(--text-secondary)";
                     }}
                 >
-                    {isConnected ? "online" : "offline"}
-                </span>
+                    <span>🧠</span> memory
+                </button>
+
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "7px",
+                    }}
+                >
+                    <span
+                        style={{
+                            width: "6px",
+                            height: "6px",
+                            borderRadius: "50%",
+                            background: isConnected
+                                ? "#4ade80"
+                                : "var(--text-muted)",
+                            boxShadow: isConnected
+                                ? "0 0 8px rgba(74, 222, 128, 0.6)"
+                                : "none",
+                            transition: "all var(--transition)",
+                        }}
+                    />
+                    <span
+                        style={{
+                            fontFamily: "var(--font-mono)",
+                            fontSize: "10px",
+                            letterSpacing: "0.12em",
+                            textTransform: "uppercase",
+                            color: isConnected
+                                ? "var(--text-secondary)"
+                                : "var(--text-muted)",
+                        }}
+                    >
+                        {isConnected ? "online" : "offline"}
+                    </span>
+                </div>
             </div>
         </div>
     );
-}
+}
