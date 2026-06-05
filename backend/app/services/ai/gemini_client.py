@@ -1,6 +1,22 @@
 import os
 import google.generativeai as genai
 
+from app.services.ai.system_prompt_manager import (
+    SystemPromptManager
+)
+
+from app.services.memory.conversation_memory_service import (
+    ConversationMemoryService
+)
+
+from app.memory.continuity_memory_service import (
+    ContinuityMemoryService
+)
+
+from app.memory.conversation_history_service import (
+    ConversationHistoryService
+)
+
 
 class GeminiClient:
 
@@ -9,19 +25,32 @@ class GeminiClient:
             "GEMINI_API_KEY"
         )
 
+        self.system_prompt_manager = (
+            SystemPromptManager()
+        )
+
+        self.memory_service = (
+            ConversationMemoryService()
+        )
+
+        self.continuity_memory = (
+            ContinuityMemoryService()
+        )
+
+        self.history_service = (
+            ConversationHistoryService()
+        )
+
         self.model = None
 
         if self.api_key:
             genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel(
-                "gemini-1.5-flash"
-            )
 
     def generate_response(
             self,
             prompt: str
     ):
-        if not self.model:
+        if not self.api_key:
             return {
                 "status": "failure",
                 "error": (
@@ -30,8 +59,72 @@ class GeminiClient:
             }
 
         try:
-            response = self.model.generate_content(
+            # Build memory and history context
+            memory_context = (
+                self.continuity_memory
+                .build_priority_briefing()
+            )
+
+            history = (
+                self.history_service
+                .get_messages()
+            )
+
+            # Recreate GenerativeModel with system instructions dynamically
+            system_prompt = self.system_prompt_manager.build_system_prompt()
+            full_system_prompt = f"{system_prompt}\n\nImportant continuity context:\n{memory_context}"
+            
+            model = genai.GenerativeModel(
+                "gemini-1.5-flash",
+                system_instruction=full_system_prompt
+            )
+
+            # Map history to Gemini format (user/model roles)
+            gemini_history = []
+            for msg in history:
+                role = "model" if msg["role"] == "assistant" else "user"
+                gemini_history.append({
+                    "role": role,
+                    "parts": [msg["content"]]
+                })
+
+            # Append current user prompt
+            gemini_history.append({
+                "role": "user",
+                "parts": [prompt]
+            })
+
+            # Generate response
+            response = model.generate_content(
+                contents=gemini_history
+            )
+
+            content = response.text
+
+            # Update history and memory services
+            self.history_service.add_message(
+                "user",
                 prompt
+            )
+
+            self.history_service.add_message(
+                "assistant",
+                content
+            )
+
+            self.memory_service.save_message(
+                "user",
+                prompt
+            )
+
+            self.continuity_memory.save_continuity(
+                None,  # extractor now detects/uses Gemini directly
+                prompt
+            )
+
+            self.memory_service.save_message(
+                "assistant",
+                content
             )
 
             return response
@@ -40,4 +133,4 @@ class GeminiClient:
             return {
                 "status": "failure",
                 "error": str(error)
-            }
+            }

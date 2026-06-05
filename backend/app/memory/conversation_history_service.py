@@ -10,11 +10,24 @@ class ConversationHistoryService:
         )
 
     def load_history(self):
-        with open(
-                self.file_path,
-                "r"
-        ) as file:
-            return json.load(file)
+        try:
+            # Ensure parent directory exists
+            self.file_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Auto-create file if missing
+            if not self.file_path.exists():
+                default_history = {"messages": []}
+                with open(self.file_path, "w") as file:
+                    json.dump(default_history, file, indent=4)
+                return default_history
+
+            with open(
+                    self.file_path,
+                    "r"
+            ) as file:
+                return json.load(file)
+        except Exception:
+            return {"messages": []}
 
     def save_history(
             self,

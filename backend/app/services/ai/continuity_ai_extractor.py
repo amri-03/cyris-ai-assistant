@@ -1,11 +1,13 @@
 import json
+import os
 
 
 class ContinuityAIExtractor:
 
     def build_extraction_prompt(
             self,
-            message: str
+            message: str,
+            existing_items_str: str
     ):
 
         return f"""
@@ -61,6 +63,13 @@ class ContinuityAIExtractor:
         - "I struggle with..."
         - "I am in semester..."
 
+        Existing known continuity items for this user:
+        {existing_items_str}
+
+        CRITICAL DIRECTIVES:
+        1. If the user's statement refers to or updates a topic that already exists in the known items, REUSE the existing "identity" (e.g., if you are updating academic details, reuse the existing identity like "academic_status" or "study_topics" instead of creating a new one).
+        2. If the new information completely replaces, updates, or conflicts with one or more existing items, list those old items' identities in the "supersedes" array so they can be retired.
+        
         Return ONLY valid JSON.
         
         The information should likely remain relevant across multiple future conversations.
@@ -99,7 +108,8 @@ class ContinuityAIExtractor:
             "identity": "...",
             "type": "...",
             "content": "...",
-            "importance": "low | medium | high"
+            "importance": "low | medium | high",
+            "supersedes": ["old_identity_1", "old_identity_2"]
         }}
 
         If nothing meaningful exists, return:
@@ -115,37 +125,66 @@ class ContinuityAIExtractor:
     def extract_structured_continuity(
             self,
             ai_client,
-            message: str
+            message: str,
+            existing_items: list = None
     ):
+        # Format existing items
+        if existing_items:
+            items_summary = []
+            for item in existing_items:
+                items_summary.append({
+                    "identity": item.get("identity"),
+                    "type": item.get("type"),
+                    "content": item.get("content")
+                })
+            existing_items_str = json.dumps(items_summary, indent=2)
+        else:
+            existing_items_str = "[]"
 
         extraction_prompt = (
             self.build_extraction_prompt(
-                message
+                message,
+                existing_items_str
             )
         )
 
-        response = (
-            ai_client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {
-                        "role": "user",
-                        "content":
-                            extraction_prompt
-                    }
-                ]
-            )
-        )
+        content = ""
+        gemini_key = os.getenv("GEMINI_API_KEY")
 
-        content = (
-            response
-            .choices[0]
-            .message
-            .content
-        )
+        # Try Gemini first as preferred by the user, falling back to Groq if key missing
+        if gemini_key:
+            try:
+                import google.generativeai as genai
+                genai.configure(api_key=gemini_key)
+                model = genai.GenerativeModel("gemini-1.5-flash")
+                response = model.generate_content(extraction_prompt)
+                content = response.text
+            except Exception as gemini_err:
+                print(f"Gemini extraction failed, falling back to Groq: {gemini_err}")
+                gemini_key = None
+
+        if not gemini_key:
+            # Fallback to Groq
+            if not ai_client:
+                from groq import Groq
+                groq_key = os.getenv("GROQ_API_KEY")
+                ai_client = Groq(api_key=groq_key)
+            try:
+                response = ai_client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": extraction_prompt
+                        }
+                    ]
+                )
+                content = response.choices[0].message.content
+            except Exception as groq_err:
+                print(f"Groq extraction failed: {groq_err}")
+                return {"identity": None}
 
         try:
-
             cleaned = (
                 content
                 .replace("```json", "")
@@ -160,10 +199,13 @@ class ContinuityAIExtractor:
                     "identity": None
                 }
 
+            # Ensure supersedes is a list
+            if "supersedes" not in parsed or not isinstance(parsed["supersedes"], list):
+                parsed["supersedes"] = []
+
             return parsed
 
         except Exception:
-
             return {
                 "identity": None
-            }
+            }

@@ -1,9 +1,11 @@
 import json
+from datetime import datetime
 from pathlib import Path
 
 from app.services.ai.continuity_ai_extractor import (
     ContinuityAIExtractor
 )
+from app.memory.continuity_extractor import ContinuityExtractor
 
 
 class ContinuityMemoryService:
@@ -20,22 +22,52 @@ class ContinuityMemoryService:
             ContinuityAIExtractor()
         )
 
-    def load_memory(self):
+        self.rule_extractor = (
+            ContinuityExtractor()
+        )
 
+    def load_memory(self):
         try:
+            # Ensure parent directory exists
+            self.memory_file.parent.mkdir(parents=True, exist_ok=True)
+
+            # Auto-create file if missing
+            if not self.memory_file.exists():
+                default_memory = {"continuity_items": []}
+                with open(self.memory_file, "w") as file:
+                    json.dump(default_memory, file, indent=4)
+                return default_memory
 
             with open(
                     self.memory_file,
                     "r"
             ) as file:
-
                 return json.load(file)
 
         except Exception:
-
             return {
                 "continuity_items": []
             }
+
+    def delete_continuity_item(
+            self,
+            identity: str
+    ):
+        try:
+            memory = self.load_memory()
+            memory["continuity_items"] = [
+                item for item in memory["continuity_items"]
+                if item["identity"] != identity
+            ]
+            with open(self.memory_file, "w") as file:
+                json.dump(
+                    memory,
+                    file,
+                    indent=4
+                )
+            return True
+        except Exception:
+            return False
 
     def save_continuity(
             self,
@@ -44,11 +76,21 @@ class ContinuityMemoryService:
     ):
 
         try:
+            # Token Efficiency: pre-filter message using rule-based keyword check
+            if not self.rule_extractor.extract_continuity(message):
+                return
+
+            memory = (
+                self.load_memory()
+            )
+            existing_items = memory.get("continuity_items", [])
+
             extracted = (
                 self.extractor
                 .extract_structured_continuity(
                     ai_client,
-                    message
+                    message,
+                    existing_items
                 )
             )
 
@@ -58,9 +100,12 @@ class ContinuityMemoryService:
             ):
                 return
 
-            memory = (
-                self.load_memory()
-            )
+            # Retiring superseded elements (conflict resolution)
+            if extracted.get("supersedes"):
+                memory["continuity_items"] = [
+                    item for item in memory["continuity_items"]
+                    if item["identity"] not in extracted["supersedes"]
+                ]
 
             existing_item = None
 
@@ -75,9 +120,11 @@ class ContinuityMemoryService:
                     existing_item = item
                     break
 
+            timestamp_str = datetime.now().isoformat()
+
             if existing_item:
 
-                existing_item["priority"] += 1
+                existing_item["priority"] = min(5, existing_item.get("priority", 3) + 1)
 
                 existing_item["content"] = (
                     extracted["content"]
@@ -86,6 +133,8 @@ class ContinuityMemoryService:
                 existing_item["importance"] = (
                     extracted["importance"]
                 )
+                
+                existing_item["last_updated"] = timestamp_str
 
             else:
 
@@ -110,7 +159,11 @@ class ContinuityMemoryService:
                         "priority": self.calculate_priority(
                             extracted["type"],
                             extracted["importance"]
-                        )
+                        ),
+                        
+                        "created_at": timestamp_str,
+                        
+                        "last_updated": timestamp_str
                     }
                 )
 
