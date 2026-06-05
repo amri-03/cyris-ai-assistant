@@ -103,21 +103,43 @@ def session_start():
                 )
         }
 
-    latest = items[-1]
+    # Generate a dynamic greeting using the active AI provider based on continuity context
+    formatted_items = []
+    for item in items:
+        formatted_items.append(f"- {item.get('content')} ({item.get('type')})")
+    items_str = "\n".join(formatted_items)
 
-    content = latest.get(
-        "content",
-        "something important"
-    )
+    prompt = f"""
+    You are Cyris, a calm, intelligent, and context-aware AI assistant.
+    The user is starting a new session. Generate a brief, warm, and natural welcome-back greeting.
+    Reference 1 or 2 of their active continuity areas naturally so they feel you remember them, but keep it calm, light, and concise (1-2 sentences). Do not use robotic phrasing like "Welcome back! I see you are..." or be overly enthusiastic.
+    
+    Active continuity profile:
+    {items_str}
+    
+    Greeting:
+    """
+
+    try:
+        response = ai_provider.generate_ai_response(prompt)
+        if isinstance(response, dict):
+            greeting = response.get("response") or response.get("content") or str(response)
+            if isinstance(greeting, dict):
+                greeting = greeting.get("response") or greeting.get("content") or str(greeting)
+        else:
+            greeting = str(response)
+
+        greeting = greeting.strip().strip('"').strip("'")
+    except Exception:
+        # Fallback to template if LLM call fails
+        latest = items[-1]
+        content = latest.get("content", "something important")
+        greeting = f"Welcome back. Last time we were discussing {content}. Would you like to continue from there?"
 
     return {
-        "message":
-            (
-                "Welcome back. "
-                f"Last time we were discussing {content}. "
-                "Would you like to continue from there?"
-            )
+        "message": greeting
     }
+
 
 
 @app.get("/memory-status")
@@ -134,6 +156,49 @@ def memory_status():
                 []
             )
     }
+
+
+@app.delete("/memory/{identity}")
+def delete_memory_item(identity: str):
+    success = continuity_memory.delete_continuity_item(identity)
+    if success:
+        return {"status": "success", "message": f"Memory item '{identity}' deleted."}
+    else:
+        return {"status": "error", "message": "Failed to delete memory item."}
+
+
+@app.post("/memory/reconcile")
+def reconcile_memory():
+    import json
+    try:
+        memory = continuity_memory.load_memory()
+        items = memory.get("continuity_items", [])
+        
+        # Chronology cleanup: if university/college is present, filter out "school" items
+        has_college = any(
+            "college" in str(item.get("identity", "")).lower() or 
+            "university" in str(item.get("content", "")).lower() or
+            "college" in str(item.get("content", "")).lower()
+            for item in items
+        )
+        
+        if has_college:
+            filtered_items = []
+            for item in items:
+                ident = str(item.get("identity", "")).lower()
+                content = str(item.get("content", "")).lower()
+                if "school" in content or "school" in ident:
+                    continue
+                filtered_items.append(item)
+            
+            memory["continuity_items"] = filtered_items
+            with open(continuity_memory.memory_file, "w") as file:
+                json.dump(memory, file, indent=4)
+                
+        return {"status": "success", "message": "Memory reconciled successfully."}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 
 
 # @app.get("/guidance")
