@@ -145,7 +145,7 @@ export default function Home() {
                     top: 0,
                     left: 0,
                     width: "100%",
-                    zIndex: 100,
+                    zIndex: 10,
                     background: "var(--bg-base)",
                 }}
             >
@@ -205,7 +205,7 @@ export default function Home() {
                     bottom: 0,
                     left: 0,
                     width: "100%",
-                    zIndex: 100,
+                    zIndex: 10,
                     background:
                         "linear-gradient(to top, var(--bg-base) 70%, transparent)",
                     paddingTop: "24px",

@@ -84,12 +84,9 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                                 >
                                     <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
                                 </svg>
-                                <div style={{display: "flex", flexDirection: "column", gap: "4px", flex: 1}}>
+                                <div style={{flex: 1}}>
                                     <span style={{fontSize: "14.5px", fontWeight: 400, color: "var(--text-primary)"}}>
                                         Dark Mode
-                                    </span>
-                                    <span style={{fontSize: "13px", color: "var(--text-muted)", lineHeight: "1.4"}}>
-                                        Premium warm charcoal grey background
                                     </span>
                                 </div>
                                 {currentTheme === "dark" && (
@@ -139,12 +136,9 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                                     <path d="m6.34 17.66-1.41 1.41"/>
                                     <path d="m19.07 4.93-1.41 1.41"/>
                                 </svg>
-                                <div style={{display: "flex", flexDirection: "column", gap: "4px", flex: 1}}>
+                                <div style={{flex: 1}}>
                                     <span style={{fontSize: "14.5px", fontWeight: 400, color: "var(--text-primary)"}}>
                                         Light Mode
-                                    </span>
-                                    <span style={{fontSize: "13px", color: "var(--text-muted)", lineHeight: "1.4"}}>
-                                        Clean warm-white Claude/ChatGPT style
                                     </span>
                                 </div>
                                 {currentTheme === "light" && (
