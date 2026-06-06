@@ -15,9 +15,10 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                 className={`memory-modal ${isOpen ? "open" : ""}`} 
                 style={{ 
                     zIndex: 10001, 
-                    pointerEvents: "auto",
+                    pointerEvents: isOpen ? "auto" : "none",
                     height: "auto",
-                    maxHeight: "380px"
+                    maxHeight: "380px",
+                    maxWidth: "440px"
                 }}
             >
                 <div className="memory-header">
@@ -65,7 +66,7 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                                     display: "flex",
                                     alignItems: "center",
                                     gap: "16px",
-                                    padding: "16px"
+                                    padding: "20px"
                                 }}
                             >
                                 <svg
@@ -112,7 +113,7 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                                     display: "flex",
                                     alignItems: "center",
                                     gap: "16px",
-                                    padding: "16px"
+                                    padding: "20px"
                                 }}
                             >
                                 <svg

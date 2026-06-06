@@ -52,6 +52,7 @@
     --radius-xl: 28px;
 
     --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-modal: 0 20px 48px rgba(0, 0, 0, 0.35), 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 body.light-theme {
@@ -84,6 +85,7 @@ body.light-theme {
     --bg-code-header: #e8e8ea;
     --text-code: #1f1f1f;
     --border-code: rgba(0, 0, 0, 0.06);
+    --shadow-modal: 0 20px 48px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
 html, body, #root {
@@ -240,7 +242,7 @@ body::after {
 }
 
 .memory-header {
-    padding: 28px 24px 20px;
+    padding: 28px 28px 20px;
     border-bottom: 1px solid var(--border-subtle);
     display: flex;
     justify-content: space-between;
@@ -250,7 +252,7 @@ body::after {
 .memory-content {
     flex: 1;
     overflow-y: auto;
-    padding: 24px;
+    padding: 28px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -260,7 +262,7 @@ body::after {
     background: var(--bg-elevated);
     border: 1px solid var(--border-dim);
     border-radius: var(--radius-md);
-    padding: 16px;
+    padding: 20px;
     position: relative;
     transition: border-color var(--transition), box-shadow var(--transition);
 }
@@ -378,7 +380,7 @@ body.light-theme .memory-badge.academic_context {
     opacity: 0;
     pointer-events: none;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: none;
+    box-shadow: var(--shadow-modal);
 }
 
 .memory-modal.open {

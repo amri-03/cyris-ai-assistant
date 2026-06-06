@@ -44,7 +44,7 @@ export default function MemoryPanel({isOpen, onClose, items, onDelete, onReconci
             />
 
             {/* Center Modal Dialog */}
-            <div className={`memory-modal ${isOpen ? "open" : ""}`} style={{ zIndex: 10001, pointerEvents: "auto" }}>
+            <div className={`memory-modal ${isOpen ? "open" : ""}`} style={{ zIndex: 10001, pointerEvents: isOpen ? "auto" : "none" }}>
                 <div className="memory-header">
                     <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
                         <h2 style={{fontSize: "22px", fontWeight: 400, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em"}}>
