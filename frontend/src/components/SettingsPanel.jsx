@@ -2,16 +2,16 @@ import {createPortal} from "react-dom";
 
 export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeChange}) {
     return createPortal(
-        <>
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 99999 }}>
             {/* Backdrop Blur Overlay */}
             <div 
                 className={`memory-overlay ${isOpen ? "open" : ""}`} 
                 onClick={onClose}
-                style={{ zIndex: 10000 }}
+                style={{ zIndex: 10000, pointerEvents: isOpen ? "auto" : "none" }}
             />
 
             {/* Sidebar Drawer */}
-            <div className={`memory-drawer ${isOpen ? "open" : ""}`} style={{ zIndex: 10001 }}>
+            <div className={`memory-drawer ${isOpen ? "open" : ""}`} style={{ zIndex: 10001, pointerEvents: "auto" }}>
                 <div className="memory-header">
                     <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
                         <h2 style={{fontSize: "22px", fontWeight: 400, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em"}}>
@@ -151,7 +151,7 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                     </div>
                 </div>
             </div>
-        </>,
+        </div>,
         document.body
     );
 }
