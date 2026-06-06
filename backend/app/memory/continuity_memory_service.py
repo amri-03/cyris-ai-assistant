@@ -127,8 +127,19 @@ class ContinuityMemoryService:
                     if not item_data.get("identity"):
                         continue
 
-                    # Retiring superseded elements (conflict resolution)
+                    # Programmatic Timeline Protection for superseded items
                     if item_data.get("supersedes"):
+                        for superseded_id in item_data["supersedes"]:
+                            sup_item = next((item for item in memory["continuity_items"] if item["identity"] == superseded_id), None)
+                            if sup_item:
+                                old_content = sup_item.get("content", "")
+                                new_content = item_data["content"]
+                                timeline_keywords = ["mit", "transfer", "gap", "12th", "2023", "2024", "2025", "getting in", "getting good", "getting dangerous", "getting free"]
+                                has_old_timeline = any(kw in old_content.lower() for kw in timeline_keywords)
+                                has_new_timeline = any(kw in new_content.lower() for kw in timeline_keywords)
+                                if has_old_timeline and not has_new_timeline:
+                                    item_data["content"] = old_content
+
                         memory["continuity_items"] = [
                             item for item in memory["continuity_items"]
                             if item["identity"] not in item_data["supersedes"]
@@ -141,6 +152,15 @@ class ContinuityMemoryService:
                             break
 
                     if existing_item:
+                        # Programmatic Timeline Protection for updated items
+                        old_content = existing_item.get("content", "")
+                        new_content = item_data["content"]
+                        timeline_keywords = ["mit", "transfer", "gap", "12th", "2023", "2024", "2025", "getting in", "getting good", "getting dangerous", "getting free"]
+                        has_old_timeline = any(kw in old_content.lower() for kw in timeline_keywords)
+                        has_new_timeline = any(kw in new_content.lower() for kw in timeline_keywords)
+                        if has_old_timeline and not has_new_timeline:
+                            item_data["content"] = old_content
+
                         existing_item["priority"] = min(5, existing_item.get("priority", 3) + 1)
                         existing_item["content"] = item_data["content"]
                         existing_item["importance"] = item_data["importance"]

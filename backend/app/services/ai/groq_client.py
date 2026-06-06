@@ -113,6 +113,9 @@ class GroqClient:
                 .content
             )
 
+            from app.services.ai.response_cleaner import ResponseCleaner
+            cleaned_content = ResponseCleaner().clean_response(content)
+
             if add_to_history:
                 self.history_service.add_message(
                     "user",
@@ -121,7 +124,7 @@ class GroqClient:
 
                 self.history_service.add_message(
                     "assistant",
-                    content
+                    cleaned_content
                 )
 
                 self.memory_service.save_message(
@@ -140,7 +143,7 @@ class GroqClient:
 
                 self.memory_service.save_message(
                     "assistant",
-                    content
+                    cleaned_content
                 )
 
             return response

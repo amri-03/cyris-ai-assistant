@@ -8,14 +8,23 @@ class ResponseCleaner:
         if not lines:
             return text
 
+        # Global indicators (if none of these are in the text, it has no thinking trace at all)
         thinking_indicators = [
             "user context", "user says", "persona:", "self-correction", "final result",
-            "drafting ", "polished selection", "refined selection", "option 1", "option 2",
+            "drafting", "polished selection", "refined selection", "option 1", "option 2",
             "option 3", "constraint 1", "constraint 2", "constraint 3", "do not invent",
             "do not assume", "ask clarifying", "testing my memory", "check against",
             "direct approach", "refined approach", "context check:", "check context",
             "refined (cyris", "selection:", "role:", "task:", "constraint:", "thinking trace", 
-            "chain of thought", "reasoning:"
+            "chain of thought", "reasoning:", "academic_status", "career_direction",
+            "java_learning", "project_development", "the user is asking", "user is asking",
+            "previous response", "current continuity", "memory contains", "does the memory",
+            "don't know", "acknowledge", "be honest", "user context:", "identity:",
+            "supersedes:", "continuity_items", "importance:", "priority:",
+            "career:", "technical:", "academics:",
+            "based on this context", "therefore", "response strategy", "strategy:",
+            "avoid ", "be accurate", "answer directly", "avoid robotic", "acknowledge ",
+            "state that", "do not get", "do not apologize", "do not explain", "maintain the"
         ]
 
         has_thinking = any(indicator in text.lower() for indicator in thinking_indicators)
@@ -24,6 +33,19 @@ class ResponseCleaner:
 
         if not (has_thinking or has_bullet_structure):
             return text
+
+        # Prefixes that indicate a line is a thinking/planning line
+        planning_prefixes = [
+            "based on", "therefore", "response strategy", "strategy", "avoid",
+            "be accurate", "answer directly", "avoid robotic", "acknowledge",
+            "state that", "do not", "maintain the", "self-correction", "drafting",
+            "polished selection", "refined selection", "selection:", "final result:",
+            "direct approach", "refined approach", "context check", "check context",
+            "testing my memory", "check against", "ask clarifying", "persona:",
+            "role:", "task:", "constraint", "identity:", "supersedes:",
+            "continuity_items:", "importance:", "priority:", "career:", "technical:",
+            "academics:", "user context", "user says", "refined (cyris"
+        ]
 
         response_lines = []
         
@@ -35,14 +57,19 @@ class ResponseCleaner:
                 continue
                 
             is_indented = line.startswith(' ') or line.startswith('\t')
-            is_meta = False
-            line_lower = stripped.lower()
-            if any(kw in line_lower for kw in thinking_indicators):
-                is_meta = True
+            
+            # Check if the line starts with any planning prefix
+            stripped_lower = stripped.lower()
+            is_meta_prefix = any(stripped_lower.startswith(pref) for pref in planning_prefixes)
+            
+            # Check if the line is bulleted and the text after bullet starts with planning prefix
+            is_bullet_meta = False
+            if stripped.startswith('*') or stripped.startswith('-'):
+                after_bullet = stripped[1:].strip().lower()
+                if any(after_bullet.startswith(pref) for pref in planning_prefixes):
+                    is_bullet_meta = True
 
-            # We break if the line is indented (as Gemma/Llama's thinking traces are indented)
-            # or if the line contains explicit meta/planning keywords.
-            if is_indented or is_meta:
+            if is_indented or is_meta_prefix or is_bullet_meta:
                 break
                 
             response_lines.append(line)

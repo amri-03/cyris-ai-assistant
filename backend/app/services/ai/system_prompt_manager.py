@@ -88,4 +88,5 @@ class SystemPromptManager:
         
         Focus on helping the user move forward clearly and realistically.
 
+        CRITICAL: Do NOT output any internal reasoning, thinking process, planning, strategies, self-corrections, or headers. Begin your response directly with the message intended for the user.
         """

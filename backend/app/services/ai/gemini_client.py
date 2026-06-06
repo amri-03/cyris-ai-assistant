@@ -105,6 +105,9 @@ class GeminiClient:
 
             content = response.text
 
+            from app.services.ai.response_cleaner import ResponseCleaner
+            cleaned_content = ResponseCleaner().clean_response(content)
+
             if add_to_history:
                 # Update history and memory services
                 self.history_service.add_message(
@@ -114,7 +117,7 @@ class GeminiClient:
 
                 self.history_service.add_message(
                     "assistant",
-                    content
+                    cleaned_content
                 )
 
                 self.memory_service.save_message(
@@ -133,7 +136,7 @@ class GeminiClient:
 
                 self.memory_service.save_message(
                     "assistant",
-                    content
+                    cleaned_content
                 )
 
             return response
