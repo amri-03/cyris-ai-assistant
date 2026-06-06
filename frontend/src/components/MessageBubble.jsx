@@ -397,8 +397,8 @@ export default function MessageBubble({ role, content }) {
                         border: "1px solid var(--user-border)",
                         color: "var(--text-primary)",
                         fontFamily: "var(--font-sans)",
-                        fontSize: "15px",
-                        lineHeight: "1.52",
+                        fontSize: "16px",
+                        lineHeight: "1.6",
                         fontWeight: 400,
                         whiteSpace: "pre-wrap",
                         wordBreak: "break-word",
@@ -433,47 +433,6 @@ export default function MessageBubble({ role, content }) {
                                 animation: "messageFadeIn 0.3s ease-out forwards",
                             }}
                         >
-                            {/* Copy Button */}
-                            <button
-                                onClick={handleCopy}
-                                title={copied ? "Copied!" : "Copy response"}
-                                style={{
-                                    background: "transparent",
-                                    border: "1px solid var(--border-subtle)",
-                                    color: copied ? "var(--accent-primary)" : "var(--text-secondary)",
-                                    cursor: "pointer",
-                                    padding: "6px",
-                                    borderRadius: "var(--radius-sm)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    width: "28px",
-                                    height: "28px",
-                                    transition: "all var(--transition)",
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = "var(--text-primary)";
-                                    e.currentTarget.style.borderColor = "var(--user-border)";
-                                    e.currentTarget.style.background = "var(--bg-elevated)";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = copied ? "var(--accent-primary)" : "var(--text-secondary)";
-                                    e.currentTarget.style.borderColor = "var(--border-subtle)";
-                                    e.currentTarget.style.background = "transparent";
-                                }}
-                            >
-                                {copied ? (
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                    </svg>
-                                ) : (
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                    </svg>
-                                )}
-                            </button>
-
                             {/* Thumbs Up Button */}
                             <button
                                 onClick={() => handleFeedback("like")}
@@ -558,6 +517,47 @@ export default function MessageBubble({ role, content }) {
                                 >
                                     <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/>
                                 </svg>
+                            </button>
+
+                            {/* Copy Button */}
+                            <button
+                                onClick={handleCopy}
+                                title={copied ? "Copied!" : "Copy response"}
+                                style={{
+                                    background: "transparent",
+                                    border: "1px solid var(--border-subtle)",
+                                    color: copied ? "var(--accent-primary)" : "var(--text-secondary)",
+                                    cursor: "pointer",
+                                    padding: "6px",
+                                    borderRadius: "var(--radius-sm)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "28px",
+                                    height: "28px",
+                                    transition: "all var(--transition)",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.color = "var(--text-primary)";
+                                    e.currentTarget.style.borderColor = "var(--user-border)";
+                                    e.currentTarget.style.background = "var(--bg-elevated)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.color = copied ? "var(--accent-primary)" : "var(--text-secondary)";
+                                    e.currentTarget.style.borderColor = "var(--border-subtle)";
+                                    e.currentTarget.style.background = "transparent";
+                                }}
+                            >
+                                {copied ? (
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                ) : (
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                )}
                             </button>
                         </div>
                     )}

@@ -143,34 +143,40 @@ export default function MemoryPanel({isOpen, onClose, items, onDelete, onReconci
                             </p>
                         </div>
                     ) : (
-                        items.map((item) => (
-                            <div className="memory-card" key={item.identity}>
-                                <div className="memory-card-header">
-                                    <span className={`memory-badge ${item.type || ""}`}>
-                                        {(item.type || "interest").replace("_", " ")}
-                                    </span>
-                                    <button 
-                                        className="memory-btn-delete"
-                                        onClick={() => onDelete(item.identity)}
-                                        title="Forget this info"
-                                    >
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                        </svg>
-                                    </button>
+                        [...items]
+                            .sort((a, b) => {
+                                const dateA = a.last_updated ? new Date(a.last_updated) : new Date(0);
+                                const dateB = b.last_updated ? new Date(b.last_updated) : new Date(0);
+                                return dateB - dateA;
+                            })
+                            .map((item) => (
+                                <div className="memory-card" key={item.identity}>
+                                    <div className="memory-card-header">
+                                        <span className={`memory-badge ${item.type || ""}`}>
+                                            {(item.type || "interest").replace("_", " ")}
+                                        </span>
+                                        <button 
+                                            className="memory-btn-delete"
+                                            onClick={() => onDelete(item.identity)}
+                                            title="Forget this info"
+                                        >
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div className="memory-card-body">
+                                        {item.content}
+                                    </div>
+                                    <div className="memory-card-footer">
+                                        <span>priority: {item.priority || 3}</span>
+                                        <span>
+                                            {item.last_updated ? formatDate(item.last_updated) : "historical"}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className="memory-card-body">
-                                    {item.content}
-                                </div>
-                                <div className="memory-card-footer">
-                                    <span>priority: {item.priority || 3}</span>
-                                    <span>
-                                        {item.last_updated ? formatDate(item.last_updated) : "historical"}
-                                    </span>
-                                </div>
-                            </div>
-                        ))
+                            ))
                     )}
                 </div>
             </div>

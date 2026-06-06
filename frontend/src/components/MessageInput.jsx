@@ -80,7 +80,7 @@ export default function MessageInput({onSend, isDisabled}) {
                         color: "var(--text-primary)",
                         fontFamily: "var(--font-sans)",
                         fontSize: "16px",
-                        fontWeight: 300,
+                        fontWeight: 400,
                         lineHeight: "1.6",
                         padding: 0,
                         margin: 0,
@@ -102,10 +102,12 @@ export default function MessageInput({onSend, isDisabled}) {
                         width: "34px",
                         height: "34px",
                         borderRadius: "50%",
-                        border: "none",
+                        border: canSend
+                            ? "1px solid var(--accent-primary)"
+                            : "1px solid var(--border-subtle)",
                         background: canSend
                             ? "var(--accent-primary)"
-                            : "var(--bg-elevated)",
+                            : "var(--bg-base)",
                         color: canSend
                             ? "#ffffff"
                             : "var(--text-muted)",
@@ -154,14 +156,14 @@ export default function MessageInput({onSend, isDisabled}) {
             <p
                 style={{
                     textAlign: "center",
-                    fontSize: "11px",
+                    fontSize: "11.5px",
                     color: "var(--text-muted)",
                     marginTop: "10px",
-                    fontFamily: "var(--font-mono)",
-                    letterSpacing: "0.05em",
+                    fontFamily: "var(--font-sans)",
+                    letterSpacing: "0.02em",
                 }}
             >
-                Enter to send · Shift+Enter for new line
+                Cyris is an AI assistant and can make mistakes.
             </p>
         </div>
     );
