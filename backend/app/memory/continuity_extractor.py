@@ -12,6 +12,8 @@ class ContinuityExtractor:
         "project", "projects", "coding", "programming", "developer", "development", "frontend", "backend", "fullstack", "design", "ui", "ux", "app", "cybersecurity",
         # Languages & Tools
         "python", "java", "javascript", "js", "typescript", "ts", "rust", "go", "golang", "cpp", "c++", "react", "nextjs", "node", "nodejs", "sql", "database", "databases", "git", "github", "docker", "aws", "cloud", "ai", "ml", "machine learning",
+        # Location & Study Specific Keywords
+        "campus", "location", "study", "track",
         # Struggles & Behaviors
         "struggle", "struggles", "struggling", "motivate", "motivation", "motivated", "distract", "distraction", "distractions", "consistent", "consistency", "inconsistent", "drift", "drifting", "overwhelm", "overwhelmed", "lazy", "laziness", "procrastinate", "procrastinating", "procrastination", "tired", "burnout", "stress", "stressed", "anxious", "anxiety", "fear", "stuck", "confused", "confusion", "fail", "failed", "failure"
     ]
@@ -23,7 +25,7 @@ class ContinuityExtractor:
         lowered_message = message.lower()
 
         # Override: Direct manual memory instructions should always pass
-        manual_keywords = ["remember", "store in memory", "save in memory", "memorize", "keep in mind", "in your memory", "save this", "store this"]
+        manual_keywords = ["remember", "store in memory", "save in memory", "memorize", "keep in mind", "in your memory", "save this", "store this", "noted", "saved", "store"]
         if any(kw in lowered_message for kw in manual_keywords):
             return {
                 "content": message,

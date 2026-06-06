@@ -62,13 +62,6 @@ class ContinuityMemoryService:
 
     def save_continuity(self, ai_client, message: str):
         try:
-            # Token Efficiency: pre-filter message using rule-based keyword check
-            if not self.rule_extractor.extract_continuity(message):
-                return
-
-            memory = self.load_memory()
-            existing_items = memory.get("continuity_items", [])
-
             # Construct conversation history context for the extractor
             from app.memory.conversation_history_service import ConversationHistoryService
             history_service = ConversationHistoryService()
@@ -84,6 +77,13 @@ class ContinuityMemoryService:
                 history_context = "\n".join(context_lines)
             else:
                 history_context = f"User: {message}"
+
+            # Token Efficiency: pre-filter message using rule-based keyword check
+            if not self.rule_extractor.extract_continuity(history_context):
+                return
+
+            memory = self.load_memory()
+            existing_items = memory.get("continuity_items", [])
 
             extracted = self.extractor.extract_structured_continuity(
                 ai_client,
