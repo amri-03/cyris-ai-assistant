@@ -159,27 +159,15 @@ class ContinuityAIExtractor:
         )
 
         content = ""
+        groq_key = os.getenv("GROQ_API_KEY")
         gemini_key = os.getenv("GEMINI_API_KEY")
 
-        # Try Gemini first as preferred by the user, falling back to Groq if key missing
-        if gemini_key:
+        # Try Groq first for extraction to preserve the limited Gemini daily quota (20 RPD) for chat
+        if groq_key:
             try:
-                import google.generativeai as genai
-                genai.configure(api_key=gemini_key)
-                model = genai.GenerativeModel("gemini-2.0-flash")
-                response = model.generate_content(extraction_prompt)
-                content = response.text
-            except Exception as gemini_err:
-                print(f"Gemini extraction failed, falling back to Groq: {gemini_err}")
-                gemini_key = None
-
-        if not gemini_key:
-            # Fallback to Groq
-            if not ai_client:
-                from groq import Groq
-                groq_key = os.getenv("GROQ_API_KEY")
-                ai_client = Groq(api_key=groq_key)
-            try:
+                if not ai_client:
+                    from groq import Groq
+                    ai_client = Groq(api_key=groq_key)
                 response = ai_client.chat.completions.create(
                     model="llama-3.1-8b-instant",
                     messages=[
@@ -191,8 +179,22 @@ class ContinuityAIExtractor:
                 )
                 content = response.choices[0].message.content
             except Exception as groq_err:
-                print(f"Groq extraction failed: {groq_err}")
+                print(f"Groq extraction failed, falling back to Gemini: {groq_err}")
+                groq_key = None
+
+        if not groq_key and gemini_key:
+            try:
+                import google.generativeai as genai
+                genai.configure(api_key=gemini_key)
+                model = genai.GenerativeModel("gemini-2.5-flash")
+                response = model.generate_content(extraction_prompt)
+                content = response.text
+            except Exception as gemini_err:
+                print(f"Gemini extraction failed: {gemini_err}")
                 return {"continuity_items": []}
+
+        if not content:
+            return {"continuity_items": []}
 
         try:
             cleaned = (

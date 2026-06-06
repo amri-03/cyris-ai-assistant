@@ -75,7 +75,7 @@ class GeminiClient:
             full_system_prompt = f"{system_prompt}\n\nImportant continuity context:\n{memory_context}"
             
             model = genai.GenerativeModel(
-                "gemini-2.0-flash",
+                "gemini-2.5-flash",
                 system_instruction=full_system_prompt
             )
 
