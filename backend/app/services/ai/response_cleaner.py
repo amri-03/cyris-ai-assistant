@@ -100,7 +100,7 @@ class ResponseCleaner:
 
         # Remove leading timestamps prepended by the model in the form of [YYYY-MM-DD HH:MM] or [YYYY-MM-DD HH:MM:SS]
         cleaned = re.sub(
-            r"^\[\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(?::\d{2})?\]\s*",
+            r"^\s*\[\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(?::\d{2})?\]\s*",
             "",
             cleaned
         )
