@@ -1,4 +1,4 @@
-# ⚙️ Cyris Setup, Installation & Contributing Guide
+# ⚙️ Cyris Setup & Installation Guide
 
 Follow these steps to set up and run Cyris on your local development machine.
 
