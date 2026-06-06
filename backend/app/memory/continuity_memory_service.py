@@ -127,23 +127,37 @@ class ContinuityMemoryService:
                     if not item_data.get("identity"):
                         continue
 
-                    # Programmatic Timeline Protection for superseded items
+                    # Programmatic Timeline Protection & Archiving for superseded items
                     if item_data.get("supersedes"):
                         for superseded_id in item_data["supersedes"]:
                             sup_item = next((item for item in memory["continuity_items"] if item["identity"] == superseded_id), None)
                             if sup_item:
-                                old_content = sup_item.get("content", "")
-                                new_content = item_data["content"]
-                                timeline_keywords = ["mit", "transfer", "gap", "12th", "2023", "2024", "2025", "getting in", "getting good", "getting dangerous", "getting free"]
-                                has_old_timeline = any(kw in old_content.lower() for kw in timeline_keywords)
-                                has_new_timeline = any(kw in new_content.lower() for kw in timeline_keywords)
-                                if has_old_timeline and not has_new_timeline:
-                                    item_data["content"] = old_content
-
-                        memory["continuity_items"] = [
-                            item for item in memory["continuity_items"]
-                            if item["identity"] not in item_data["supersedes"]
-                        ]
+                                # ONLY allow superseding if they have the same type OR the same identity (prevents cross-type deletion)
+                                if sup_item.get("type") == item_data.get("type") or sup_item.get("identity") == item_data.get("identity"):
+                                    old_content = sup_item.get("content", "")
+                                    new_content = item_data["content"]
+                                    timeline_keywords = ["mit", "transfer", "gap", "12th", "2023", "2024", "2025", "getting in", "getting good", "getting dangerous", "getting free"]
+                                    has_old_timeline = any(kw in old_content.lower() for kw in timeline_keywords)
+                                    has_new_timeline = any(kw in new_content.lower() for kw in timeline_keywords)
+                                    
+                                    if has_old_timeline and not has_new_timeline:
+                                        item_data["content"] = old_content
+                                    elif has_old_timeline and has_new_timeline:
+                                        # Protect specific details (gap year, college transfer) from being lost
+                                        important_timeline_kws = ["mit", "parul", "gap", "transfer", "2023", "2024", "2025"]
+                                        old_kws = [kw for kw in important_timeline_kws if kw in old_content.lower()]
+                                        new_kws = [kw for kw in important_timeline_kws if kw in new_content.lower()]
+                                        missing_kws = [kw for kw in old_kws if kw not in new_kws]
+                                        if missing_kws:
+                                            # Merge if the new content has supplementary details like ICSE/ISC school info
+                                            if "icse" in new_content.lower() or "isc" in new_content.lower():
+                                                item_data["content"] = f"{new_content}. College/gap details: {old_content}"
+                                            else:
+                                                item_data["content"] = old_content
+                                    
+                                    # Archive (retire) the item instead of deleting it
+                                    sup_item["retired"] = True
+                                    sup_item["last_updated"] = timestamp_str
 
                     existing_item = None
                     for item in memory["continuity_items"]:
@@ -158,13 +172,26 @@ class ContinuityMemoryService:
                         timeline_keywords = ["mit", "transfer", "gap", "12th", "2023", "2024", "2025", "getting in", "getting good", "getting dangerous", "getting free"]
                         has_old_timeline = any(kw in old_content.lower() for kw in timeline_keywords)
                         has_new_timeline = any(kw in new_content.lower() for kw in timeline_keywords)
+                        
                         if has_old_timeline and not has_new_timeline:
                             item_data["content"] = old_content
+                        elif has_old_timeline and has_new_timeline:
+                            important_timeline_kws = ["mit", "parul", "gap", "transfer", "2023", "2024", "2025"]
+                            old_kws = [kw for kw in important_timeline_kws if kw in old_content.lower()]
+                            new_kws = [kw for kw in important_timeline_kws if kw in new_content.lower()]
+                            missing_kws = [kw for kw in old_kws if kw not in new_kws]
+                            if missing_kws:
+                                if "icse" in new_content.lower() or "isc" in new_content.lower():
+                                    item_data["content"] = f"{new_content}. College/gap details: {old_content}"
+                                else:
+                                    item_data["content"] = old_content
 
                         existing_item["priority"] = min(5, existing_item.get("priority", 3) + 1)
                         existing_item["content"] = item_data["content"]
                         existing_item["importance"] = item_data["importance"]
                         existing_item["last_updated"] = timestamp_str
+                        # Reactivate if it was previously retired
+                        existing_item.pop("retired", None)
                     else:
                         memory["continuity_items"].append({
                             "identity": item_data["identity"],
@@ -198,9 +225,7 @@ class ContinuityMemoryService:
         )
 
         items = sorted(
-            memory[
-                "continuity_items"
-            ],
+            [item for item in memory.get("continuity_items", []) if not item.get("retired", False)],
             key=lambda item:
             item["priority"],
             reverse=True
@@ -236,9 +261,7 @@ class ContinuityMemoryService:
         )
 
         items = sorted(
-            memory[
-                "continuity_items"
-            ],
+            [item for item in memory.get("continuity_items", []) if not item.get("retired", False)],
             key=lambda item:
             item["priority"],
             reverse=True

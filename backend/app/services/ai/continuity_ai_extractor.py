@@ -171,7 +171,7 @@ class ContinuityAIExtractor:
                     from groq import Groq
                     ai_client = Groq(api_key=groq_key)
                 response = ai_client.chat.completions.create(
-                    model="llama-3.1-8b-instant",
+                    model="llama-3.3-70b-versatile",
                     messages=[
                         {
                             "role": "user",
