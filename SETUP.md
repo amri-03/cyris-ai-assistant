@@ -4,12 +4,20 @@ Follow these steps to set up and run Cyris on your local development machine.
 
 ---
 
+## Prerequisites
+
+Before starting, ensure you have the following installed on your system:
+* **Python 3.10+** (Ensure Python is added to your system PATH)
+* **Node.js (v16+) and npm**
+
+---
+
 ## 1. Clone the Repository
 
 Open your terminal and clone the repository, then navigate to the root directory:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/aman-kumar/cyris-ai-assistant.git
 cd cyris-ai-assistant
 ```
 
