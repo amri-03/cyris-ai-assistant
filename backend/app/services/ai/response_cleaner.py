@@ -25,7 +25,9 @@ class ResponseCleaner:
             "based on this context", "therefore", "response strategy", "strategy:",
             "avoid ", "be accurate", "answer directly", "avoid robotic", "acknowledge ",
             "state that", "do not get", "do not apologize", "do not explain", "maintain the",
-            "potential directions", "options", "refining for", "refining", "refine"
+            "potential directions", "options", "refining for", "refining", "refine",
+            "consistent with the persona", "simple acknowledgment", "since it's a parting",
+            "keep it brief"
         ]
 
         has_thinking = any(indicator in text.lower() for indicator in thinking_indicators)
@@ -50,7 +52,8 @@ class ResponseCleaner:
             "options:", "options", "let's go", "let's keep", "let's use", "let's",
             "wait,", "since the", "1. ", "2. ", "3. ", "4. ", "i should", "i will",
             "options and drafting", "drafting response", "here is", "refining for",
-            "refining"
+            "refining", "keep it brief", "since it's a parting", "simple acknowledgment",
+            "consistent with the persona"
         ]
 
         response_lines = []

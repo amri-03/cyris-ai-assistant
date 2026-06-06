@@ -95,9 +95,14 @@ class GeminiClient:
                         time_prefix = dt.strftime("[%Y-%m-%d %H:%M] ")
                     except Exception:
                         pass
+                
+                content_text = msg["content"]
+                if role == "model" and msg.get("feedback"):
+                    content_text = f"{content_text}\n\n[User Feedback: {msg['feedback'].upper()}]"
+                
                 gemini_history.append({
                     "role": role,
-                    "parts": [f"{time_prefix}{msg['content']}"]
+                    "parts": [f"{time_prefix}{content_text}"]
                 })
 
             # Generate response

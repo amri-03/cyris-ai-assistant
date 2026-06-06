@@ -40,7 +40,7 @@ class ConversationHistoryService:
         cursor = conn.cursor()
         
         cursor.execute(
-            "SELECT role, content, created_at FROM messages WHERE session_active = 1 ORDER BY id ASC"
+            "SELECT role, content, created_at, feedback FROM messages WHERE session_active = 1 ORDER BY id ASC"
         )
         rows = cursor.fetchall()
         
@@ -50,7 +50,8 @@ class ConversationHistoryService:
             {
                 "role": row["role"],
                 "content": row["content"],
-                "created_at": row["created_at"]
+                "created_at": row["created_at"],
+                "feedback": row["feedback"]
             }
             for row in rows
         ]

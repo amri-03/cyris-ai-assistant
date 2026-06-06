@@ -99,9 +99,14 @@ class GroqClient:
                         time_prefix = dt.strftime("[%Y-%m-%d %H:%M] ")
                     except Exception:
                         pass
+                
+                content_text = msg["content"]
+                if msg["role"] == "assistant" and msg.get("feedback"):
+                    content_text = f"{content_text}\n\n[User Feedback: {msg['feedback'].upper()}]"
+                
                 messages.append({
                     "role": msg["role"],
-                    "content": f"{time_prefix}{msg['content']}"
+                    "content": f"{time_prefix}{content_text}"
                 })
 
             messages.append(
