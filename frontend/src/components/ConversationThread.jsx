@@ -18,7 +18,7 @@ export default function ConversationThread({messages, isThinking}) {
                 padding: "32px 0 24px",
                 display: "flex",
                 flexDirection: "column",
-                gap: "24px",
+                gap: "36px",
                 position: "relative",
                 zIndex: 1,
             }}

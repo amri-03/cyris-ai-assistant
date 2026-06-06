@@ -178,7 +178,7 @@ export default function Home() {
                 <div
                     style={{
                         width: "100%",
-                        maxWidth: "760px",
+                        maxWidth: "820px",
                         margin: "0 auto",
                         minHeight: "100%",
                         display: "flex",
@@ -214,7 +214,7 @@ export default function Home() {
                 <div
                     style={{
                         width: "100%",
-                        maxWidth: "760px",
+                        maxWidth: "820px",
                         margin: "0 auto",
                     }}
                 >
