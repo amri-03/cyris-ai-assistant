@@ -27,17 +27,21 @@ class ResponseCleaner:
             "state that", "do not get", "do not apologize", "do not explain", "maintain the",
             "potential directions", "options", "refining for", "refining", "refine",
             "consistent with the persona", "simple acknowledgment", "since it's a parting",
-            "keep it brief"
+            "keep it brief", "final polish"
         ]
 
         has_thinking = any(indicator in text.lower() for indicator in thinking_indicators)
-        # Fallback to general bullet check just in case, but keep it narrow to avoid false positives
         has_bullet_structure = any(line.startswith(' ') and '*' in line for line in lines)
 
         if not (has_thinking or has_bullet_structure):
             return text, False
 
-        # Prefixes that indicate a line is a thinking/planning line
+        # Regex to match planning labels like "Final Polish:", "Refining for persona (Cyris):", "Constraint 1:"
+        planning_label_pattern = re.compile(
+            r'^(final result|final polish|refining|refine|refinement|persona|role|task|constraint|self-correction|draft|drafting|strategy|approach|selection|context check|check context|option \d+|greeting|acknowledgment|parting)\b',
+            re.IGNORECASE
+        )
+
         planning_prefixes = [
             "based on", "therefore", "response strategy", "strategy", "avoid",
             "be accurate", "answer directly", "avoid robotic", "acknowledge",
@@ -53,8 +57,12 @@ class ResponseCleaner:
             "wait,", "since the", "1. ", "2. ", "3. ", "4. ", "i should", "i will",
             "options and drafting", "drafting response", "here is", "refining for",
             "refining", "keep it brief", "since it's a parting", "simple acknowledgment",
-            "consistent with the persona"
+            "consistent with the persona", "final polish"
         ]
+
+        def get_words(t):
+            t_clean = re.sub(r'[^\w\s]', '', t.strip().lower())
+            return set(t_clean.split())
 
         response_lines = []
         
@@ -67,18 +75,32 @@ class ResponseCleaner:
                 
             is_indented = line.startswith(' ') or line.startswith('\t')
             
-            # Check if the line starts with any planning prefix
+            # Check if the line matches planning label regex or prefixes
             stripped_lower = stripped.lower()
-            is_meta_prefix = any(stripped_lower.startswith(pref) for pref in planning_prefixes)
+            is_meta_prefix = any(stripped_lower.startswith(pref) for pref in planning_prefixes) or bool(planning_label_pattern.match(stripped_lower))
             
-            # Check if the line is bulleted and the text after bullet starts with planning prefix
+            # Check if the line is bulleted and is planning
             is_bullet_meta = False
             if stripped.startswith('*') or stripped.startswith('-'):
                 after_bullet = stripped[1:].strip().lower()
-                if any(after_bullet.startswith(pref) for pref in planning_prefixes):
+                if any(after_bullet.startswith(pref) for pref in planning_prefixes) or bool(planning_label_pattern.match(after_bullet)):
                     is_bullet_meta = True
 
-            if is_indented or is_meta_prefix or is_bullet_meta:
+            # Check if this line is highly similar to the response collected so far (draft detection)
+            is_draft = False
+            if response_lines:
+                # Combine current response lines to compare
+                current_response = " ".join([l for l in response_lines if l.strip()])
+                words_response = get_words(current_response)
+                words_line = get_words(stripped.strip('"\''))
+                
+                if words_response and words_line:
+                    intersection = words_response.intersection(words_line)
+                    overlap_ratio = len(intersection) / min(len(words_response), len(words_line))
+                    if overlap_ratio > 0.8:
+                        is_draft = True
+
+            if is_indented or is_meta_prefix or is_bullet_meta or is_draft:
                 break
                 
             response_lines.append(line)
