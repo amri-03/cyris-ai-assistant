@@ -74,7 +74,7 @@ class GeminiClient:
             system_prompt = self.system_prompt_manager.build_system_prompt()
             full_system_prompt = f"{system_prompt}\n\nImportant continuity context:\n{memory_context}"
             
-            model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+            model_name = os.getenv("GEMINI_MODEL", "gemma-4-26b-a4b-it")
             model = genai.GenerativeModel(
                 model_name,
                 system_instruction=full_system_prompt

@@ -186,7 +186,7 @@ class ContinuityAIExtractor:
             try:
                 import google.generativeai as genai
                 genai.configure(api_key=gemini_key)
-                model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+                model_name = os.getenv("GEMINI_MODEL", "gemma-4-26b-a4b-it")
                 model = genai.GenerativeModel(model_name)
                 response = model.generate_content(extraction_prompt)
                 content = response.text
