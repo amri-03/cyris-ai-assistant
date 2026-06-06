@@ -34,13 +34,21 @@ export default function Home() {
         }
     };
 
-    useEffect(() => {
+    const scrollToBottom = (behavior = "smooth", force = false) => {
         if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollTo({
-                top: scrollContainerRef.current.scrollHeight,
-                behavior: "smooth"
-            });
+            const container = scrollContainerRef.current;
+            const isNear = container.scrollHeight - container.scrollTop - container.clientHeight < 200;
+            if (force || isNear) {
+                container.scrollTo({
+                    top: container.scrollHeight,
+                    behavior
+                });
+            }
         }
+    };
+
+    useEffect(() => {
+        scrollToBottom("smooth", true);
     }, [messages, isThinking]);
 
     useEffect ( () => {
@@ -193,6 +201,7 @@ export default function Home() {
                     <ConversationThread
                         messages={messages}
                         isThinking={isThinking}
+                        onScrollToBottom={scrollToBottom}
                     />
 
                 </div>

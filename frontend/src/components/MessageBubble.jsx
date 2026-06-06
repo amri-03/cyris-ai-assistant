@@ -295,13 +295,21 @@ const renderFormattedText = (text) => {
     });
 };
 
-export default function MessageBubble({ role, content }) {
+export default function MessageBubble({ role, content, isLatest, onScrollToBottom }) {
     const ref = useRef(null);
     const isUser = role === "user";
     const [displayedContent, setDisplayedContent] = useState(isUser ? content : "");
     const [isTypingComplete, setIsTypingComplete] = useState(isUser);
     const [copied, setCopied] = useState(false);
     const [feedback, setFeedback] = useState(null);
+
+    const isLatestRef = useRef(isLatest);
+    const onScrollToBottomRef = useRef(onScrollToBottom);
+
+    useEffect(() => {
+        isLatestRef.current = isLatest;
+        onScrollToBottomRef.current = onScrollToBottom;
+    }, [isLatest, onScrollToBottom]);
 
     useEffect(() => {
         if (ref.current) {
@@ -328,9 +336,18 @@ export default function MessageBubble({ role, content }) {
             setDisplayedContent(words.slice(0, index + 1).join(" "));
             index++;
 
+            if (isLatestRef.current && onScrollToBottomRef.current) {
+                onScrollToBottomRef.current("auto");
+            }
+
             if (index >= words.length) {
                 clearInterval(interval);
                 setIsTypingComplete(true);
+                if (isLatestRef.current && onScrollToBottomRef.current) {
+                    setTimeout(() => {
+                        onScrollToBottomRef.current?.("smooth");
+                    }, 50);
+                }
             }
         }, 25);
 

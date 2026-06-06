@@ -3,10 +3,10 @@ import re
 
 class ResponseCleaner:
 
-    def clean_thinking_trace(self, text: str) -> str:
+    def clean_thinking_trace(self, text: str) -> tuple[str, bool]:
         lines = text.splitlines()
         if not lines:
-            return text
+            return text, False
 
         # Global indicators (if none of these are in the text, it has no thinking trace at all)
         thinking_indicators = [
@@ -25,7 +25,7 @@ class ResponseCleaner:
             "based on this context", "therefore", "response strategy", "strategy:",
             "avoid ", "be accurate", "answer directly", "avoid robotic", "acknowledge ",
             "state that", "do not get", "do not apologize", "do not explain", "maintain the",
-            "potential directions", "options"
+            "potential directions", "options", "refining for", "refining", "refine"
         ]
 
         has_thinking = any(indicator in text.lower() for indicator in thinking_indicators)
@@ -33,7 +33,7 @@ class ResponseCleaner:
         has_bullet_structure = any(line.startswith(' ') and '*' in line for line in lines)
 
         if not (has_thinking or has_bullet_structure):
-            return text
+            return text, False
 
         # Prefixes that indicate a line is a thinking/planning line
         planning_prefixes = [
@@ -49,7 +49,8 @@ class ResponseCleaner:
             "the user says", "the user", "this is", "the goal", "potential", 
             "options:", "options", "let's go", "let's keep", "let's use", "let's",
             "wait,", "since the", "1. ", "2. ", "3. ", "4. ", "i should", "i will",
-            "options and drafting", "drafting response", "here is"
+            "options and drafting", "drafting response", "here is", "refining for",
+            "refining"
         ]
 
         response_lines = []
@@ -84,9 +85,9 @@ class ResponseCleaner:
             res = "\n".join(response_lines).strip()
             if (res.startswith('"') and res.endswith('"')) or (res.startswith("'") and res.endswith("'")):
                 res = res[1:-1].strip()
-            return res
+            return res, True
 
-        return lines[-1].strip().strip('"')
+        return lines[-1].strip().strip('"'), True
 
     def clean_response(
             self,
@@ -96,7 +97,7 @@ class ResponseCleaner:
             return str(text)
 
         # Remove model internal thoughts/chain-of-thought traces
-        cleaned = self.clean_thinking_trace(text)
+        cleaned, has_thinking = self.clean_thinking_trace(text)
 
         # Remove leading timestamps prepended by the model in the form of [YYYY-MM-DD HH:MM] or [YYYY-MM-DD HH:MM:SS]
         cleaned = re.sub(
@@ -104,6 +105,46 @@ class ResponseCleaner:
             "",
             cleaned
         )
+
+        if has_thinking:
+            # Deduplicate adjacent lines/paragraphs (quoted vs unquoted drafts) if there was thinking trace
+            lines = cleaned.splitlines()
+            non_empty = [(i, line.strip()) for i, line in enumerate(lines) if line.strip()]
+            
+            def clean_p(p):
+                p_clean = re.sub(r'[^\w\s]', '', p.strip().lower())
+                return set(p_clean.split())
+
+            indices_to_remove = set()
+            i = 0
+            while i < len(non_empty) - 1:
+                idx1, l1 = non_empty[i]
+                idx2, l2 = non_empty[i+1]
+                
+                l1_unquoted = l1.strip('"\'')
+                l2_unquoted = l2.strip('"\'')
+                
+                words1 = clean_p(l1_unquoted)
+                words2 = clean_p(l2_unquoted)
+                
+                if words1 and words2:
+                    intersection = words1.intersection(words2)
+                    union = words1.union(words2)
+                    similarity = len(intersection) / len(union) if union else 0
+                    
+                    if similarity > 0.6 or l1_unquoted == l2_unquoted:
+                        # Mark the earlier one for removal
+                        indices_to_remove.add(idx1)
+                        non_empty.pop(i)
+                        continue
+                i += 1
+            
+            reconstructed_lines = []
+            for i, line in enumerate(lines):
+                if i in indices_to_remove:
+                    continue
+                reconstructed_lines.append(line)
+            cleaned = "\n".join(reconstructed_lines)
 
         # Deduplicate identical adjacent lines (quoted draft vs unquoted final response)
         lines_list = [line.strip() for line in cleaned.splitlines() if line.strip()]

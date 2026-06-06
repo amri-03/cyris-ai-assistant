@@ -2,13 +2,7 @@ import {useEffect, useRef} from "react";
 import MessageBubble from "./MessageBubble";
 import ThinkingIndicator from "./ThinkingIndicator";
 
-export default function ConversationThread({messages, isThinking}) {
-    const bottomRef = useRef ( null );
-
-    useEffect ( () => {
-        bottomRef.current?.scrollIntoView ( {behavior: "smooth"} );
-    }, [messages, isThinking] );
-
+export default function ConversationThread({messages, isThinking, onScrollToBottom}) {
     const isEmpty = messages.length === 0 && !isThinking;
 
     return (
@@ -70,12 +64,12 @@ export default function ConversationThread({messages, isThinking}) {
                     key={index}
                     role={msg.role}
                     content={msg.content}
+                    isLatest={index === messages.length - 1}
+                    onScrollToBottom={onScrollToBottom}
                 />
             ) )}
 
             {isThinking && <ThinkingIndicator/>}
-
-            <div ref={bottomRef}/>
         </div>
     );
 }
