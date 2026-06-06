@@ -129,10 +129,14 @@ class GroqClient:
                     prompt
                 )
 
-                self.continuity_memory.save_continuity(
-                    self.client,
-                    prompt
+                # Run memory extraction in a background thread to avoid blocking the main chat response
+                import threading
+                thread = threading.Thread(
+                    target=self.continuity_memory.save_continuity,
+                    args=(self.client, prompt)
                 )
+                thread.daemon = True
+                thread.start()
 
                 self.memory_service.save_message(
                     "assistant",

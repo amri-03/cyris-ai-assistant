@@ -1,4 +1,5 @@
 import json
+import threading
 from datetime import datetime
 from pathlib import Path
 
@@ -9,6 +10,7 @@ from app.memory.continuity_extractor import ContinuityExtractor
 
 
 class ContinuityMemoryService:
+    _file_lock = threading.Lock()
 
     def __init__(self):
 
@@ -54,17 +56,18 @@ class ContinuityMemoryService:
             identity: str
     ):
         try:
-            memory = self.load_memory()
-            memory["continuity_items"] = [
-                item for item in memory["continuity_items"]
-                if item["identity"] != identity
-            ]
-            with open(self.memory_file, "w") as file:
-                json.dump(
-                    memory,
-                    file,
-                    indent=4
-                )
+            with self._file_lock:
+                memory = self.load_memory()
+                memory["continuity_items"] = [
+                    item for item in memory["continuity_items"]
+                    if item["identity"] != identity
+                ]
+                with open(self.memory_file, "w") as file:
+                    json.dump(
+                        memory,
+                        file,
+                        indent=4
+                    )
             return True
         except Exception:
             return False
@@ -115,52 +118,55 @@ class ContinuityMemoryService:
                 return
 
             timestamp_str = datetime.now().isoformat()
-            has_changes = False
+            
+            with self._file_lock:
+                memory = self.load_memory()
+                has_changes = False
 
-            for item_data in items_to_save:
-                if not item_data.get("identity"):
-                    continue
+                for item_data in items_to_save:
+                    if not item_data.get("identity"):
+                        continue
 
-                # Retiring superseded elements (conflict resolution)
-                if item_data.get("supersedes"):
-                    memory["continuity_items"] = [
-                        item for item in memory["continuity_items"]
-                        if item["identity"] not in item_data["supersedes"]
-                    ]
+                    # Retiring superseded elements (conflict resolution)
+                    if item_data.get("supersedes"):
+                        memory["continuity_items"] = [
+                            item for item in memory["continuity_items"]
+                            if item["identity"] not in item_data["supersedes"]
+                        ]
 
-                existing_item = None
-                for item in memory["continuity_items"]:
-                    if item["identity"] == item_data["identity"]:
-                        existing_item = item
-                        break
+                    existing_item = None
+                    for item in memory["continuity_items"]:
+                        if item["identity"] == item_data["identity"]:
+                            existing_item = item
+                            break
 
-                if existing_item:
-                    existing_item["priority"] = min(5, existing_item.get("priority", 3) + 1)
-                    existing_item["content"] = item_data["content"]
-                    existing_item["importance"] = item_data["importance"]
-                    existing_item["last_updated"] = timestamp_str
-                else:
-                    memory["continuity_items"].append({
-                        "identity": item_data["identity"],
-                        "type": item_data["type"],
-                        "content": item_data["content"],
-                        "importance": item_data["importance"],
-                        "priority": self.calculate_priority(
-                            item_data["type"],
-                            item_data["importance"]
-                        ),
-                        "created_at": timestamp_str,
-                        "last_updated": timestamp_str
-                    })
-                has_changes = True
+                    if existing_item:
+                        existing_item["priority"] = min(5, existing_item.get("priority", 3) + 1)
+                        existing_item["content"] = item_data["content"]
+                        existing_item["importance"] = item_data["importance"]
+                        existing_item["last_updated"] = timestamp_str
+                    else:
+                        memory["continuity_items"].append({
+                            "identity": item_data["identity"],
+                            "type": item_data["type"],
+                            "content": item_data["content"],
+                            "importance": item_data["importance"],
+                            "priority": self.calculate_priority(
+                                item_data["type"],
+                                item_data["importance"]
+                            ),
+                            "created_at": timestamp_str,
+                            "last_updated": timestamp_str
+                        })
+                    has_changes = True
 
-            if has_changes:
-                with open(self.memory_file, "w") as file:
-                    json.dump(
-                        memory,
-                        file,
-                        indent=4
-                    )
+                if has_changes:
+                    with open(self.memory_file, "w") as file:
+                        json.dump(
+                            memory,
+                            file,
+                            indent=4
+                        )
 
         except Exception:
             return

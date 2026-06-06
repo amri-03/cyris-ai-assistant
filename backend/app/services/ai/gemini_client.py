@@ -122,10 +122,14 @@ class GeminiClient:
                     prompt
                 )
 
-                self.continuity_memory.save_continuity(
-                    None,  # extractor now detects/uses Gemini directly
-                    prompt
+                # Run memory extraction in a background thread to avoid blocking the main chat response
+                import threading
+                thread = threading.Thread(
+                    target=self.continuity_memory.save_continuity,
+                    args=(None, prompt)
                 )
+                thread.daemon = True
+                thread.start()
 
                 self.memory_service.save_message(
                     "assistant",
