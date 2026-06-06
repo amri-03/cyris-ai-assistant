@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import api from "../services/api";
 import Header from "../components/Header";
 import ConversationThread from "../components/ConversationThread";
@@ -11,6 +11,7 @@ export default function Home() {
     const [isConnected, setIsConnected] = useState ( true );
     const [isMemoryOpen, setIsMemoryOpen] = useState(false);
     const [memoryItems, setMemoryItems] = useState([]);
+    const hasInitialized = useRef(false);
 
     const fetchMemoryItems = async () => {
         try {
@@ -22,6 +23,8 @@ export default function Home() {
     };
 
     useEffect ( () => {
+        if (hasInitialized.current) return;
+        hasInitialized.current = true;
 
         const loadSession = async () => {
 

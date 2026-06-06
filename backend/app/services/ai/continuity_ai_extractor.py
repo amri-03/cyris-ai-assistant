@@ -184,6 +184,8 @@ class ContinuityAIExtractor:
 
         if not groq_key and gemini_key:
             try:
+                import warnings
+                warnings.filterwarnings("ignore", category=FutureWarning, module="google.generativeai")
                 import google.generativeai as genai
                 genai.configure(api_key=gemini_key)
                 model_name = os.getenv("GEMINI_MODEL", "gemma-4-26b-a4b-it")
