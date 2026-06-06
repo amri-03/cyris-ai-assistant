@@ -1,4 +1,4 @@
-# ⚙️ Cyris Setup & Installation Guide
+# ⚙️ Cyris Setup, Installation & Contributing Guide
 
 Follow these steps to set up and run Cyris on your local development machine.
 
@@ -94,7 +94,7 @@ GROQ_API_KEY=your_groq_api_key_here
 
 ## 4. Run the Backend Server
 
-Start the FastAPI application by executing `run.py`:
+Start the FastAPI application by executing `run.py` in the `backend/` folder:
 
 ```bash
 python run.py
@@ -123,5 +123,5 @@ The frontend client will start running at:
 ## 6. Access Cyris AI Assistant
 
 Open your web browser and navigate to **`http://localhost:5173`** to begin chatting with Cyris!
-* Click the **🧠 Memory** button in the top right header to toggle open the memory dashboard panel.
+* Click the **Memory Profile (Brain)** icon button in the top right header to toggle open the memory dashboard modal.
 * Chat naturally, and Cyris will extract goals/struggles and automatically update your profile.

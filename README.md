@@ -49,8 +49,7 @@ Unlike traditional checklist apps or cheerleading motivational assistants, Cyris
 
 ## 🚀 Getting Started
 
-To install and run Cyris on your local machine, please follow the step-by-step instructions in:
-👉 **[SETUP.md](file:///c:/Developer_Workspace/active_projects/AI-Projects/cyris-ai-assistant/SETUP.md)**
+To install, configure, and run Cyris on your local machine, please see the **Contributing** guidelines tab at the top of the repository card on GitHub, or refer directly to the **[CONTRIBUTING.md](./CONTRIBUTING.md)** file.
 
 ---
 
