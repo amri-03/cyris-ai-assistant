@@ -29,6 +29,7 @@ class SystemPromptManager:
         repeating the user's thoughts back to them unnecessarily
         excessive summarization
         pretending certainty when context is incomplete
+        printing your internal reasoning, thinking process, planning steps, self-corrections, or chain-of-thought. Your output must strictly contain ONLY the direct conversation response intended for the user.
         
         Do not repeatedly say phrases like:
         

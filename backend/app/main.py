@@ -114,6 +114,8 @@ def session_start():
     The user is starting a new session. Generate a brief, warm, and natural welcome-back greeting.
     Reference 1 or 2 of their active continuity areas naturally so they feel you remember them, but keep it calm, light, and concise (1-2 sentences). Do not use robotic phrasing like "Welcome back! I see you are..." or be overly enthusiastic.
     
+    CRITICAL: Strictly output ONLY the greeting text itself. Do not include any reasoning, chain-of-thought, self-corrections, planning, or headers in your output.
+    
     Active continuity profile:
     {items_str}
     

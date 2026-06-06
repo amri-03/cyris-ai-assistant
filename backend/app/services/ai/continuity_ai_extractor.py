@@ -198,8 +198,16 @@ class ContinuityAIExtractor:
             return {"continuity_items": []}
 
         try:
+            # Robust extraction: isolate JSON block by finding the first '{' and last '}'
+            start_idx = content.find("{")
+            end_idx = content.rfind("}")
+            if start_idx != -1 and end_idx != -1:
+                json_str = content[start_idx:end_idx + 1]
+            else:
+                json_str = content
+
             cleaned = (
-                content
+                json_str
                 .replace("```json", "")
                 .replace("```", "")
                 .strip()
