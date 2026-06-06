@@ -5,7 +5,7 @@ class ContinuityExtractor:
     # If a message doesn't contain any of these, we skip LLM extraction to save tokens and avoid rate limits.
     CONTINUITY_TOPICS = [
         # Action/Intent & Academics
-        "learn", "studies", "academic", "academics", "college", "university", "semester", "sem", "degree", "exam", "exams", "test", "tests", "gpa", "cgpa", "class", "school", "course", "courses", "syllabus", "assignment", "assignments",
+        "learn", "studies", "academic", "academics", "college", "university", "semester", "sem", "degree", "exam", "exams", "test", "tests", "gpa", "cgpa", "class", "school", "course", "courses", "syllabus", "assignment", "assignments", "transfer", "transferred", "transferring",
         # Career & Goals
         "career", "job", "jobs", "internship", "internships", "placement", "freelance", "freelancing", "resume", "cv", "portfolio", "linkedin", "profile", "goal", "goals", "focus", "target", "targets", "plan", "plans", "schedule", "routine", "routines", "habit", "habits", "todo",
         # Key Technical Focus Areas

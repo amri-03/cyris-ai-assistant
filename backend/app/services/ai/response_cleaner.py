@@ -5,60 +5,56 @@ class ResponseCleaner:
 
     def clean_thinking_trace(self, text: str) -> str:
         lines = text.splitlines()
-        
-        # If the text does not contain any bullet points or reasoning markers, return it as is
-        if not any(line.strip().startswith('*') for line in lines):
+        if not lines:
             return text
-            
-        markers = [
-            "drafting the final response:",
-            "final result:",
-            "response:",
-            "*response:",
-            "polished selection:",
-            "refined selection:"
+
+        thinking_indicators = [
+            "user context", "user says", "persona:", "self-correction", "final result",
+            "drafting ", "polished selection", "refined selection", "option 1", "option 2",
+            "option 3", "constraint 1", "constraint 2", "constraint 3", "do not invent",
+            "do not assume", "ask clarifying", "testing my memory", "check against",
+            "direct approach", "refined approach", "context check:", "check context",
+            "refined (cyris", "selection:", "role:", "task:", "constraint:", "thinking trace", 
+            "chain of thought", "reasoning:"
         ]
+
+        has_thinking = any(indicator in text.lower() for indicator in thinking_indicators)
+        # Fallback to general bullet check just in case, but keep it narrow to avoid false positives
+        has_bullet_structure = any(line.startswith(' ') and '*' in line for line in lines)
+
+        if not (has_thinking or has_bullet_structure):
+            return text
+
+        response_lines = []
         
-        for i in range(len(lines) - 1, -1, -1):
-            line_lower = lines[i].lower()
-            if any(marker in line_lower for marker in markers):
-                actual_lines = lines[i+1:]
-                result = "\n".join(actual_lines).strip()
-                if (result.startswith('"') and result.endswith('"')) or (result.startswith("'") and result.endswith("'")):
-                    result = result[1:-1].strip()
-                
-                sub_lines = result.splitlines()
-                if len(sub_lines) >= 2:
-                    last_line = sub_lines[-1].strip()
-                    second_last_line = sub_lines[-2].strip().strip('"').strip("'")
-                    if last_line == second_last_line:
-                        return last_line
-                return result
-                
-        # Fallback: find the first line that is not a bullet point/reasoning step
-        start_of_response = 0
-        for idx, line in enumerate(lines):
+        for line in reversed(lines):
             stripped = line.strip()
-            if stripped.startswith('*') or (line.startswith('    ') and (stripped.startswith('-') or stripped.startswith('*'))):
+            if not stripped:
+                if response_lines:
+                    response_lines.append(line)
                 continue
-            if stripped.startswith('(') and stripped.endswith(')'):
-                continue
-            if any(w in stripped.lower() for w in ["option ", "selection:", "refined selection:", "drafting ", "choice:", "constraint "]):
-                continue
-            start_of_response = idx
-            break
-            
-        actual_lines = lines[start_of_response:]
-        result = "\n".join(actual_lines).strip()
-        
-        sub_lines = result.splitlines()
-        if len(sub_lines) >= 2:
-            last_line = sub_lines[-1].strip()
-            second_last_line = sub_lines[-2].strip().strip('"').strip("'")
-            if last_line == second_last_line:
-                return last_line
                 
-        return result
+            is_indented = line.startswith(' ') or line.startswith('\t')
+            is_meta = False
+            line_lower = stripped.lower()
+            if any(kw in line_lower for kw in thinking_indicators):
+                is_meta = True
+
+            # We break if the line is indented (as Gemma/Llama's thinking traces are indented)
+            # or if the line contains explicit meta/planning keywords.
+            if is_indented or is_meta:
+                break
+                
+            response_lines.append(line)
+            
+        if response_lines:
+            response_lines.reverse()
+            res = "\n".join(response_lines).strip()
+            if (res.startswith('"') and res.endswith('"')) or (res.startswith("'") and res.endswith("'")):
+                res = res[1:-1].strip()
+            return res
+
+        return lines[-1].strip().strip('"')
 
     def clean_response(
             self,

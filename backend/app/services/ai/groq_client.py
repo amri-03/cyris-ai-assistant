@@ -51,7 +51,8 @@ class GroqClient:
     def generate_response(
             self,
             prompt: str,
-            model="llama-3.3-70b-versatile"
+            model="llama-3.3-70b-versatile",
+            add_to_history: bool = True
     ):
         if not self.client:
             return {
@@ -112,30 +113,31 @@ class GroqClient:
                 .content
             )
 
-            self.history_service.add_message(
-                "user",
-                prompt
-            )
+            if add_to_history:
+                self.history_service.add_message(
+                    "user",
+                    prompt
+                )
 
-            self.history_service.add_message(
-                "assistant",
-                content
-            )
+                self.history_service.add_message(
+                    "assistant",
+                    content
+                )
 
-            self.memory_service.save_message(
-                "user",
-                prompt
-            )
+                self.memory_service.save_message(
+                    "user",
+                    prompt
+                )
 
-            self.continuity_memory.save_continuity(
-                self.client,
-                prompt
-            )
+                self.continuity_memory.save_continuity(
+                    self.client,
+                    prompt
+                )
 
-            self.memory_service.save_message(
-                "assistant",
-                content
-            )
+                self.memory_service.save_message(
+                    "assistant",
+                    content
+                )
 
             return response
 

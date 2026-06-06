@@ -50,7 +50,8 @@ class GeminiClient:
 
     def generate_response(
             self,
-            prompt: str
+            prompt: str,
+            add_to_history: bool = True
     ):
         if not self.api_key:
             return {
@@ -104,31 +105,32 @@ class GeminiClient:
 
             content = response.text
 
-            # Update history and memory services
-            self.history_service.add_message(
-                "user",
-                prompt
-            )
+            if add_to_history:
+                # Update history and memory services
+                self.history_service.add_message(
+                    "user",
+                    prompt
+                )
 
-            self.history_service.add_message(
-                "assistant",
-                content
-            )
+                self.history_service.add_message(
+                    "assistant",
+                    content
+                )
 
-            self.memory_service.save_message(
-                "user",
-                prompt
-            )
+                self.memory_service.save_message(
+                    "user",
+                    prompt
+                )
 
-            self.continuity_memory.save_continuity(
-                None,  # extractor now detects/uses Gemini directly
-                prompt
-            )
+                self.continuity_memory.save_continuity(
+                    None,  # extractor now detects/uses Gemini directly
+                    prompt
+                )
 
-            self.memory_service.save_message(
-                "assistant",
-                content
-            )
+                self.memory_service.save_message(
+                    "assistant",
+                    content
+                )
 
             return response
 

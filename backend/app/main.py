@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -35,7 +38,8 @@ def ai_test(
 ):
     response = (
         ai_provider.generate_ai_response(
-            request.prompt
+            request.prompt,
+            add_to_history=False
         )
     )
 
@@ -123,7 +127,7 @@ def session_start():
     """
 
     try:
-        response = ai_provider.generate_ai_response(prompt)
+        response = ai_provider.generate_ai_response(prompt, add_to_history=False)
         if isinstance(response, dict):
             greeting = response.get("response") or response.get("content") or str(response)
             if isinstance(greeting, dict):

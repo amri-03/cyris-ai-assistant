@@ -74,6 +74,8 @@ class ContinuityAIExtractor:
         1. If the user's statement refers to or updates a topic that already exists in the known items, REUSE the existing "identity" (e.g., if you are updating academic details, reuse the existing identity like "academic_status" or "study_topics" instead of creating a new one).
         2. If the new information completely replaces, updates, or conflicts with one or more existing items, list those old items' identities in the "supersedes" array so they can be retired.
         3. If the user explicitly asks you to remember or store something (e.g., "remember my favorite color is blue" or "keep in mind that I prefer..."), you MUST extract this fact. Map it to the closest category (like "user_preference" or "interest") and capture the core detail exactly as requested.
+        4. When updating an existing item (or superseding an old one) representing academic timeline, career history, or project history, ensure that the new "content" merges and preserves the historical progression details (like previous college name, gap years, transfer details) rather than discarding them, unless the user explicitly corrected or deleted them. We want to preserve the timeline of the user's life (e.g., "finished 12th in 2023, took gap year, joined MIT ADT in 2024, transferred to Parul in 2025, now starting 3rd year").
+        
         
         Return ONLY valid JSON.
         

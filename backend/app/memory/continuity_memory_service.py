@@ -216,7 +216,7 @@ class ContinuityMemoryService:
             key=lambda item:
             item["priority"],
             reverse=True
-        )[:5]
+        )[:20]
 
         if not items:
             return ""

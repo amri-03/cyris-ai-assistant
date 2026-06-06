@@ -47,12 +47,14 @@ class AIProviderManager:
 
     def generate_ai_response(
             self,
-            prompt: str
+            prompt: str,
+            add_to_history: bool = True
     ):
         raw_response = (
             self.ai_client
             .generate_response(
-                prompt
+                prompt,
+                add_to_history=add_to_history
             )
         )
 
