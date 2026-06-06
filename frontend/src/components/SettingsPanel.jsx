@@ -10,8 +10,16 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                 style={{ zIndex: 10000, pointerEvents: isOpen ? "auto" : "none" }}
             />
 
-            {/* Sidebar Drawer */}
-            <div className={`memory-drawer ${isOpen ? "open" : ""}`} style={{ zIndex: 10001, pointerEvents: "auto" }}>
+            {/* Center Modal Dialog */}
+            <div 
+                className={`memory-modal ${isOpen ? "open" : ""}`} 
+                style={{ 
+                    zIndex: 10001, 
+                    pointerEvents: "auto",
+                    height: "auto",
+                    maxHeight: "380px"
+                }}
+            >
                 <div className="memory-header">
                     <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
                         <h2 style={{fontSize: "22px", fontWeight: 400, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em"}}>

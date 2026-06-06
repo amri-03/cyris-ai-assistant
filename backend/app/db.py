@@ -24,9 +24,16 @@ def init_db():
             role TEXT NOT NULL,
             content TEXT NOT NULL,
             created_at TEXT NOT NULL,
-            session_active INTEGER DEFAULT 1
+            session_active INTEGER DEFAULT 1,
+            feedback TEXT
         )
     """)
+    
+    # Ensure feedback column exists
+    try:
+        cursor.execute("ALTER TABLE messages ADD COLUMN feedback TEXT")
+    except Exception:
+        pass
     
     # Create user_continuity table (stores long-term memories)
     cursor.execute("""

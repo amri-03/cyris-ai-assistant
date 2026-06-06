@@ -1,5 +1,6 @@
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
+from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,6 +34,35 @@ def root():
 
 class PromptRequest(BaseModel):
     prompt: str
+
+
+class FeedbackRequest(BaseModel):
+    content: str
+    feedback: Optional[str] = None
+
+
+@app.post("/message/feedback")
+def save_feedback(request: FeedbackRequest):
+    from app.db import get_db_connection
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Update the feedback column for the most recent message with matching content and role = 'assistant'
+    cursor.execute("""
+        UPDATE messages
+        SET feedback = ?
+        WHERE id = (
+            SELECT id FROM messages
+            WHERE role = 'assistant' AND content = ?
+            ORDER BY id DESC
+            LIMIT 1
+        )
+    """, (request.feedback, request.content))
+    
+    conn.commit()
+    conn.close()
+    
+    return {"status": "success"}
 
 
 @app.post("/ai-test")

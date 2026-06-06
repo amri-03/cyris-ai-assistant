@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from "react";
+import api from "../services/api";
 
 function CodeBlock({ language, code }) {
     const [copied, setCopied] = useState(false);
@@ -300,6 +301,7 @@ export default function MessageBubble({ role, content }) {
     const [displayedContent, setDisplayedContent] = useState(isUser ? content : "");
     const [isTypingComplete, setIsTypingComplete] = useState(isUser);
     const [copied, setCopied] = useState(false);
+    const [feedback, setFeedback] = useState(null);
 
     useEffect(() => {
         if (ref.current) {
@@ -330,7 +332,7 @@ export default function MessageBubble({ role, content }) {
                 clearInterval(interval);
                 setIsTypingComplete(true);
             }
-        }, 45);
+        }, 25);
 
         return () => clearInterval(interval);
     }, [content, role]);
@@ -343,6 +345,19 @@ export default function MessageBubble({ role, content }) {
     };
 
     const safeContent = typeof content === "string" ? content : JSON.stringify(content);
+
+    const handleFeedback = async (val) => {
+        const newVal = feedback === val ? null : val;
+        setFeedback(newVal);
+        try {
+            await api.post("/message/feedback", {
+                content: safeContent,
+                feedback: newVal
+            });
+        } catch (error) {
+            console.error("Failed to save message feedback", error);
+        }
+    };
 
     return (
         <div
@@ -412,29 +427,29 @@ export default function MessageBubble({ role, content }) {
                             style={{
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "12px",
+                                gap: "8px",
                                 marginTop: "12px",
                                 opacity: 0,
                                 animation: "messageFadeIn 0.3s ease-out forwards",
                             }}
                         >
+                            {/* Copy Button */}
                             <button
                                 onClick={handleCopy}
+                                title={copied ? "Copied!" : "Copy response"}
                                 style={{
                                     background: "transparent",
                                     border: "1px solid var(--border-subtle)",
-                                    color: "var(--text-secondary)",
-                                    fontSize: "11px",
+                                    color: copied ? "var(--accent-primary)" : "var(--text-secondary)",
                                     cursor: "pointer",
-                                    padding: "4px 8px",
+                                    padding: "6px",
                                     borderRadius: "var(--radius-sm)",
                                     display: "flex",
                                     alignItems: "center",
-                                    gap: "5px",
+                                    justifyContent: "center",
+                                    width: "28px",
+                                    height: "28px",
                                     transition: "all var(--transition)",
-                                    fontFamily: "var(--font-sans)",
-                                    textTransform: "uppercase",
-                                    letterSpacing: "0.05em",
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.color = "var(--text-primary)";
@@ -442,27 +457,107 @@ export default function MessageBubble({ role, content }) {
                                     e.currentTarget.style.background = "var(--bg-elevated)";
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = "var(--text-secondary)";
+                                    e.currentTarget.style.color = copied ? "var(--accent-primary)" : "var(--text-secondary)";
                                     e.currentTarget.style.borderColor = "var(--border-subtle)";
                                     e.currentTarget.style.background = "transparent";
                                 }}
                             >
                                 {copied ? (
-                                    <>
-                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                        <span>Copied</span>
-                                    </>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
                                 ) : (
-                                    <>
-                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                        </svg>
-                                        <span>Copy</span>
-                                    </>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
                                 )}
+                            </button>
+
+                            {/* Thumbs Up Button */}
+                            <button
+                                onClick={() => handleFeedback("like")}
+                                title="Like response"
+                                style={{
+                                    background: "transparent",
+                                    border: "1px solid " + (feedback === "like" ? "var(--accent-primary)" : "var(--border-subtle)"),
+                                    color: feedback === "like" ? "var(--accent-primary)" : "var(--text-secondary)",
+                                    cursor: "pointer",
+                                    padding: "6px",
+                                    borderRadius: "var(--radius-sm)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "28px",
+                                    height: "28px",
+                                    transition: "all var(--transition)",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.color = feedback === "like" ? "var(--accent-primary)" : "var(--text-primary)";
+                                    e.currentTarget.style.borderColor = feedback === "like" ? "var(--accent-primary)" : "var(--user-border)";
+                                    e.currentTarget.style.background = "var(--bg-elevated)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.color = feedback === "like" ? "var(--accent-primary)" : "var(--text-secondary)";
+                                    e.currentTarget.style.borderColor = feedback === "like" ? "var(--accent-primary)" : "var(--border-subtle)";
+                                    e.currentTarget.style.background = "transparent";
+                                }}
+                            >
+                                <svg 
+                                    width="14" 
+                                    height="14" 
+                                    viewBox="0 0 24 24" 
+                                    fill={feedback === "like" ? "currentColor" : "none"} 
+                                    stroke="currentColor" 
+                                    strokeWidth="2" 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round"
+                                >
+                                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                                </svg>
+                            </button>
+
+                            {/* Thumbs Down Button */}
+                            <button
+                                onClick={() => handleFeedback("dislike")}
+                                title="Dislike response"
+                                style={{
+                                    background: "transparent",
+                                    border: "1px solid " + (feedback === "dislike" ? "#ef4444" : "var(--border-subtle)"),
+                                    color: feedback === "dislike" ? "#ef4444" : "var(--text-secondary)",
+                                    cursor: "pointer",
+                                    padding: "6px",
+                                    borderRadius: "var(--radius-sm)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "28px",
+                                    height: "28px",
+                                    transition: "all var(--transition)",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.color = feedback === "dislike" ? "#ef4444" : "var(--text-primary)";
+                                    e.currentTarget.style.borderColor = feedback === "dislike" ? "#ef4444" : "var(--user-border)";
+                                    e.currentTarget.style.background = "var(--bg-elevated)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.color = feedback === "dislike" ? "#ef4444" : "var(--text-secondary)";
+                                    e.currentTarget.style.borderColor = feedback === "dislike" ? "#ef4444" : "var(--border-subtle)";
+                                    e.currentTarget.style.background = "transparent";
+                                }}
+                            >
+                                <svg 
+                                    width="14" 
+                                    height="14" 
+                                    viewBox="0 0 24 24" 
+                                    fill={feedback === "dislike" ? "currentColor" : "none"} 
+                                    stroke="currentColor" 
+                                    strokeWidth="2" 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round"
+                                >
+                                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/>
+                                </svg>
                             </button>
                         </div>
                     )}
