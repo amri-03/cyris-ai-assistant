@@ -21,6 +21,15 @@ class ContinuityExtractor:
             message: str
     ):
         lowered_message = message.lower()
+
+        # Override: Direct manual memory instructions should always pass
+        manual_keywords = ["remember", "store in memory", "save in memory", "memorize", "keep in mind", "in your memory", "save this", "store this"]
+        if any(kw in lowered_message for kw in manual_keywords):
+            return {
+                "content": message,
+                "topics": ["manual_instruction"]
+            }
+
         matched_topics = []
 
         for topic in self.CONTINUITY_TOPICS:

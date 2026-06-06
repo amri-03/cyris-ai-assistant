@@ -50,6 +50,7 @@ class ContinuityAIExtractor:
         - project
         - academic_context
         - career_direction
+        - user_preference
         
         Extract ONLY information the user personally claims,
         owns, is actively pursuing,
@@ -62,6 +63,9 @@ class ContinuityAIExtractor:
         - "My project is..."
         - "I struggle with..."
         - "I am in semester..."
+        - "Remember that I..."
+        - "Store in memory..."
+        - "Keep in mind..."
 
         Existing known continuity items for this user:
         {existing_items_str}
@@ -69,6 +73,7 @@ class ContinuityAIExtractor:
         CRITICAL DIRECTIVES:
         1. If the user's statement refers to or updates a topic that already exists in the known items, REUSE the existing "identity" (e.g., if you are updating academic details, reuse the existing identity like "academic_status" or "study_topics" instead of creating a new one).
         2. If the new information completely replaces, updates, or conflicts with one or more existing items, list those old items' identities in the "supersedes" array so they can be retired.
+        3. If the user explicitly asks you to remember or store something (e.g., "remember my favorite color is blue" or "keep in mind that I prefer..."), you MUST extract this fact. Map it to the closest category (like "user_preference" or "interest") and capture the core detail exactly as requested.
         
         Return ONLY valid JSON.
         
