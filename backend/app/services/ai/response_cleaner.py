@@ -24,7 +24,8 @@ class ResponseCleaner:
             "career:", "technical:", "academics:",
             "based on this context", "therefore", "response strategy", "strategy:",
             "avoid ", "be accurate", "answer directly", "avoid robotic", "acknowledge ",
-            "state that", "do not get", "do not apologize", "do not explain", "maintain the"
+            "state that", "do not get", "do not apologize", "do not explain", "maintain the",
+            "potential directions", "options"
         ]
 
         has_thinking = any(indicator in text.lower() for indicator in thinking_indicators)
@@ -44,7 +45,11 @@ class ResponseCleaner:
             "testing my memory", "check against", "ask clarifying", "persona:",
             "role:", "task:", "constraint", "identity:", "supersedes:",
             "continuity_items:", "importance:", "priority:", "career:", "technical:",
-            "academics:", "user context", "user says", "refined (cyris"
+            "academics:", "user context", "user says", "refined (cyris",
+            "the user says", "the user", "this is", "the goal", "potential", 
+            "options:", "options", "let's go", "let's keep", "let's use", "let's",
+            "wait,", "since the", "1. ", "2. ", "3. ", "4. ", "i should", "i will",
+            "options and drafting", "drafting response", "here is"
         ]
 
         response_lines = []
@@ -92,6 +97,28 @@ class ResponseCleaner:
 
         # Remove model internal thoughts/chain-of-thought traces
         cleaned = self.clean_thinking_trace(text)
+
+        # Remove leading timestamps prepended by the model in the form of [YYYY-MM-DD HH:MM] or [YYYY-MM-DD HH:MM:SS]
+        cleaned = re.sub(
+            r"^\[\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(?::\d{2})?\]\s*",
+            "",
+            cleaned
+        )
+
+        # Deduplicate identical adjacent lines (quoted draft vs unquoted final response)
+        lines_list = [line.strip() for line in cleaned.splitlines() if line.strip()]
+        if len(lines_list) >= 2:
+            l0 = lines_list[-2]
+            l1 = lines_list[-1]
+            l0_unquoted = l0.strip('"\'')
+            l1_unquoted = l1.strip('"\'')
+            if l0_unquoted == l1_unquoted:
+                all_lines = cleaned.splitlines()
+                non_empty_indices = [i for i, line in enumerate(all_lines) if line.strip()]
+                if len(non_empty_indices) >= 2:
+                    idx_to_remove = non_empty_indices[-2]
+                    del all_lines[idx_to_remove]
+                    cleaned = "\n".join(all_lines)
 
         # Remove bold markdown
         cleaned = re.sub(
