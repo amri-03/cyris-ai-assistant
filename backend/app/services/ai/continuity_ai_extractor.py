@@ -105,21 +105,26 @@ class ContinuityAIExtractor:
 
         Format:
         {{
-            "identity": "...",
-            "type": "...",
-            "content": "...",
-            "importance": "low | medium | high",
-            "supersedes": ["old_identity_1", "old_identity_2"]
+            "continuity_items": [
+                {{
+                    "identity": "...",
+                    "type": "...",
+                    "content": "...",
+                    "importance": "low | medium | high",
+                    "supersedes": ["old_identity_1", "old_identity_2"]
+                }}
+            ]
         }}
 
         If nothing meaningful exists, return:
         {{
-            "identity": null
+            "continuity_items": []
         }}
 
-        User message:
-        "{message}"
-
+        Recent Conversation Context:
+        {message}
+        
+        Analyze the conversation above, focusing on the user's latest statement and its context, and extract any new or updated long-term continuity details.
         """
 
     def extract_structured_continuity(
@@ -182,7 +187,7 @@ class ContinuityAIExtractor:
                 content = response.choices[0].message.content
             except Exception as groq_err:
                 print(f"Groq extraction failed: {groq_err}")
-                return {"identity": None}
+                return {"continuity_items": []}
 
         try:
             cleaned = (
@@ -194,18 +199,20 @@ class ContinuityAIExtractor:
 
             parsed = json.loads(cleaned)
 
-            if not parsed.get("identity"):
-                return {
-                    "identity": None
-                }
+            if "continuity_items" not in parsed:
+                # Normalize old single-item format to list
+                if parsed.get("identity"):
+                    return {"continuity_items": [parsed]}
+                return {"continuity_items": []}
 
-            # Ensure supersedes is a list
-            if "supersedes" not in parsed or not isinstance(parsed["supersedes"], list):
-                parsed["supersedes"] = []
+            # Ensure all items have a valid supersedes list
+            for item in parsed["continuity_items"]:
+                if "supersedes" not in item or not isinstance(item["supersedes"], list):
+                    item["supersedes"] = []
 
             return parsed
 
         except Exception:
             return {
-                "identity": None
+                "continuity_items": []
             }

@@ -85,94 +85,82 @@ class ContinuityMemoryService:
             )
             existing_items = memory.get("continuity_items", [])
 
+            # Construct conversation history context for the extractor
+            from app.memory.conversation_history_service import ConversationHistoryService
+            history_service = ConversationHistoryService()
+            history_messages = history_service.get_messages()
+
+            # Format the last 5 messages for context
+            context_lines = []
+            for msg in history_messages[-5:]:
+                role = "User" if msg["role"] == "user" else "Assistant"
+                context_lines.append(f"{role}: {msg['content']}")
+            
+            if context_lines:
+                history_context = "\n".join(context_lines)
+            else:
+                history_context = f"User: {message}"
+
             extracted = (
                 self.extractor
                 .extract_structured_continuity(
                     ai_client,
-                    message,
+                    history_context,
                     existing_items
                 )
             )
 
-            if (
-                    extracted["identity"]
-                    is None
-            ):
+            items_to_save = extracted.get("continuity_items", [])
+            if not items_to_save:
                 return
 
-            # Retiring superseded elements (conflict resolution)
-            if extracted.get("supersedes"):
-                memory["continuity_items"] = [
-                    item for item in memory["continuity_items"]
-                    if item["identity"] not in extracted["supersedes"]
-                ]
-
-            existing_item = None
-
-            for item in memory[
-                "continuity_items"
-            ]:
-
-                if (
-                        item["identity"]
-                        == extracted["identity"]
-                ):
-                    existing_item = item
-                    break
-
             timestamp_str = datetime.now().isoformat()
+            has_changes = False
 
-            if existing_item:
+            for item_data in items_to_save:
+                if not item_data.get("identity"):
+                    continue
 
-                existing_item["priority"] = min(5, existing_item.get("priority", 3) + 1)
+                # Retiring superseded elements (conflict resolution)
+                if item_data.get("supersedes"):
+                    memory["continuity_items"] = [
+                        item for item in memory["continuity_items"]
+                        if item["identity"] not in item_data["supersedes"]
+                    ]
 
-                existing_item["content"] = (
-                    extracted["content"]
-                )
+                existing_item = None
+                for item in memory["continuity_items"]:
+                    if item["identity"] == item_data["identity"]:
+                        existing_item = item
+                        break
 
-                existing_item["importance"] = (
-                    extracted["importance"]
-                )
-                
-                existing_item["last_updated"] = timestamp_str
-
-            else:
-
-                memory[
-                    "continuity_items"
-                ].append(
-                    {
-                        "identity":
-                            extracted["identity"],
-
-                        "type":
-                            extracted["type"],
-
-                        "content":
-                            extracted["content"],
-
-                        "importance":
-                            extracted[
-                                "importance"
-                            ],
-
+                if existing_item:
+                    existing_item["priority"] = min(5, existing_item.get("priority", 3) + 1)
+                    existing_item["content"] = item_data["content"]
+                    existing_item["importance"] = item_data["importance"]
+                    existing_item["last_updated"] = timestamp_str
+                else:
+                    memory["continuity_items"].append({
+                        "identity": item_data["identity"],
+                        "type": item_data["type"],
+                        "content": item_data["content"],
+                        "importance": item_data["importance"],
                         "priority": self.calculate_priority(
-                            extracted["type"],
-                            extracted["importance"]
+                            item_data["type"],
+                            item_data["importance"]
                         ),
-                        
                         "created_at": timestamp_str,
-                        
                         "last_updated": timestamp_str
-                    }
-                )
+                    })
+                has_changes = True
 
-            with open(self.memory_file, "w") as file:
-                json.dump(
-                    memory,
-                    file,
-                    indent=4
-                )
+            if has_changes:
+                with open(self.memory_file, "w") as file:
+                    json.dump(
+                        memory,
+                        file,
+                        indent=4
+                    )
 
         except Exception:
             return
