@@ -1,4 +1,4 @@
-export default function Header({isConnected, onOpenMemory}) {
+export default function Header({isConnected, onOpenMemory, onOpenSettings}) {
     return (
         <div
             style={{
@@ -46,38 +46,71 @@ export default function Header({isConnected, onOpenMemory}) {
                 style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "24px",
+                    gap: "16px",
                 }}
             >
                 {/* Memory panel button */}
                 <button
                     onClick={onOpenMemory}
+                    title="Memory Profile"
                     style={{
                         background: "transparent",
                         border: "1px solid var(--border-subtle)",
                         borderRadius: "var(--radius-sm)",
-                        padding: "6px 12px",
+                        padding: "8px 10px",
                         color: "var(--text-secondary)",
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "10px",
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        gap: "6px",
+                        justifyContent: "center",
+                        fontSize: "18px",
+                        lineHeight: 1,
                         transition: "all var(--transition)",
                     }}
                     onMouseEnter={(e) => {
                         e.currentTarget.style.borderColor = "var(--user-border)";
                         e.currentTarget.style.color = "var(--text-primary)";
+                        e.currentTarget.style.background = "var(--bg-elevated)";
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.borderColor = "var(--border-subtle)";
                         e.currentTarget.style.color = "var(--text-secondary)";
+                        e.currentTarget.style.background = "transparent";
                     }}
                 >
-                    <span>🧠</span> memory
+                    🧠
+                </button>
+
+                {/* Settings button */}
+                <button
+                    onClick={onOpenSettings}
+                    title="Settings"
+                    style={{
+                        background: "transparent",
+                        border: "1px solid var(--border-subtle)",
+                        borderRadius: "var(--radius-sm)",
+                        padding: "8px 10px",
+                        color: "var(--text-secondary)",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "18px",
+                        lineHeight: 1,
+                        transition: "all var(--transition)",
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = "var(--user-border)";
+                        e.currentTarget.style.color = "var(--text-primary)";
+                        e.currentTarget.style.background = "var(--bg-elevated)";
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = "var(--border-subtle)";
+                        e.currentTarget.style.color = "var(--text-secondary)";
+                        e.currentTarget.style.background = "transparent";
+                    }}
+                >
+                    ⚙️
                 </button>
 
                 <div
@@ -85,6 +118,7 @@ export default function Header({isConnected, onOpenMemory}) {
                         display: "flex",
                         alignItems: "center",
                         gap: "7px",
+                        marginLeft: "8px"
                     }}
                 >
                     <span

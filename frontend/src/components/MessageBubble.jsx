@@ -7,12 +7,10 @@ export default function MessageBubble({
 
     const ref = useRef ( null );
 
-    const [displayedContent, setDisplayedContent] =
-        useState (
-            role === "user"
-                ? content
-                : ""
-        );
+    const isUser = role === "user";
+    const [displayedContent, setDisplayedContent] = useState(isUser ? content : "");
+    const [isTypingComplete, setIsTypingComplete] = useState(isUser);
+    const [copied, setCopied] = useState(false);
 
     useEffect ( () => {
 
@@ -31,6 +29,8 @@ export default function MessageBubble({
     useEffect ( () => {
 
         if (role === "user") {
+            setIsTypingComplete(true);
+            setDisplayedContent(content);
             return;
         }
 
@@ -43,6 +43,8 @@ export default function MessageBubble({
             safeContent.split ( " " );
 
         let index = 0;
+        setDisplayedContent("");
+        setIsTypingComplete(false);
 
         const interval = setInterval ( () => {
 
@@ -56,6 +58,7 @@ export default function MessageBubble({
 
             if (index >= words.length) {
                 clearInterval ( interval );
+                setIsTypingComplete(true);
             }
 
         }, 45 );
@@ -64,7 +67,15 @@ export default function MessageBubble({
 
     }, [content, role] );
 
-    const isUser = role === "user";
+    const handleCopy = () => {
+        const safeContent =
+            typeof content === "string"
+                ? content
+                : JSON.stringify ( content );
+        navigator.clipboard.writeText(safeContent);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     const safeContent =
         typeof content === "string"
@@ -140,22 +151,83 @@ export default function MessageBubble({
 
                 ) : (
 
-                    <div
-                        style={{
-                            maxWidth: "78%",
-                            color:
-                                "var(--text-primary)",
-                            fontFamily:
-                                "var(--font-sans)",
-                            fontSize: "14.5px",
-                            lineHeight: "1.9",
-                            fontWeight: 300,
-                            whiteSpace: "pre-wrap",
-                            wordBreak: "break-word",
-                            paddingLeft: "2px",
-                        }}
-                    >
-                        {displayedContent}
+                    <div style={{ maxWidth: "78%" }}>
+                        <div
+                            style={{
+                                color:
+                                    "var(--text-primary)",
+                                fontFamily:
+                                    "var(--font-sans)",
+                                fontSize: "14.5px",
+                                lineHeight: "1.9",
+                                fontWeight: 300,
+                                whiteSpace: "pre-wrap",
+                                wordBreak: "break-word",
+                                paddingLeft: "2px",
+                            }}
+                        >
+                            {displayedContent}
+                        </div>
+
+                        {!isUser && isTypingComplete && (
+                            <div 
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "12px",
+                                    marginTop: "12px",
+                                    opacity: 0,
+                                    animation: "messageFadeIn 0.3s ease-out forwards",
+                                }}
+                            >
+                                <button
+                                    onClick={handleCopy}
+                                    style={{
+                                        background: "transparent",
+                                        border: "1px solid var(--border-subtle)",
+                                        color: "var(--text-secondary)",
+                                        fontSize: "11px",
+                                        cursor: "pointer",
+                                        padding: "4px 8px",
+                                        borderRadius: "var(--radius-sm)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "5px",
+                                        transition: "all var(--transition)",
+                                        fontFamily: "var(--font-mono)",
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.05em",
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.color = "var(--text-primary)";
+                                        e.currentTarget.style.borderColor = "var(--user-border)";
+                                        e.currentTarget.style.background = "var(--bg-elevated)";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.color = "var(--text-secondary)";
+                                        e.currentTarget.style.borderColor = "var(--border-subtle)";
+                                        e.currentTarget.style.background = "transparent";
+                                    }}
+                                >
+                                    {copied ? (
+                                        <>
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                            <span>Copied</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                            </svg>
+                                            <span>Copy</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                 )

@@ -7,10 +7,10 @@
 }
 
 :root {
-    --bg-base: #080a0e;
-    --bg-surface: #0d1117;
-    --bg-elevated: #141b24;
-    --bg-input: #0f151d;
+    --bg-base: #18181c;
+    --bg-surface: #1e1e24;
+    --bg-elevated: #282830;
+    --bg-input: #22222a;
 
     --accent-primary: #7b6cff;
     --accent-glow: rgba(123, 108, 255, 0.15);
@@ -18,16 +18,25 @@
 
     --text-primary: #e8eaf0;
     --text-secondary: #7a8494;
-    --text-muted: #3d4654;
+    --text-muted: #5c6674;
     --text-accent: #a89fff;
 
-    --user-bubble: #151d2e;
+    --user-bubble: #252535;
     --user-border: rgba(123, 108, 255, 0.2);
-    --cyris-bubble: #0d1117;
-    --cyris-border: rgba(255, 255, 255, 0.05);
+    --cyris-bubble: #1e1e24;
+    --cyris-border: rgba(255, 255, 255, 0.04);
 
     --border-subtle: rgba(255, 255, 255, 0.06);
     --border-dim: rgba(255, 255, 255, 0.03);
+
+    --bg-drawer: rgba(30, 30, 36, 0.95);
+    --bg-overlay: rgba(4, 5, 8, 0.4);
+
+    --pulse-color-1: rgba(123, 108, 255, 0.06);
+    --pulse-color-2: rgba(80, 180, 255, 0.04);
+
+    --scrollbar-thumb: rgba(255, 255, 255, 0.08);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.14);
 
     --font-mono: 'DM Mono', monospace;
     --font-sans: 'DM Sans', sans-serif;
@@ -38,6 +47,39 @@
     --radius-xl: 28px;
 
     --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.light-theme {
+    --bg-base: #f9f9fb;
+    --bg-surface: #ffffff;
+    --bg-elevated: #f0f0f4;
+    --bg-input: #f0f0f4;
+
+    --accent-primary: #6355e6;
+    --accent-glow: rgba(99, 85, 230, 0.08);
+    --accent-dim: rgba(99, 85, 230, 0.3);
+
+    --text-primary: #1a1a20;
+    --text-secondary: #5e6678;
+    --text-muted: #8e98a8;
+    --text-accent: #6355e6;
+
+    --user-bubble: #f1effd;
+    --user-border: rgba(99, 85, 230, 0.15);
+    --cyris-bubble: #ffffff;
+    --cyris-border: rgba(0, 0, 0, 0.06);
+
+    --border-subtle: rgba(0, 0, 0, 0.08);
+    --border-dim: rgba(0, 0, 0, 0.04);
+    
+    --bg-drawer: rgba(255, 255, 255, 0.95);
+    --bg-overlay: rgba(0, 0, 0, 0.25);
+
+    --pulse-color-1: rgba(99, 85, 230, 0.03);
+    --pulse-color-2: rgba(80, 180, 255, 0.02);
+
+    --scrollbar-thumb: rgba(0, 0, 0, 0.12);
+    --scrollbar-thumb-hover: rgba(0, 0, 0, 0.2);
 }
 
 html, body, #root {
@@ -67,7 +109,7 @@ body::before {
     height: 70%;
     background: radial-gradient(
             ellipse at center,
-            rgba(123, 108, 255, 0.06) 0%,
+            var(--pulse-color-1) 0%,
             transparent 70%
     );
     pointer-events: none;
@@ -84,7 +126,7 @@ body::after {
     height: 60%;
     background: radial-gradient(
             ellipse at center,
-            rgba(80, 180, 255, 0.04) 0%,
+            var(--pulse-color-2) 0%,
             transparent 70%
     );
     pointer-events: none;
@@ -113,14 +155,14 @@ body::after {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--scrollbar-thumb);
     border-radius: 999px;
     border: 3px solid transparent;
     background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.14);
+    background: var(--scrollbar-thumb-hover);
     background-clip: content-box;
 }
 
@@ -161,8 +203,7 @@ body::after {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(4, 5, 8, 0.4);
-    backdrop-filter: blur(8px);
+    background: var(--bg-overlay);
     z-index: 1000;
     opacity: 0;
     pointer-events: none;
@@ -179,17 +220,16 @@ body::after {
     top: 0;
     right: 0;
     width: 100%;
-    max-width: 440px;
+    max-width: 320px;
     height: 100vh;
-    background: rgba(13, 17, 23, 0.95);
+    background: var(--bg-drawer);
     border-left: 1px solid var(--border-subtle);
-    backdrop-filter: blur(20px);
     z-index: 1001;
     transform: translateX(100%);
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
-    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+    box-shadow: none;
 }
 
 .memory-drawer.open {
@@ -236,7 +276,7 @@ body::after {
 
 .memory-badge {
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     padding: 3px 8px;
@@ -278,7 +318,7 @@ body::after {
 }
 
 .memory-card-body {
-    font-size: 13.5px;
+    font-size: 14.5px;
     color: var(--text-primary);
     line-height: 1.6;
     font-weight: 300;
@@ -290,6 +330,56 @@ body::after {
     align-items: center;
     margin-top: 12px;
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: 11px;
     color: var(--text-muted);
+}
+
+/* Theme badge overrides for light mode contrast */
+body.light-theme .memory-badge {
+    background: rgba(99, 85, 230, 0.08);
+    color: var(--text-accent);
+    border-color: rgba(99, 85, 230, 0.18);
+}
+body.light-theme .memory-badge.struggle {
+    background: rgba(239, 68, 68, 0.08);
+    color: #b91c1c;
+    border-color: rgba(239, 68, 68, 0.18);
+}
+body.light-theme .memory-badge.goal {
+    background: rgba(16, 185, 129, 0.08);
+    color: #047857;
+    border-color: rgba(16, 185, 129, 0.18);
+}
+body.light-theme .memory-badge.academic_context {
+    background: rgba(59, 130, 246, 0.08);
+    color: #1d4ed8;
+    border-color: rgba(59, 130, 246, 0.18);
+}
+
+/* Centered Memory Modal Styles */
+.memory-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    width: 90%;
+    max-width: 580px;
+    height: 80vh;
+    max-height: 600px;
+    background: var(--bg-drawer);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+}
+
+.memory-modal.open {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    pointer-events: auto;
 }

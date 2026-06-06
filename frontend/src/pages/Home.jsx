@@ -4,14 +4,26 @@ import Header from "../components/Header";
 import ConversationThread from "../components/ConversationThread";
 import MessageInput from "../components/MessageInput";
 import MemoryPanel from "../components/MemoryPanel";
+import SettingsPanel from "../components/SettingsPanel";
 
 export default function Home() {
     const [messages, setMessages] = useState ( [] );
     const [isThinking, setIsThinking] = useState ( false );
     const [isConnected, setIsConnected] = useState ( true );
     const [isMemoryOpen, setIsMemoryOpen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [memoryItems, setMemoryItems] = useState([]);
+    const [theme, setTheme] = useState(() => {
+        const saved = localStorage.getItem("cyris-theme");
+        return saved === "light" ? "light" : "dark";
+    });
     const hasInitialized = useRef(false);
+    const scrollContainerRef = useRef(null);
+
+    useEffect(() => {
+        document.body.className = `${theme}-theme`;
+        localStorage.setItem("cyris-theme", theme);
+    }, [theme]);
 
     const fetchMemoryItems = async () => {
         try {
@@ -21,6 +33,15 @@ export default function Home() {
             console.error("Failed to fetch memory items", error);
         }
     };
+
+    useEffect(() => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({
+                top: scrollContainerRef.current.scrollHeight,
+                behavior: "smooth"
+            });
+        }
+    }, [messages, isThinking]);
 
     useEffect ( () => {
         if (hasInitialized.current) return;
@@ -139,12 +160,14 @@ export default function Home() {
                     <Header 
                         isConnected={isConnected}
                         onOpenMemory={() => setIsMemoryOpen(true)}
+                        onOpenSettings={() => setIsSettingsOpen(true)}
                     />
                 </div>
             </div>
 
             {/* SCROLLABLE THREAD */}
             <div
+                ref={scrollContainerRef}
                 style={{
                     height: "100%",
                     overflowY: "auto",
@@ -209,6 +232,14 @@ export default function Home() {
                 items={memoryItems}
                 onDelete={handleDeleteMemoryItem}
                 onReconcile={fetchMemoryItems}
+            />
+
+            {/* SETTINGS DRAWER */}
+            <SettingsPanel
+                isOpen={isSettingsOpen}
+                onClose={() => setIsSettingsOpen(false)}
+                currentTheme={theme}
+                onThemeChange={(newTheme) => setTheme(newTheme)}
             />
 
         </div>

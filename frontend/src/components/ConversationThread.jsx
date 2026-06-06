@@ -15,7 +15,6 @@ export default function ConversationThread({messages, isThinking}) {
         <div
             style={{
                 flex: 1,
-                overflowY: "auto",
                 padding: "32px 0 24px",
                 display: "flex",
                 flexDirection: "column",
