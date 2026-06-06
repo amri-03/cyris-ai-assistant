@@ -87,24 +87,26 @@ def chat(request: PromptRequest):
 
 @app.get("/session-start")
 def session_start():
+    from app.memory.conversation_history_service import ConversationHistoryService
+    history_service = ConversationHistoryService()
+
     continuity = (
         continuity_memory
         .load_memory()
     )
 
-    items = continuity.get(
-        "continuity_items",
-        []
-    )
+    items = [item for item in continuity.get("continuity_items", []) if not item.get("retired", False)]
 
     if not items:
+        default_greeting = (
+            "Hello. I'm Cyris. "
+            "Tell me a little about yourself "
+            "and what matters to you right now."
+        )
+        history_service.save_history({"messages": []})
+        history_service.add_message("assistant", default_greeting)
         return {
-            "message":
-                (
-                    "Hello. I'm Cyris. "
-                    "Tell me a little about yourself "
-                    "and what matters to you right now."
-                )
+            "message": default_greeting
         }
 
     # Generate a dynamic greeting using the active AI provider based on continuity context
@@ -141,6 +143,10 @@ def session_start():
         latest = items[-1]
         content = latest.get("content", "something important")
         greeting = f"Welcome back. Last time we were discussing {content}. Would you like to continue from there?"
+
+    # Reset history for the new session and append the greeting
+    history_service.save_history({"messages": []})
+    history_service.add_message("assistant", greeting)
 
     return {
         "message": greeting
