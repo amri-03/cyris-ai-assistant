@@ -17,7 +17,7 @@ Before starting, ensure you have the following installed on your system:
 Open your terminal and clone the repository, then navigate to the root directory:
 
 ```bash
-git clone https://github.com/aman-kumar/cyris-ai-assistant.git
+git clone https://github.com/amri-03/cyris-ai-assistant.git
 cd cyris-ai-assistant
 ```
 
