@@ -1,91 +1,72 @@
-import json
+import sqlite3
 import threading
 from datetime import datetime
-from pathlib import Path
 
-from app.services.ai.continuity_ai_extractor import (
-    ContinuityAIExtractor
-)
+from app.db import get_db_connection
+from app.services.ai.continuity_ai_extractor import ContinuityAIExtractor
 from app.memory.continuity_extractor import ContinuityExtractor
 
 
 class ContinuityMemoryService:
-    _file_lock = threading.Lock()
+    _db_lock = threading.Lock()
 
     def __init__(self):
-
-        self.memory_file = (
-            Path(
-                "data/user_continuity.json"
-            )
-        )
-
-        self.extractor = (
-            ContinuityAIExtractor()
-        )
-
-        self.rule_extractor = (
-            ContinuityExtractor()
-        )
+        self.extractor = ContinuityAIExtractor()
+        self.rule_extractor = ContinuityExtractor()
 
     def load_memory(self):
         try:
-            # Ensure parent directory exists
-            self.memory_file.parent.mkdir(parents=True, exist_ok=True)
-
-            # Auto-create file if missing
-            if not self.memory_file.exists():
-                default_memory = {"continuity_items": []}
-                with open(self.memory_file, "w") as file:
-                    json.dump(default_memory, file, indent=4)
-                return default_memory
-
-            with open(
-                    self.memory_file,
-                    "r"
-            ) as file:
-                return json.load(file)
-
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute(
+                "SELECT identity, type, content, importance, priority, created_at, last_updated FROM user_continuity WHERE retired = 0"
+            )
+            rows = cursor.fetchall()
+            conn.close()
+            
+            items = []
+            for row in rows:
+                items.append({
+                    "identity": row["identity"],
+                    "type": row["type"],
+                    "content": row["content"],
+                    "importance": row["importance"],
+                    "priority": row["priority"],
+                    "created_at": row["created_at"],
+                    "last_updated": row["last_updated"]
+                })
+            
+            return {"continuity_items": items}
+            
         except Exception:
-            return {
-                "continuity_items": []
-            }
+            return {"continuity_items": []}
 
-    def delete_continuity_item(
-            self,
-            identity: str
-    ):
+    def delete_continuity_item(self, identity: str):
         try:
-            with self._file_lock:
-                memory = self.load_memory()
-                memory["continuity_items"] = [
-                    item for item in memory["continuity_items"]
-                    if item["identity"] != identity
-                ]
-                with open(self.memory_file, "w") as file:
-                    json.dump(
-                        memory,
-                        file,
-                        indent=4
-                    )
+            with self._db_lock:
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                
+                timestamp_str = datetime.now().isoformat()
+                cursor.execute(
+                    "UPDATE user_continuity SET retired = 1, last_updated = ? WHERE identity = ?",
+                    (timestamp_str, identity)
+                )
+                
+                conn.commit()
+                conn.close()
             return True
         except Exception:
             return False
 
-    def save_continuity(
-            self,
-            ai_client,
-            message: str
-    ):
-
+    def save_continuity(self, ai_client, message: str):
         try:
             # Token Efficiency: pre-filter message using rule-based keyword check
             if not self.rule_extractor.extract_continuity(message):
                 return
 
-            memory = (
-                self.load_memory()
-            )
+            memory = self.load_memory()
             existing_items = memory.get("continuity_items", [])
 
             # Construct conversation history context for the extractor
@@ -104,13 +85,10 @@ class ContinuityMemoryService:
             else:
                 history_context = f"User: {message}"
 
-            extracted = (
-                self.extractor
-                .extract_structured_continuity(
-                    ai_client,
-                    history_context,
-                    existing_items
-                )
+            extracted = self.extractor.extract_structured_continuity(
+                ai_client,
+                history_context,
+                existing_items
             )
 
             items_to_save = extracted.get("continuity_items", [])
@@ -119,23 +97,31 @@ class ContinuityMemoryService:
 
             timestamp_str = datetime.now().isoformat()
             
-            with self._file_lock:
-                memory = self.load_memory()
-                has_changes = False
+            with self._db_lock:
+                conn = get_db_connection()
+                cursor = conn.cursor()
 
                 for item_data in items_to_save:
-                    if not item_data.get("identity"):
+                    identity = item_data.get("identity")
+                    if not identity:
                         continue
 
-                    # Programmatic Timeline Protection & Archiving for superseded items
+                    # Process supersedes: check and archive
                     if item_data.get("supersedes"):
                         for superseded_id in item_data["supersedes"]:
-                            sup_item = next((item for item in memory["continuity_items"] if item["identity"] == superseded_id), None)
-                            if sup_item:
-                                # ONLY allow superseding if they have the same type OR the same identity (prevents cross-type deletion)
-                                if sup_item.get("type") == item_data.get("type") or sup_item.get("identity") == item_data.get("identity"):
-                                    old_content = sup_item.get("content", "")
+                            # Fetch superseded item
+                            cursor.execute(
+                                "SELECT type, content FROM user_continuity WHERE identity = ? AND retired = 0",
+                                (superseded_id,)
+                            )
+                            sup_row = cursor.fetchone()
+                            
+                            if sup_row:
+                                # Type Guard: Only allow superseding if type or identity matches
+                                if sup_row["type"] == item_data["type"] or superseded_id == identity:
+                                    old_content = sup_row["content"]
                                     new_content = item_data["content"]
+                                    
                                     timeline_keywords = ["mit", "transfer", "gap", "12th", "2023", "2024", "2025", "getting in", "getting good", "getting dangerous", "getting free"]
                                     has_old_timeline = any(kw in old_content.lower() for kw in timeline_keywords)
                                     has_new_timeline = any(kw in new_content.lower() for kw in timeline_keywords)
@@ -149,26 +135,28 @@ class ContinuityMemoryService:
                                         new_kws = [kw for kw in important_timeline_kws if kw in new_content.lower()]
                                         missing_kws = [kw for kw in old_kws if kw not in new_kws]
                                         if missing_kws:
-                                            # Merge if the new content has supplementary details like ICSE/ISC school info
                                             if "icse" in new_content.lower() or "isc" in new_content.lower():
                                                 item_data["content"] = f"{new_content}. College/gap details: {old_content}"
                                             else:
                                                 item_data["content"] = old_content
                                     
-                                    # Archive (retire) the item instead of deleting it
-                                    sup_item["retired"] = True
-                                    sup_item["last_updated"] = timestamp_str
+                                    # Retire the superseded item
+                                    cursor.execute(
+                                        "UPDATE user_continuity SET retired = 1, last_updated = ? WHERE identity = ?",
+                                        (timestamp_str, superseded_id)
+                                    )
 
-                    existing_item = None
-                    for item in memory["continuity_items"]:
-                        if item["identity"] == item_data["identity"]:
-                            existing_item = item
-                            break
+                    # Check if the target item already exists
+                    cursor.execute(
+                        "SELECT priority, content FROM user_continuity WHERE identity = ?",
+                        (identity,)
+                    )
+                    existing_row = cursor.fetchone()
 
-                    if existing_item:
-                        # Programmatic Timeline Protection for updated items
-                        old_content = existing_item.get("content", "")
+                    if existing_row:
+                        old_content = existing_row["content"]
                         new_content = item_data["content"]
+                        
                         timeline_keywords = ["mit", "transfer", "gap", "12th", "2023", "2024", "2025", "getting in", "getting good", "getting dangerous", "getting free"]
                         has_old_timeline = any(kw in old_content.lower() for kw in timeline_keywords)
                         has_new_timeline = any(kw in new_content.lower() for kw in timeline_keywords)
@@ -186,114 +174,73 @@ class ContinuityMemoryService:
                                 else:
                                     item_data["content"] = old_content
 
-                        existing_item["priority"] = min(5, existing_item.get("priority", 3) + 1)
-                        existing_item["content"] = item_data["content"]
-                        existing_item["importance"] = item_data["importance"]
-                        existing_item["last_updated"] = timestamp_str
-                        # Reactivate if it was previously retired
-                        existing_item.pop("retired", None)
+                        # Calculate new priority
+                        new_priority = min(5, (existing_row["priority"] or 3) + 1)
+                        
+                        cursor.execute("""
+                            UPDATE user_continuity 
+                            SET type = ?, content = ?, importance = ?, priority = ?, retired = 0, last_updated = ?
+                            WHERE identity = ?
+                        """, (item_data["type"], item_data["content"], item_data["importance"], new_priority, timestamp_str, identity))
                     else:
-                        memory["continuity_items"].append({
-                            "identity": item_data["identity"],
-                            "type": item_data["type"],
-                            "content": item_data["content"],
-                            "importance": item_data["importance"],
-                            "priority": self.calculate_priority(
-                                item_data["type"],
-                                item_data["importance"]
-                            ),
-                            "created_at": timestamp_str,
-                            "last_updated": timestamp_str
-                        })
-                    has_changes = True
+                        priority = self.calculate_priority(item_data["type"], item_data["importance"])
+                        cursor.execute("""
+                            INSERT INTO user_continuity (identity, type, content, importance, priority, retired, created_at, last_updated)
+                            VALUES (?, ?, ?, ?, ?, 0, ?, ?)
+                        """, (identity, item_data["type"], item_data["content"], item_data["importance"], priority, timestamp_str, timestamp_str))
 
-                if has_changes:
-                    with open(self.memory_file, "w") as file:
-                        json.dump(
-                            memory,
-                            file,
-                            indent=4
-                        )
+                conn.commit()
+                conn.close()
 
-        except Exception:
-            return
+        except Exception as e:
+            print(f"Error saving continuity in SQLite: {e}")
 
     def build_continuity_context(self):
-
-        memory = (
-            self.load_memory()
-        )
-
-        items = sorted(
-            [item for item in memory.get("continuity_items", []) if not item.get("retired", False)],
-            key=lambda item:
-            item["priority"],
-            reverse=True
-        )[:10]
-
-        if not items:
-            return ""
-
-        formatted_items = []
-
-        for item in items:
-            formatted_items.append(
-                (
-                    f'- {item["content"]} '
-                    f'(importance: '
-                    f'{item["importance"]})'
-                )
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT content, importance FROM user_continuity WHERE retired = 0 ORDER BY priority DESC LIMIT 10"
             )
-
-        formatted = "\n".join(
-            formatted_items
-        )
-
-        return (
-            "Known user continuity:\n"
-            f"{formatted}"
-        )
+            rows = cursor.fetchall()
+            conn.close()
+            
+            if not rows:
+                return ""
+                
+            formatted_items = []
+            for row in rows:
+                formatted_items.append(f'- {row["content"]} (importance: {row["importance"]})')
+            
+            return "Known user continuity:\n" + "\n".join(formatted_items)
+            
+        except Exception:
+            return ""
 
     def build_priority_briefing(self):
-
-        memory = (
-            self.load_memory()
-        )
-
-        items = sorted(
-            [item for item in memory.get("continuity_items", []) if not item.get("retired", False)],
-            key=lambda item:
-            item["priority"],
-            reverse=True
-        )[:20]
-
-        if not items:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT identity, content FROM user_continuity WHERE retired = 0 ORDER BY priority DESC LIMIT 20"
+            )
+            rows = cursor.fetchall()
+            conn.close()
+            
+            if not rows:
+                return ""
+                
+            briefing = []
+            for row in rows:
+                briefing.append(f'- {row["identity"]}: {row["content"]}')
+                
+            return "Current important continuity areas:\n" + "\n".join(briefing)
+            
+        except Exception:
             return ""
 
-        briefing = []
-
-        for item in items:
-            briefing.append(
-                (
-                    f'- {item["identity"]}: '
-                    f'{item["content"]}'
-                )
-            )
-
-        return (
-                "Current important continuity areas:\n"
-                +
-                "\n".join(briefing)
-        )
-
-    def calculate_priority(
-            self,
-            continuity_type,
-            importance
-    ):
-
+    def calculate_priority(self, continuity_type, importance):
         priority_map = {
-
             "career_direction": 5,
             "goal": 4,
             "focus_area": 4,
@@ -302,33 +249,11 @@ class ContinuityMemoryService:
             "struggle": 5,
             "interest": 2
         }
-
         importance_bonus = {
-
             "high": 1,
             "medium": 0,
             "low": -1
         }
-
-        base_priority = (
-            priority_map.get(
-                continuity_type,
-                1
-            )
-        )
-
-        adjustment = (
-            importance_bonus.get(
-                importance,
-                0
-            )
-        )
-
-        final_priority = (
-                base_priority + adjustment
-        )
-
-        return max(
-            1,
-            min(final_priority, 5)
-        )
+        base_priority = priority_map.get(continuity_type, 1)
+        adjustment = importance_bonus.get(importance, 0)
+        return max(1, min(base_priority + adjustment, 5))

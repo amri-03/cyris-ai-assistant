@@ -1,8 +1,14 @@
+from datetime import datetime
+
 class SystemPromptManager:
 
 
     def build_system_prompt(self):
-        return """
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%A, %B %d, %Y %H:%M")
+        
+        return f"""
+        Current Date & Time: {formatted_time}
 
         You are Cyris.
 

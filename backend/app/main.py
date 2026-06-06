@@ -19,6 +19,9 @@ app.add_middleware(
 )
 
 
+from app.db import init_db
+init_db()
+
 ai_provider = AIProviderManager()
 continuity_memory = ContinuityMemoryService()
 
@@ -181,33 +184,11 @@ def delete_memory_item(identity: str):
 
 @app.post("/memory/reconcile")
 def reconcile_memory():
-    import json
     try:
-        memory = continuity_memory.load_memory()
-        items = memory.get("continuity_items", [])
-        
-        # Chronology cleanup: if university/college is present, filter out "school" items
-        has_college = any(
-            "college" in str(item.get("identity", "")).lower() or 
-            "university" in str(item.get("content", "")).lower() or
-            "college" in str(item.get("content", "")).lower()
-            for item in items
-        )
-        
-        if has_college:
-            filtered_items = []
-            for item in items:
-                ident = str(item.get("identity", "")).lower()
-                content = str(item.get("content", "")).lower()
-                if "school" in content or "school" in ident:
-                    continue
-                filtered_items.append(item)
-            
-            memory["continuity_items"] = filtered_items
-            with open(continuity_memory.memory_file, "w") as file:
-                json.dump(memory, file, indent=4)
-                
-        return {"status": "success", "message": "Memory reconciled successfully."}
+        from app.memory.memory_reconciler import MemoryReconciler
+        reconciler = MemoryReconciler()
+        result = reconciler.rebuild_memory_from_history(ai_provider)
+        return result
     except Exception as e:
         return {"status": "error", "message": str(e)}
 

@@ -90,7 +90,19 @@ class GroqClient:
                 }
             ]
 
-            messages.extend(history)
+            from datetime import datetime
+            for msg in history:
+                time_prefix = ""
+                if msg.get("created_at"):
+                    try:
+                        dt = datetime.fromisoformat(msg["created_at"])
+                        time_prefix = dt.strftime("[%Y-%m-%d %H:%M] ")
+                    except Exception:
+                        pass
+                messages.append({
+                    "role": msg["role"],
+                    "content": f"{time_prefix}{msg['content']}"
+                })
 
             messages.append(
                 {

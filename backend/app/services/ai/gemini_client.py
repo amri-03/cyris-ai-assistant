@@ -84,12 +84,20 @@ class GeminiClient:
             )
 
             # Map history to Gemini format (user/model roles)
+            from datetime import datetime
             gemini_history = []
             for msg in history:
                 role = "model" if msg["role"] == "assistant" else "user"
+                time_prefix = ""
+                if msg.get("created_at"):
+                    try:
+                        dt = datetime.fromisoformat(msg["created_at"])
+                        time_prefix = dt.strftime("[%Y-%m-%d %H:%M] ")
+                    except Exception:
+                        pass
                 gemini_history.append({
                     "role": role,
-                    "parts": [msg["content"]]
+                    "parts": [f"{time_prefix}{msg['content']}"]
                 })
 
             # Generate response
