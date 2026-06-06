@@ -18,7 +18,7 @@ export default function Header({isConnected, onOpenMemory, onOpenSettings}) {
                 <span
                     style={{
                         fontFamily: "var(--font-mono)",
-                        fontSize: "18px",
+                        fontSize: "22px",
                         fontWeight: 500,
                         letterSpacing: "0.12em",
                         textTransform: "uppercase",
@@ -30,7 +30,7 @@ export default function Header({isConnected, onOpenMemory, onOpenSettings}) {
                 <span
                     style={{
                         fontFamily: "var(--font-mono)",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         fontWeight: 300,
                         letterSpacing: "0.15em",
                         textTransform: "uppercase",
@@ -165,7 +165,7 @@ export default function Header({isConnected, onOpenMemory, onOpenSettings}) {
                     <span
                         style={{
                             fontFamily: "var(--font-mono)",
-                            fontSize: "10px",
+                            fontSize: "12px",
                             letterSpacing: "0.12em",
                             textTransform: "uppercase",
                             color: isConnected

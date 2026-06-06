@@ -1,19 +1,9 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
+import {createPortal} from "react-dom";
 import api from "../services/api";
 
 export default function MemoryPanel({isOpen, onClose, items, onDelete, onReconcile}) {
     const [isReconciling, setIsReconciling] = useState(false);
-
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "";
-        }
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [isOpen]);
 
     const handleReconcile = async () => {
         setIsReconciling(true);
@@ -44,22 +34,23 @@ export default function MemoryPanel({isOpen, onClose, items, onDelete, onReconci
         }
     };
 
-    return (
+    return createPortal(
         <>
             {/* Backdrop Overlay */}
             <div 
                 className={`memory-overlay ${isOpen ? "open" : ""}`} 
                 onClick={onClose}
+                style={{ zIndex: 10000 }}
             />
 
             {/* Center Modal Dialog */}
-            <div className={`memory-modal ${isOpen ? "open" : ""}`}>
+            <div className={`memory-modal ${isOpen ? "open" : ""}`} style={{ zIndex: 10001 }}>
                 <div className="memory-header">
                     <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
-                        <h2 style={{fontSize: "18px", fontWeight: 400, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em"}}>
+                        <h2 style={{fontSize: "22px", fontWeight: 400, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em"}}>
                             Memory Profile
                         </h2>
-                        <span style={{fontSize: "13px", color: "var(--text-muted)", fontFamily: "var(--font-sans)"}}>
+                        <span style={{fontSize: "14.5px", color: "var(--text-muted)", fontFamily: "var(--font-sans)"}}>
                             Remembered context for this session
                         </span>
                     </div>
@@ -70,7 +61,7 @@ export default function MemoryPanel({isOpen, onClose, items, onDelete, onReconci
                             border: "none",
                             color: "var(--text-secondary)",
                             cursor: "pointer",
-                            fontSize: "22px",
+                            fontSize: "26px",
                             lineHeight: 1,
                             transition: "color var(--transition)"
                         }}
@@ -84,7 +75,7 @@ export default function MemoryPanel({isOpen, onClose, items, onDelete, onReconci
                 <div className="memory-content">
                     {/* Action Header */}
                     <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px"}}>
-                        <span style={{fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--text-secondary)", textTransform: "uppercase"}}>
+                        <span style={{fontFamily: "var(--font-mono)", fontSize: "13.5px", color: "var(--text-secondary)", textTransform: "uppercase"}}>
                             {items.length} items active
                         </span>
                         <button
@@ -95,7 +86,7 @@ export default function MemoryPanel({isOpen, onClose, items, onDelete, onReconci
                                 border: "1px solid var(--border-subtle)",
                                 borderRadius: "4px",
                                 padding: "6px 12px",
-                                fontSize: "12px",
+                                fontSize: "13px",
                                 fontFamily: "var(--font-mono)",
                                 textTransform: "uppercase",
                                 color: "var(--text-secondary)",
@@ -183,6 +174,7 @@ export default function MemoryPanel({isOpen, onClose, items, onDelete, onReconci
                     )}
                 </div>
             </div>
-        </>
+        </>,
+        document.body
     );
 }

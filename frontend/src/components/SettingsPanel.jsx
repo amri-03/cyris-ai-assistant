@@ -1,33 +1,23 @@
-import {useEffect} from "react";
+import {createPortal} from "react-dom";
 
 export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeChange}) {
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "";
-        }
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [isOpen]);
-
-    return (
+    return createPortal(
         <>
             {/* Backdrop Blur Overlay */}
             <div 
                 className={`memory-overlay ${isOpen ? "open" : ""}`} 
                 onClick={onClose}
+                style={{ zIndex: 10000 }}
             />
 
             {/* Sidebar Drawer */}
-            <div className={`memory-drawer ${isOpen ? "open" : ""}`}>
+            <div className={`memory-drawer ${isOpen ? "open" : ""}`} style={{ zIndex: 10001 }}>
                 <div className="memory-header">
                     <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
-                        <h2 style={{fontSize: "18px", fontWeight: 400, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em"}}>
+                        <h2 style={{fontSize: "22px", fontWeight: 400, fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em"}}>
                             Settings
                         </h2>
-                        <span style={{fontSize: "13px", color: "var(--text-muted)", fontFamily: "var(--font-sans)"}}>
+                        <span style={{fontSize: "14.5px", color: "var(--text-muted)", fontFamily: "var(--font-sans)"}}>
                             Configure theme and visual options
                         </span>
                     </div>
@@ -38,7 +28,7 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                             border: "none",
                             color: "var(--text-secondary)",
                             cursor: "pointer",
-                            fontSize: "22px",
+                            fontSize: "26px",
                             lineHeight: 1,
                             transition: "color var(--transition)"
                         }}
@@ -51,7 +41,7 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
 
                 <div className="memory-content" style={{gap: "24px"}}>
                     <div style={{display: "flex", flexDirection: "column", gap: "12px"}}>
-                        <span style={{fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em"}}>
+                        <span style={{fontFamily: "var(--font-mono)", fontSize: "14px", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em"}}>
                             Appearance
                         </span>
                         
@@ -84,9 +74,12 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                                 >
                                     <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
                                 </svg>
-                                <div style={{flex: 1}}>
-                                    <span style={{fontSize: "14.5px", fontWeight: 400, color: "var(--text-primary)"}}>
+                                <div style={{display: "flex", flexDirection: "column", gap: "4px", flex: 1}}>
+                                    <span style={{fontSize: "16px", fontWeight: 400, color: "var(--text-primary)"}}>
                                         Dark Mode
+                                    </span>
+                                    <span style={{fontSize: "13.5px", color: "var(--text-muted)", lineHeight: "1.4"}}>
+                                        Premium warm charcoal grey appearance
                                     </span>
                                 </div>
                                 {currentTheme === "dark" && (
@@ -136,9 +129,12 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                                     <path d="m6.34 17.66-1.41 1.41"/>
                                     <path d="m19.07 4.93-1.41 1.41"/>
                                 </svg>
-                                <div style={{flex: 1}}>
-                                    <span style={{fontSize: "14.5px", fontWeight: 400, color: "var(--text-primary)"}}>
+                                <div style={{display: "flex", flexDirection: "column", gap: "4px", flex: 1}}>
+                                    <span style={{fontSize: "16px", fontWeight: 400, color: "var(--text-primary)"}}>
                                         Light Mode
+                                    </span>
+                                    <span style={{fontSize: "13.5px", color: "var(--text-muted)", lineHeight: "1.4"}}>
+                                        Clean minimalist warm-white appearance
                                     </span>
                                 </div>
                                 {currentTheme === "light" && (
@@ -155,6 +151,7 @@ export default function SettingsPanel({isOpen, onClose, currentTheme, onThemeCha
                     </div>
                 </div>
             </div>
-        </>
+        </>,
+        document.body
     );
 }

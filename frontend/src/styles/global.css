@@ -30,7 +30,7 @@
     --border-dim: rgba(255, 255, 255, 0.03);
 
     --bg-drawer: rgba(30, 30, 36, 0.95);
-    --bg-overlay: rgba(4, 5, 8, 0.4);
+    --bg-overlay: transparent;
 
     --pulse-color-1: rgba(123, 108, 255, 0.06);
     --pulse-color-2: rgba(80, 180, 255, 0.04);
@@ -73,7 +73,7 @@ body.light-theme {
     --border-dim: rgba(0, 0, 0, 0.04);
     
     --bg-drawer: rgba(255, 255, 255, 0.95);
-    --bg-overlay: rgba(0, 0, 0, 0.25);
+    --bg-overlay: transparent;
 
     --pulse-color-1: rgba(99, 85, 230, 0.03);
     --pulse-color-2: rgba(80, 180, 255, 0.02);
@@ -95,8 +95,7 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    overflow: hidden;
 }
 
 /* Ambient background pulse */
