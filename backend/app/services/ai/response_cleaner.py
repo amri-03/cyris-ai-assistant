@@ -186,34 +186,4 @@ class ResponseCleaner:
                     del all_lines[idx_to_remove]
                     cleaned = "\n".join(all_lines)
 
-        # Remove bold markdown
-        cleaned = re.sub(
-            r"\*\*(.*?)\*\*",
-            r"\1",
-            cleaned
-        )
-
-        # Remove italic markdown
-        cleaned = re.sub(
-            r"\*(.*?)\*",
-            r"\1",
-            cleaned
-        )
-
-        # Remove markdown headers
-        cleaned = re.sub(
-            r"^#+\s",
-            "",
-            cleaned,
-            flags=re.MULTILINE
-        )
-
-        # Remove bullet prefixes
-        cleaned = re.sub(
-            r"^\s*[-•]\s+",
-            "",
-            cleaned,
-            flags=re.MULTILINE
-        )
-
         return cleaned.strip()

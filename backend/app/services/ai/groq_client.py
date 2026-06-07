@@ -5,10 +5,6 @@ from app.services.ai.system_prompt_manager import (
     SystemPromptManager
 )
 
-from app.services.memory.conversation_memory_service import (
-    ConversationMemoryService
-)
-
 from app.memory.continuity_memory_service import (
     ContinuityMemoryService
 )
@@ -27,10 +23,6 @@ class GroqClient:
 
         self.system_prompt_manager = (
             SystemPromptManager()
-        )
-
-        self.memory_service = (
-            ConversationMemoryService()
         )
 
         self.continuity_memory = (
@@ -130,9 +122,6 @@ class GroqClient:
                 .content
             )
 
-            from app.services.ai.response_cleaner import ResponseCleaner
-            cleaned_content = ResponseCleaner().clean_response(content)
-
             if add_to_history:
                 self.history_service.add_message(
                     "user",
@@ -141,12 +130,7 @@ class GroqClient:
 
                 self.history_service.add_message(
                     "assistant",
-                    cleaned_content
-                )
-
-                self.memory_service.save_message(
-                    "user",
-                    prompt
+                    content
                 )
 
                 # Run memory extraction in a background thread to avoid blocking the main chat response
@@ -157,11 +141,6 @@ class GroqClient:
                 )
                 thread.daemon = True
                 thread.start()
-
-                self.memory_service.save_message(
-                    "assistant",
-                    cleaned_content
-                )
 
             return response
 
