@@ -74,10 +74,10 @@ class MemoryReconciler:
             - user_preference
             
             Ensure that:
-            1. Academic timeline details (such as completing ICSE 10th, ISC 12th in 2023, gap year, MIT ADT in 2024, and transferring to Parul University in 2025) are merged into a single detailed 'academic_status' item.
-            2. Career directions (such as becoming dangerous in cybersecurity) are captured in 'career_direction'.
-            3. Active projects (such as the Flipkart Tracker, using tools like Gemini AI Studio, Antigravity, Gemini, and ChatGPT) are captured in 'flipkart_project' with their full tech stack/details.
-            4. Focus areas (such as mastering Java) are captured cleanly.
+            1. Academic timeline details (institutions, dates, transfers, gaps) should be merged into a single detailed 'academic_status' item that preserves chronological progression.
+            2. Career directions should be captured in 'career_direction' items.
+            3. Active projects should be captured with their relevant tech stack and details.
+            4. Focus areas should be captured cleanly without duplication.
             
             Return ONLY valid JSON in the format:
             {{

@@ -119,27 +119,6 @@ class ContinuityMemoryService:
                             if sup_row:
                                 # Type Guard: Only allow superseding if type or identity matches
                                 if sup_row["type"] == item_data["type"] or superseded_id == identity:
-                                    old_content = sup_row["content"]
-                                    new_content = item_data["content"]
-                                    
-                                    timeline_keywords = ["mit", "transfer", "gap", "12th", "2023", "2024", "2025", "getting in", "getting good", "getting dangerous", "getting free"]
-                                    has_old_timeline = any(kw in old_content.lower() for kw in timeline_keywords)
-                                    has_new_timeline = any(kw in new_content.lower() for kw in timeline_keywords)
-                                    
-                                    if has_old_timeline and not has_new_timeline:
-                                        item_data["content"] = old_content
-                                    elif has_old_timeline and has_new_timeline:
-                                        # Protect specific details (gap year, college transfer) from being lost
-                                        important_timeline_kws = ["mit", "parul", "gap", "transfer", "2023", "2024", "2025"]
-                                        old_kws = [kw for kw in important_timeline_kws if kw in old_content.lower()]
-                                        new_kws = [kw for kw in important_timeline_kws if kw in new_content.lower()]
-                                        missing_kws = [kw for kw in old_kws if kw not in new_kws]
-                                        if missing_kws:
-                                            if "icse" in new_content.lower() or "isc" in new_content.lower():
-                                                item_data["content"] = f"{new_content}. College/gap details: {old_content}"
-                                            else:
-                                                item_data["content"] = old_content
-                                    
                                     # Retire the superseded item
                                     cursor.execute(
                                         "UPDATE user_continuity SET retired = 1, last_updated = ? WHERE identity = ?",
@@ -154,26 +133,6 @@ class ContinuityMemoryService:
                     existing_row = cursor.fetchone()
 
                     if existing_row:
-                        old_content = existing_row["content"]
-                        new_content = item_data["content"]
-                        
-                        timeline_keywords = ["mit", "transfer", "gap", "12th", "2023", "2024", "2025", "getting in", "getting good", "getting dangerous", "getting free"]
-                        has_old_timeline = any(kw in old_content.lower() for kw in timeline_keywords)
-                        has_new_timeline = any(kw in new_content.lower() for kw in timeline_keywords)
-                        
-                        if has_old_timeline and not has_new_timeline:
-                            item_data["content"] = old_content
-                        elif has_old_timeline and has_new_timeline:
-                            important_timeline_kws = ["mit", "parul", "gap", "transfer", "2023", "2024", "2025"]
-                            old_kws = [kw for kw in important_timeline_kws if kw in old_content.lower()]
-                            new_kws = [kw for kw in important_timeline_kws if kw in new_content.lower()]
-                            missing_kws = [kw for kw in old_kws if kw not in new_kws]
-                            if missing_kws:
-                                if "icse" in new_content.lower() or "isc" in new_content.lower():
-                                    item_data["content"] = f"{new_content}. College/gap details: {old_content}"
-                                else:
-                                    item_data["content"] = old_content
-
                         # Calculate new priority
                         new_priority = min(5, (existing_row["priority"] or 3) + 1)
                         
