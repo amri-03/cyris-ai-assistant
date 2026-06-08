@@ -1,7 +1,3 @@
-from app.services.ai.response_summary_builder import (
-    ResponseSummaryBuilder
-)
-
 from app.services.adaptive_response_refiner import (
     AdaptiveResponseRefiner
 )
@@ -9,10 +5,6 @@ from app.services.adaptive_response_refiner import (
 class ResponseCoordinator:
 
     def __init__(self):
-
-        self.summary_builder = (
-            ResponseSummaryBuilder()
-        )
 
         self.refiner = (
             AdaptiveResponseRefiner()
