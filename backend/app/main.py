@@ -201,4 +201,12 @@ def reconcile_memory():
         return {"status": "error", "message": str(e)}
 
 
+@app.get("/session-messages")
+def session_messages():
+    from app.memory.conversation_history_service import ConversationHistoryService
+    history_service = ConversationHistoryService()
+    messages = history_service.get_messages()
+    return {"messages": messages}
+
+
 

@@ -56,30 +56,31 @@ export default function Home() {
         hasInitialized.current = true;
 
         const loadSession = async () => {
-
             try {
+                // Fetch active session messages to check if this is a page refresh
+                const messagesResponse = await api.get("/session-messages");
+                const activeMessages = messagesResponse.data.messages || [];
 
-                const response =
-                    await api.get (
-                        "/session-start"
+                if (activeMessages.length > 0) {
+                    setMessages(
+                        activeMessages.map((msg) => ({
+                            role: msg.role,
+                            content: msg.content,
+                        }))
                     );
-
-                const message =
-                    response.data.message;
-
-                setMessages ( [
-                    {
-                        role: "assistant",
-                        content: message,
-                    }
-                ] );
-
+                } else {
+                    // Fresh session - request start greeting
+                    const response = await api.get("/session-start");
+                    const message = response.data.message;
+                    setMessages([
+                        {
+                            role: "assistant",
+                            content: message,
+                        }
+                    ]);
+                }
             } catch (error) {
-
-                console.error (
-                    "Session start failed",
-                    error
-                );
+                console.error("Session initialization failed", error);
             }
         };
 
