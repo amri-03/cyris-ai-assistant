@@ -9,6 +9,15 @@ class ConversationHistoryService:
             role: str,
             content: str
     ):
+        # Clean assistant messages before database insertion to prevent thinking trace leaks
+        if role == "assistant":
+            try:
+                from app.services.ai.response_cleaner import ResponseCleaner
+                content = ResponseCleaner().clean_response(content)
+            except Exception:
+                # Fallback to saving original content if cleaner fails
+                pass
+
         conn = get_db_connection()
         cursor = conn.cursor()
         
