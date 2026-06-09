@@ -57,19 +57,15 @@ export default function Home() {
 
         const loadSession = async () => {
             try {
-                // Fetch active session messages to check if this is a page refresh
-                const messagesResponse = await api.get("/session-messages");
-                const activeMessages = messagesResponse.data.messages || [];
+                const historyRes = await api.get("/session-messages");
+                const historyMessages = historyRes.data.messages || [];
 
-                if (activeMessages.length > 0) {
-                    setMessages(
-                        activeMessages.map((msg) => ({
-                            role: msg.role,
-                            content: msg.content,
-                        }))
-                    );
+                if (historyMessages.length > 0) {
+                    setMessages(historyMessages.map(msg => ({
+                        role: msg.role,
+                        content: msg.content
+                    })));
                 } else {
-                    // Fresh session - request start greeting
                     const response = await api.get("/session-start");
                     const message = response.data.message;
                     setMessages([
@@ -80,7 +76,7 @@ export default function Home() {
                     ]);
                 }
             } catch (error) {
-                console.error("Session initialization failed", error);
+                console.error("Session start/reload failed", error);
             }
         };
 
