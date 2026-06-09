@@ -15,7 +15,11 @@ class ContinuityExtractor:
         # Location & Study Specific Keywords
         "campus", "location", "study", "track",
         # Struggles & Behaviors
-        "struggle", "struggles", "struggling", "motivate", "motivation", "motivated", "distract", "distraction", "distractions", "consistent", "consistency", "inconsistent", "drift", "drifting", "overwhelm", "overwhelmed", "lazy", "laziness", "procrastinate", "procrastinating", "procrastination", "tired", "burnout", "stress", "stressed", "anxious", "anxiety", "fear", "stuck", "confused", "confusion", "fail", "failed", "failure"
+        "struggle", "struggles", "struggling", "motivate", "motivation", "motivated", "distract", "distraction", "distractions", "consistent", "consistency", "inconsistent", "drift", "drifting", "overwhelm", "overwhelmed", "lazy", "laziness", "procrastinate", "procrastinating", "procrastination", "tired", "burnout", "stress", "stressed", "anxious", "anxiety", "fear", "stuck", "confused", "confusion", "fail", "failed", "failure",
+        # Mood & Energy Signals
+        "frustrated", "frustrating", "frustration", "excited", "excited", "happy", "sad", "angry", "anger", "hopeless", "hopeful", "motivated", "demotivated", "unmotivated", "energetic", "exhausted", "drained", "energized", "productive", "unproductive", "bored", "boredom", "lonely", "grateful", "proud", "disappointed", "disappointed", "depressed", "restless",
+        # Behavioral Patterns
+        "pattern", "tendency", "tend to", "always", "never", "usually", "every time", "whenever", "habit"
     ]
 
     def extract_continuity(

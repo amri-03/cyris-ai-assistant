@@ -120,17 +120,25 @@ def session_start():
             "message": default_greeting
         }
 
-    # Generate a dynamic greeting using the active AI provider based on continuity context
     formatted_items = []
     for item in items:
         formatted_items.append(f"- {item.get('content')} ({item.get('type')})")
     items_str = "\n".join(formatted_items)
 
+    # Get recent mood context for the greeting
+    mood_context_str = continuity_memory.build_mood_context()
+    mood_instruction = ""
+    if mood_context_str:
+        mood_instruction = f"""
+The following is behavioral context from recent sessions. Use it to subtly adapt your greeting tone — do NOT mention mood detection or analysis to the user. Just naturally adjust warmth and energy:
+{mood_context_str}
+"""
+
     prompt = f"""
     You are Cyris, a calm, intelligent, and context-aware AI assistant.
     The user is starting a new session. Generate a brief, warm, and natural welcome-back greeting.
     Reference 1 or 2 of their active continuity areas naturally so they feel you remember them, but keep it calm, light, and concise (1-2 sentences). Do not use robotic phrasing like "Welcome back! I see you are..." or be overly enthusiastic.
-    
+    {mood_instruction}
     CRITICAL: Strictly output ONLY the greeting text itself. Do not include any reasoning, chain-of-thought, self-corrections, planning, or headers in your output.
     
     Active continuity profile:

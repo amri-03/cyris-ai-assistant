@@ -65,22 +65,22 @@ class GroqClient:
                 .get_messages()
             )
 
+            mood_context = self.continuity_memory.build_mood_context()
             messages = [
                 {
                     "role": "system",
-                    "content": (
-                        self.system_prompt_manager
-                        .build_system_prompt()
-                    )
+                    "content": self.system_prompt_manager.build_system_prompt()
                 },
                 {
                     "role": "system",
-                    "content": (
-                        "Important continuity context:\n"
-                        f"{memory_context}"
-                    )
+                    "content": f"Important continuity context:\n{memory_context}"
                 }
             ]
+            if mood_context:
+                messages.append({
+                    "role": "system",
+                    "content": mood_context
+                })
 
             from datetime import datetime
             for msg in history:

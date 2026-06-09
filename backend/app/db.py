@@ -49,6 +49,17 @@ def init_db():
         )
     """)
     
+    # Create behavioral_signals table (stores timestamped mood/energy observations)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS behavioral_signals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            signal_type TEXT NOT NULL,
+            signal_value TEXT NOT NULL,
+            context TEXT,
+            created_at TEXT NOT NULL
+        )
+    """)
+    
     conn.commit()
     conn.close()
     

@@ -151,6 +151,31 @@ class ContinuityMemoryService:
                 conn.commit()
                 conn.close()
 
+            # --- Mood Classification (runs after continuity extraction) ---
+            try:
+                from app.services.ai.mood_classifier import MoodClassifier
+                classifier = MoodClassifier()
+                mood_result = classifier.classify_mood(ai_client, history_context)
+                if mood_result and mood_result["mood"] != "neutral":
+                    signal_timestamp = datetime.now().isoformat()
+                    with self._db_lock:
+                        conn = get_db_connection()
+                        cursor = conn.cursor()
+                        # Save mood signal
+                        cursor.execute("""
+                            INSERT INTO behavioral_signals (signal_type, signal_value, context, created_at)
+                            VALUES (?, ?, ?, ?)
+                        """, ("mood", mood_result["mood"], mood_result.get("context", ""), signal_timestamp))
+                        # Save energy signal
+                        cursor.execute("""
+                            INSERT INTO behavioral_signals (signal_type, signal_value, context, created_at)
+                            VALUES (?, ?, ?, ?)
+                        """, ("energy", mood_result["energy"], mood_result.get("context", ""), signal_timestamp))
+                        conn.commit()
+                        conn.close()
+            except Exception as e:
+                print(f"Mood classification failed (non-blocking): {e}")
+
         except Exception as e:
             print(f"Error saving continuity in SQLite: {e}")
 
@@ -197,6 +222,60 @@ class ContinuityMemoryService:
             
         except Exception:
             return ""
+            
+    def build_mood_context(self):
+        """
+        Build a brief mood context string from recent behavioral signals.
+        Returns empty string if no meaningful signals exist.
+        """
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            # Get the last 5 mood signals (most recent first)
+            cursor.execute("""
+                SELECT signal_type, signal_value, context, created_at
+                FROM behavioral_signals
+                WHERE signal_type IN ('mood', 'energy')
+                ORDER BY created_at DESC
+                LIMIT 5
+            """)
+            rows = cursor.fetchall()
+            conn.close()
+            
+            if not rows:
+                return ""
+            
+            # Separate mood and energy signals
+            moods = []
+            energies = []
+            for row in rows:
+                if row["signal_type"] == "mood":
+                    moods.append(row["signal_value"])
+                elif row["signal_type"] == "energy":
+                    energies.append(row["signal_value"])
+            
+            context_parts = []
+            if moods:
+                latest_mood = moods[0]
+                context_parts.append(f"Recent mood: {latest_mood}")
+                # Detect trend if multiple signals
+                if len(moods) >= 3:
+                    unique_moods = set(moods[:3])
+                    if len(unique_moods) == 1:
+                        context_parts.append(f"(consistent — user has been {latest_mood} across recent sessions)")
+                    elif any(m in ["stressed", "frustrated", "anxious", "overwhelmed"] for m in moods[:3]):
+                        context_parts.append("(trend: user has shown signs of stress/frustration recently)")
+            
+            if energies:
+                latest_energy = energies[0]
+                context_parts.append(f"Recent energy: {latest_energy}")
+            
+            if not context_parts:
+                return ""
+            
+            return "User behavioral context:\n" + "\n".join(context_parts)
+        except Exception:
+            return ""
 
     def calculate_priority(self, continuity_type, importance):
         priority_map = {
@@ -206,7 +285,10 @@ class ContinuityMemoryService:
             "project": 4,
             "academic_context": 3,
             "struggle": 5,
-            "interest": 2
+            "interest": 2,
+            "mood_signal": 2,
+            "behavioral_pattern": 3,
+            "energy_pattern": 2
         }
         importance_bonus = {
             "high": 1,

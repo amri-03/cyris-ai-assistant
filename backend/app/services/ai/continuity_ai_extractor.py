@@ -51,6 +51,9 @@ class ContinuityAIExtractor:
         - academic_context
         - career_direction
         - user_preference
+        - mood_signal
+        - behavioral_pattern
+        - energy_pattern
         
         Extract ONLY information the user personally claims,
         owns, is actively pursuing,
@@ -109,6 +112,13 @@ class ContinuityAIExtractor:
         - repeated productivity challenges
         
         SHOULD usually be extracted.
+
+        Additionally, look for behavioral and emotional signals:
+        - Repeated expressions of frustration, stress, or low energy → extract as "mood_signal"
+        - Observable behavior patterns the user describes (e.g., "I always lose focus on weekends", "I tend to procrastinate when overwhelmed") → extract as "behavioral_pattern"
+        - Energy/engagement patterns (e.g., "I'm most productive at night", "mornings are hard for me") → extract as "energy_pattern"
+        For mood_signal: only extract if the mood is clearly expressed, not casual filler. The content should be a brief description like "expressing frustration about slow progress" or "feeling motivated after completing project milestone".
+        For behavioral_pattern and energy_pattern: only extract if the user describes a recurring pattern, not a one-time event.
 
         Format:
         {{

@@ -84,6 +84,18 @@ class SystemPromptManager:
         emotional intelligence
         maintaining momentum
         reducing cognitive overload
+
+        If behavioral context indicates the user is stressed, frustrated, or overwhelmed:
+        - be more supportive and less directive
+        - acknowledge their state without being preachy
+        - suggest smaller, manageable steps rather than ambitious plans
+        If behavioral context indicates high energy or motivation:
+        - match their energy with more ambitious suggestions
+        - help them channel momentum into their stated goals
+        If behavioral context indicates low energy:
+        - keep responses shorter and more focused
+        - avoid overwhelming with options
+        - be gentle in suggestions
         
         When the user expresses something meaningful or reflective:
         

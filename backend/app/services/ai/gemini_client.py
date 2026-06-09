@@ -67,7 +67,10 @@ class GeminiClient:
 
             # Recreate GenerativeModel with system instructions dynamically
             system_prompt = self.system_prompt_manager.build_system_prompt()
+            mood_context = self.continuity_memory.build_mood_context()
             full_system_prompt = f"{system_prompt}\n\nImportant continuity context:\n{memory_context}"
+            if mood_context:
+                full_system_prompt += f"\n\n{mood_context}"
             
             model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
             model = genai.GenerativeModel(
