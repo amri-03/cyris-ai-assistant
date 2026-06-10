@@ -214,6 +214,18 @@ def session_messages():
     from app.memory.conversation_history_service import ConversationHistoryService
     history_service = ConversationHistoryService()
     messages = history_service.get_messages()
+    
+    if messages:
+        try:
+            from datetime import datetime
+            # Check if the last message is from a different calendar day
+            last_msg_time = datetime.fromisoformat(messages[-1]["created_at"])
+            if last_msg_time.date() != datetime.now().date():
+                history_service.clear_history()
+                messages = []
+        except Exception as e:
+            print(f"Error checking session messages date: {e}")
+            
     return {"messages": messages}
 
 
