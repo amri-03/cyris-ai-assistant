@@ -60,20 +60,36 @@ export default function Home() {
                 const historyRes = await api.get("/session-messages");
                 const historyMessages = historyRes.data.messages || [];
 
+                // Guard: If user has already sent messages, abort to prevent overwrite
+                let alreadyHasMessages = false;
+                setMessages(prev => {
+                    if (prev.length > 0) {
+                        alreadyHasMessages = true;
+                    }
+                    return prev;
+                });
+                if (alreadyHasMessages) return;
+
                 if (historyMessages.length > 0) {
-                    setMessages(historyMessages.map(msg => ({
-                        role: msg.role,
-                        content: msg.content
-                    })));
+                    setMessages(prev => {
+                        if (prev.length > 0) return prev;
+                        return historyMessages.map(msg => ({
+                            role: msg.role,
+                            content: msg.content
+                        }));
+                    });
                 } else {
                     const response = await api.get("/session-start");
                     const message = response.data.message;
-                    setMessages([
-                        {
-                            role: "assistant",
-                            content: message,
-                        }
-                    ]);
+                    setMessages(prev => {
+                        if (prev.length > 0) return prev;
+                        return [
+                            {
+                                role: "assistant",
+                                content: message,
+                            }
+                        ];
+                    });
                 }
             } catch (error) {
                 console.error("Session start/reload failed", error);
