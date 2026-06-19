@@ -295,14 +295,18 @@ const renderFormattedText = (text) => {
     });
 };
 
-export default function MessageBubble({ role, content, isLatest, onScrollToBottom, animate }) {
+export default function MessageBubble({ role, content, isLatest, onScrollToBottom, animate, feedback: initialFeedback }) {
     const ref = useRef(null);
     const isUser = role === "user";
     const shouldAnimate = !isUser && animate === true;
     const [displayedContent, setDisplayedContent] = useState(shouldAnimate ? "" : content);
     const [isTypingComplete, setIsTypingComplete] = useState(!shouldAnimate);
     const [copied, setCopied] = useState(false);
-    const [feedback, setFeedback] = useState(null);
+    const [feedback, setFeedback] = useState(initialFeedback || null);
+
+    useEffect(() => {
+        setFeedback(initialFeedback || null);
+    }, [initialFeedback]);
 
     const isLatestRef = useRef(isLatest);
     const onScrollToBottomRef = useRef(onScrollToBottom);

@@ -76,7 +76,8 @@ export default function Home() {
                         return historyMessages.map(msg => ({
                             role: msg.role,
                             content: msg.content,
-                            animate: false
+                            animate: false,
+                            feedback: msg.feedback
                         }));
                     });
                 } else {
