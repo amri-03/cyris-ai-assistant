@@ -66,6 +66,7 @@ export default function ConversationThread({messages, isThinking, onScrollToBott
                     content={msg.content}
                     isLatest={index === messages.length - 1}
                     onScrollToBottom={onScrollToBottom}
+                    animate={msg.animate}
                 />
             ) )}
 

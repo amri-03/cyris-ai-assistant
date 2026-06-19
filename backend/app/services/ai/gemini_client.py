@@ -1,7 +1,6 @@
 import os
-import warnings
-warnings.filterwarnings("ignore", category=FutureWarning, module="google.generativeai")
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 from app.services.ai.system_prompt_manager import (
     SystemPromptManager
@@ -35,17 +34,17 @@ class GeminiClient:
             ConversationHistoryService()
         )
 
-        self.model = None
+        self.client = None
 
         if self.api_key:
-            genai.configure(api_key=self.api_key)
+            self.client = genai.Client(api_key=self.api_key)
 
     def generate_response(
             self,
             prompt: str,
             add_to_history: bool = True
     ):
-        if not self.api_key:
+        if not self.api_key or not self.client:
             return {
                 "status": "failure",
                 "error": (
@@ -65,7 +64,7 @@ class GeminiClient:
                 .get_messages()
             )
 
-            # Recreate GenerativeModel with system instructions dynamically
+            # Recreate system instructions dynamically
             system_prompt = self.system_prompt_manager.build_system_prompt()
             mood_context = self.continuity_memory.build_mood_context()
             full_system_prompt = f"{system_prompt}\n\nImportant continuity context:\n{memory_context}"
@@ -73,10 +72,6 @@ class GeminiClient:
                 full_system_prompt += f"\n\n{mood_context}"
             
             model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
-            model = genai.GenerativeModel(
-                model_name=model_name,
-                system_instruction=full_system_prompt
-            )
 
             # Map history to Gemini format (user/model roles)
             from datetime import datetime
@@ -95,15 +90,22 @@ class GeminiClient:
                 if role == "model" and msg.get("feedback"):
                     content_text = f"{content_text}\n\n[User Feedback: {msg['feedback'].upper()}]"
                 
-                gemini_history.append({
-                    "role": role,
-                    "parts": [f"{time_prefix}{content_text}"]
-                })
+                gemini_history.append(
+                    types.Content(
+                        role=role,
+                        parts=[types.Part.from_text(text=f"{time_prefix}{content_text}")]
+                    )
+                )
 
-            # Generate response
-            chat = model.start_chat(history=gemini_history)
+            # Generate response using chat
+            chat = self.client.chats.create(
+                model=model_name,
+                history=gemini_history,
+                config=types.GenerateContentConfig(
+                    system_instruction=full_system_prompt
+                )
+            )
             response = chat.send_message(prompt)
-
             content = response.text
 
             if add_to_history:
@@ -127,11 +129,10 @@ class GeminiClient:
                 thread.daemon = True
                 thread.start()
 
-
             return response
 
         except Exception as error:
             return {
                 "status": "failure",
                 "error": str(error)
-            }
+            }

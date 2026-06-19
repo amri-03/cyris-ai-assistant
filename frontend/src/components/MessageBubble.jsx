@@ -295,11 +295,12 @@ const renderFormattedText = (text) => {
     });
 };
 
-export default function MessageBubble({ role, content, isLatest, onScrollToBottom }) {
+export default function MessageBubble({ role, content, isLatest, onScrollToBottom, animate }) {
     const ref = useRef(null);
     const isUser = role === "user";
-    const [displayedContent, setDisplayedContent] = useState(isUser ? content : "");
-    const [isTypingComplete, setIsTypingComplete] = useState(isUser);
+    const shouldAnimate = !isUser && animate === true;
+    const [displayedContent, setDisplayedContent] = useState(shouldAnimate ? "" : content);
+    const [isTypingComplete, setIsTypingComplete] = useState(!shouldAnimate);
     const [copied, setCopied] = useState(false);
     const [feedback, setFeedback] = useState(null);
 
@@ -320,7 +321,7 @@ export default function MessageBubble({ role, content, isLatest, onScrollToBotto
     }, []);
 
     useEffect(() => {
-        if (role === "user") {
+        if (!shouldAnimate) {
             setIsTypingComplete(true);
             setDisplayedContent(content);
             return;
@@ -352,7 +353,7 @@ export default function MessageBubble({ role, content, isLatest, onScrollToBotto
         }, 25);
 
         return () => clearInterval(interval);
-    }, [content, role]);
+    }, [content, role, shouldAnimate]);
 
     const handleCopy = () => {
         const safeContent = typeof content === "string" ? content : JSON.stringify(content);

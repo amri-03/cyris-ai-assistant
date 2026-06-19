@@ -75,7 +75,8 @@ export default function Home() {
                         if (prev.length > 0) return prev;
                         return historyMessages.map(msg => ({
                             role: msg.role,
-                            content: msg.content
+                            content: msg.content,
+                            animate: false
                         }));
                     });
                 } else {
@@ -87,6 +88,7 @@ export default function Home() {
                             {
                                 role: "assistant",
                                 content: message,
+                                animate: false
                             }
                         ];
                     });
@@ -118,7 +120,7 @@ export default function Home() {
 
             setMessages ( (prev) => [
                 ...prev,
-                {role: "assistant", content},
+                {role: "assistant", content, animate: true},
             ] );
 
             setIsConnected ( true );

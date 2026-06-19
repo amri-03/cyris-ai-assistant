@@ -67,13 +67,13 @@ class MoodClassifier:
 
         if not groq_key and gemini_key:
             try:
-                import warnings
-                warnings.filterwarnings("ignore", category=FutureWarning)
-                import google.generativeai as genai
-                genai.configure(api_key=gemini_key)
-                model_name = os.getenv("GEMINI_MODEL", "gemma-4-26b-a4b-it")
-                model = genai.GenerativeModel(model_name)
-                response = model.generate_content(prompt)
+                from google import genai
+                client = genai.Client(api_key=gemini_key)
+                model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt
+                )
                 content = response.text
             except Exception as e:
                 print(f"Gemini mood classification failed: {e}")

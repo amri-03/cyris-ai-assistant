@@ -196,13 +196,13 @@ class ContinuityAIExtractor:
 
         if not groq_key and gemini_key:
             try:
-                import warnings
-                warnings.filterwarnings("ignore", category=FutureWarning, module="google.generativeai")
-                import google.generativeai as genai
-                genai.configure(api_key=gemini_key)
-                model_name = os.getenv("GEMINI_MODEL", "gemma-4-26b-a4b-it")
-                model = genai.GenerativeModel(model_name)
-                response = model.generate_content(extraction_prompt)
+                from google import genai
+                client = genai.Client(api_key=gemini_key)
+                model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=extraction_prompt
+                )
                 content = response.text
             except Exception as gemini_err:
                 print(f"Gemini extraction failed: {gemini_err}")
