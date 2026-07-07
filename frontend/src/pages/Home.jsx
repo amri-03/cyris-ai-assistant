@@ -12,6 +12,8 @@ export default function Home() {
     const [isConnected, setIsConnected] = useState ( true );
     const [isMemoryOpen, setIsMemoryOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isReflectionOpen, setIsReflectionOpen] = useState(false);
+    const [reflectionSummary, setReflectionSummary] = useState(null);
     const [memoryItems, setMemoryItems] = useState([]);
     const [theme, setTheme] = useState(() => {
         const saved = localStorage.getItem("cyris-theme");
@@ -152,6 +154,22 @@ export default function Home() {
         }
     };
 
+    const handleConcludeSession = async () => {
+        setIsThinking(true);
+        try {
+            const response = await api.post("/session/conclude");
+            if (response.data.status === "success") {
+                setReflectionSummary(response.data.summary);
+                setIsReflectionOpen(true);
+                setMessages([]);
+            }
+        } catch (error) {
+            console.error("Failed to conclude session", error);
+        } finally {
+            setIsThinking(false);
+        }
+    };
+
     return (
         <div
             style={{
@@ -185,6 +203,7 @@ export default function Home() {
                         isConnected={isConnected}
                         onOpenMemory={() => setIsMemoryOpen(true)}
                         onOpenSettings={() => setIsSettingsOpen(true)}
+                        onConcludeSession={handleConcludeSession}
                     />
                 </div>
             </div>
@@ -266,6 +285,109 @@ export default function Home() {
                 currentTheme={theme}
                 onThemeChange={(newTheme) => setTheme(newTheme)}
             />
+
+            {/* REFLECTION OVERLAY MODAL */}
+            {isReflectionOpen && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        background: "rgba(0, 0, 0, 0.6)",
+                        backdropFilter: "blur(10px)",
+                        zIndex: 100,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }}
+                >
+                    <div
+                        style={{
+                            background: "var(--bg-drawer)",
+                            border: "1px solid var(--border-subtle)",
+                            borderRadius: "var(--radius-lg)",
+                            padding: "40px",
+                            maxWidth: "600px",
+                            width: "95%",
+                            boxShadow: "var(--shadow-modal)",
+                            textAlign: "center",
+                            animation: "messageFadeIn 0.3s ease-out",
+                        }}
+                    >
+                        <h2
+                            style={{
+                                fontSize: "22px",
+                                fontWeight: 500,
+                                marginBottom: "20px",
+                                color: "var(--text-accent)",
+                                fontFamily: "var(--font-mono)",
+                                letterSpacing: "0.05em",
+                            }}
+                        >
+                            SESSION CONCLUDED
+                        </h2>
+                        <div
+                            style={{
+                                color: "var(--text-secondary)",
+                                fontSize: "14px",
+                                lineHeight: "1.7",
+                                textAlign: "left",
+                                marginBottom: "30px",
+                                background: "var(--bg-base)",
+                                padding: "20px 24px",
+                                borderRadius: "var(--radius-md)",
+                                border: "1px solid var(--border-dim)",
+                            }}
+                        >
+                            <p style={{ fontWeight: 500, marginBottom: "12px", color: "var(--text-primary)" }}>
+                                Achievements & Commitments:
+                            </p>
+                            <div style={{ whiteSpace: "pre-line" }}>
+                                {reflectionSummary}
+                            </div>
+                        </div>
+                        <button
+                            onClick={async () => {
+                                setIsReflectionOpen(false);
+                                setReflectionSummary(null);
+                                try {
+                                    setIsThinking(true);
+                                    const response = await api.get("/session-start");
+                                    const message = response.data.message;
+                                    setMessages([
+                                        {
+                                            role: "assistant",
+                                            content: message,
+                                        }
+                                    ]);
+                                    fetchMemoryItems();
+                                } catch (err) {
+                                    console.error("Failed to load new session", err);
+                                } finally {
+                                    setIsThinking(false);
+                                }
+                            }}
+                            style={{
+                                background: "var(--accent-primary)",
+                                color: "#ffffff",
+                                border: "none",
+                                borderRadius: "var(--radius-sm)",
+                                padding: "12px 28px",
+                                fontSize: "14px",
+                                fontWeight: 500,
+                                cursor: "pointer",
+                                transition: "opacity var(--transition)",
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.opacity = 0.9}
+                            onMouseLeave={(e) => e.currentTarget.style.opacity = 1}
+                        >
+                            Start New Session
+                        </button>
+                    </div>
+                </div>
+            )}
 
         </div>
     );

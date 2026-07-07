@@ -54,7 +54,7 @@ class AIProviderManager:
             self.ai_client
             .generate_response(
                 prompt,
-                add_to_history=add_to_history
+                add_to_history=False
             )
         )
 
@@ -97,5 +97,24 @@ class AIProviderManager:
                 final_response
             )
         )
+
+        if add_to_history and normalized_response.get("status") != "failure":
+            from app.memory.conversation_history_service import ConversationHistoryService
+            from app.memory.continuity_memory_service import ContinuityMemoryService
+            
+            history_service = ConversationHistoryService()
+            continuity_memory = ContinuityMemoryService()
+            
+            history_service.add_message("user", prompt)
+            history_service.add_message("assistant", cleaned_response)
+            
+            import threading
+            client_instance = getattr(self.ai_client, "client", None)
+            thread = threading.Thread(
+                target=continuity_memory.save_continuity,
+                args=(client_instance, prompt)
+            )
+            thread.daemon = True
+            thread.start()
 
         return cleaned_response

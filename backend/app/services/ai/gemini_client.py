@@ -108,27 +108,6 @@ class GeminiClient:
             response = chat.send_message(prompt)
             content = response.text
 
-            if add_to_history:
-                # Update history and memory services
-                self.history_service.add_message(
-                    "user",
-                    prompt
-                )
-
-                self.history_service.add_message(
-                    "assistant",
-                    content
-                )
-
-                # Run memory extraction in a background thread to avoid blocking the main chat response
-                import threading
-                thread = threading.Thread(
-                    target=self.continuity_memory.save_continuity,
-                    args=(None, prompt)
-                )
-                thread.daemon = True
-                thread.start()
-
             return response
 
         except Exception as error:

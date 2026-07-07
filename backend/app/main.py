@@ -98,6 +98,7 @@ def chat(request: PromptRequest):
 
 @app.get("/session-start")
 def session_start():
+    from datetime import datetime
     from app.memory.conversation_history_service import ConversationHistoryService
     history_service = ConversationHistoryService()
 
@@ -107,6 +108,59 @@ def session_start():
     )
 
     items = [item for item in continuity.get("continuity_items", []) if not item.get("retired", False)]
+
+    # 1. Calculate time gap since last session
+    from app.db import get_db_connection
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT created_at FROM messages ORDER BY id DESC LIMIT 1")
+    last_msg_row = cursor.fetchone()
+    
+    gap_days = 0
+    if last_msg_row:
+        try:
+            last_time = datetime.fromisoformat(last_msg_row["created_at"])
+            delta = datetime.now() - last_time
+            gap_days = delta.days
+        except Exception:
+            pass
+
+    # 2. Retrieve and consume any active next_session_context
+    cursor.execute(
+        "SELECT identity, content FROM user_continuity WHERE type = 'session_context' AND retired = 0"
+    )
+    context_rows = cursor.fetchall()
+    
+    session_contexts = []
+    timestamp_str = datetime.now().isoformat()
+    for row in context_rows:
+        session_contexts.append(row["content"])
+        cursor.execute(
+            "UPDATE user_continuity SET retired = 1, last_updated = ? WHERE identity = ?",
+            (timestamp_str, row["identity"])
+        )
+    conn.commit()
+
+    # 3. Scan for stale goals/projects/focus areas (last updated > 7 days ago)
+    cursor.execute("""
+        SELECT content, type, last_updated 
+        FROM user_continuity 
+        WHERE retired = 0 AND type IN ('goal', 'focus_area', 'project')
+    """)
+    continuity_rows = cursor.fetchall()
+    
+    stale_items = []
+    now = datetime.now()
+    for row in continuity_rows:
+        try:
+            last_updated = datetime.fromisoformat(row["last_updated"])
+            delta = now - last_updated
+            if delta.days >= 7:
+                stale_items.append(f"- {row['content']} ({row['type']})")
+        except Exception:
+            pass
+            
+    conn.close()
 
     if not items:
         default_greeting = (
@@ -134,12 +188,27 @@ The following is behavioral context from recent sessions. Use it to subtly adapt
 {mood_context_str}
 """
 
+    # Build gap and stale instructions
+    gap_instruction = ""
+    if gap_days > 0:
+        gap_instruction += f"\nIt has been {gap_days} days since the user's last session. Subtly acknowledge the gap if it is long (e.g. 3+ days) without being dramatic."
+        
+    if session_contexts:
+        contexts_str = "\n".join([f"- {c}" for c in session_contexts])
+        gap_instruction += f"\nHere is context/reflection from the end of their last session. Reference these commitments or progress naturally:\n{contexts_str}"
+        
+    if stale_items:
+        stale_str = "\n".join(stale_items)
+        gap_instruction += f"\nThese active goals/projects haven't been discussed in over a week. If appropriate, gently ask the user for an update on one of them:\n{stale_str}"
+
     prompt = f"""
     You are Cyris, a calm, intelligent, and context-aware AI assistant.
     The user is starting a new session. Generate a brief, warm, and natural welcome-back greeting.
     Reference 1 or 2 of their active continuity areas naturally so they feel you remember them, but keep it calm, light, and concise (1-2 sentences). Do not use robotic phrasing like "Welcome back! I see you are..." or be overly enthusiastic.
     {mood_instruction}
-    CRITICAL: Strictly output ONLY the greeting text itself. Do not include any reasoning, chain-of-thought, self-corrections, planning, or headers in your output.
+    {gap_instruction}
+    
+    CRITICAL: Wrap any internal reasoning, thoughts, or planning inside a <thinking>...</thinking> block before your final response. The user-facing response must start immediately after the </thinking> tag and contain ONLY the greeting text itself.
     
     Active continuity profile:
     {items_str}
@@ -156,7 +225,7 @@ The following is behavioral context from recent sessions. Use it to subtly adapt
         else:
             greeting = str(response)
 
-        greeting = greeting.strip().strip('"').strip("'")
+        greeting = greeting.strip()
     except Exception:
         # Fallback to template if LLM call fails
         latest = items[-1]
@@ -170,6 +239,80 @@ The following is behavioral context from recent sessions. Use it to subtly adapt
     return {
         "message": greeting
     }
+
+
+@app.post("/session/conclude")
+def conclude_session():
+    from datetime import datetime
+    from app.memory.conversation_history_service import ConversationHistoryService
+    history_service = ConversationHistoryService()
+    messages = history_service.get_messages()
+
+    if not messages or len(messages) <= 1:
+        # If there's no chat, or only the start greeting, just clear and return
+        history_service.clear_history()
+        return {"status": "success", "summary": "Session concluded with no active conversation."}
+
+    # Format history for summarization
+    formatted_chat = []
+    for msg in messages:
+        role = "User" if msg["role"] == "user" else "Assistant"
+        formatted_chat.append(f"{role}: {msg['content']}")
+    chat_history_str = "\n".join(formatted_chat)
+
+    prompt = f"""
+    You are Cyris, a supportive and context-aware assistant.
+    The user is ending their current session. Summarize the session and extract key commitments/next steps.
+    Format your response in a supportive, concise, and calm manner (maximum 3 bullet points, keep sentences very short and direct).
+    Focus strictly on:
+    - What was discussed/accomplished.
+    - Commitments or next steps the user planned.
+    
+    CRITICAL: Wrap any internal reasoning, thoughts, or planning inside a <thinking>...</thinking> block before your final response. The user-facing summary text must start immediately after the </thinking> tag.
+    
+    Session Chat History:
+    {chat_history_str}
+    
+    Summary:
+    """
+
+    try:
+        response = ai_provider.generate_ai_response(prompt, add_to_history=False)
+        if isinstance(response, dict):
+            summary = response.get("response") or response.get("content") or str(response)
+            if isinstance(summary, dict):
+                summary = summary.get("response") or summary.get("content") or str(summary)
+        else:
+            summary = str(response)
+        summary = summary.strip()
+    except Exception:
+        summary = "Session concluded. Let's resume progress next time."
+
+    # Save to user_continuity table
+    try:
+        from app.db import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        timestamp_str = datetime.now().isoformat()
+        identity = f"session_context_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        cursor.execute("""
+            INSERT INTO user_continuity (identity, type, content, importance, priority, retired, created_at, last_updated)
+            VALUES (?, ?, ?, ?, ?, 0, ?, ?)
+        """, (identity, "session_context", summary, "high", 5, timestamp_str, timestamp_str))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Failed to save session context: {e}")
+
+    # Set active session messages to inactive
+    history_service.clear_history()
+
+    return {
+        "status": "success",
+        "summary": summary
+    }
+
 
 
 

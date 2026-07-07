@@ -122,26 +122,6 @@ class GroqClient:
                 .content
             )
 
-            if add_to_history:
-                self.history_service.add_message(
-                    "user",
-                    prompt
-                )
-
-                self.history_service.add_message(
-                    "assistant",
-                    content
-                )
-
-                # Run memory extraction in a background thread to avoid blocking the main chat response
-                import threading
-                thread = threading.Thread(
-                    target=self.continuity_memory.save_continuity,
-                    args=(self.client, prompt)
-                )
-                thread.daemon = True
-                thread.start()
-
             return response
 
         except Exception as error:

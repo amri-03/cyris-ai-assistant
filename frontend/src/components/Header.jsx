@@ -1,4 +1,4 @@
-export default function Header({isConnected, onOpenMemory, onOpenSettings}) {
+export default function Header({isConnected, onOpenMemory, onOpenSettings, onConcludeSession}) {
     return (
         <div
             style={{
@@ -49,6 +49,50 @@ export default function Header({isConnected, onOpenMemory, onOpenSettings}) {
                     gap: "16px",
                 }}
             >
+                {/* Conclude Session button */}
+                <button
+                    onClick={onConcludeSession}
+                    title="Conclude Session"
+                    style={{
+                        background: "transparent",
+                        border: "1px solid var(--border-subtle)",
+                        borderRadius: "var(--radius-sm)",
+                        padding: "8px 10px",
+                        color: "var(--text-secondary)",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        lineHeight: 1,
+                        transition: "all var(--transition)",
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = "#4ade80";
+                        e.currentTarget.style.color = "#4ade80";
+                        e.currentTarget.style.background = "var(--bg-elevated)";
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = "var(--border-subtle)";
+                        e.currentTarget.style.color = "var(--text-secondary)";
+                        e.currentTarget.style.background = "transparent";
+                    }}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                </button>
+
                 {/* Memory panel button */}
                 <button
                     onClick={onOpenMemory}
