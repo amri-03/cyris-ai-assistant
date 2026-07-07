@@ -50,116 +50,12 @@ Unlike traditional checklist apps or cheerleading motivational assistants, Cyris
 
 ## Getting Started
 
-To install and run Cyris on your local machine, follow the setup guide below. Detailed setup instructions are also available in [SETUP.md](./SETUP.md).
+<details>
+<summary><b>Setup and Installation Guide</b></summary>
 
-### Prerequisites
+Please refer to the detailed **[SETUP.md](./SETUP.md)** for step-by-step instructions on how to install, configure, and run the Cyris AI Assistant on your local machine.
 
-Before starting, ensure you have the following installed:
-* Python 3.10+ (added to your system PATH)
-* Node.js (v16+) and npm
-
-### 1. Clone the Repository
-
-Clone the repository and navigate to the project root:
-
-```bash
-git clone https://github.com/amri-03/cyris-ai-assistant.git
-cd cyris-ai-assistant
-```
-
-### 2. Backend Setup (FastAPI)
-
-Navigate to the `backend` directory:
-
-```bash
-cd backend
-```
-
-#### Create a Python Virtual Environment
-
-* **Windows**:
-  ```powershell
-  python -m venv venv
-  ```
-* **macOS / Linux**:
-  ```bash
-  python3 -m venv venv
-  ```
-
-#### Activate the Virtual Environment
-
-* **Windows (PowerShell)**:
-  ```powershell
-  .\venv\Scripts\Activate.ps1
-  ```
-* **Windows (CMD)**:
-  ```cmd
-  .\venv\Scripts\activate.bat
-  ```
-* **macOS / Linux**:
-  ```bash
-  source venv/bin/activate
-  ```
-
-#### Install Python Dependencies
-
-Make sure your virtual environment is active (indicated by `(venv)` in your terminal prompt), then run:
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Configure Environment Variables
-
-Create a `.env` file in the `backend/` folder:
-
-```bash
-cp .env.example .env
-```
-
-Open the `.env` file and configure your API keys and provider selection:
-
-```env
-# Choose your main chat provider: "gemini" or "groq"
-AI_PROVIDER=gemini
-
-# If using Gemini (recommended for Chat and Memory extraction)
-GEMINI_API_KEY=your_gemini_api_key_here
-
-# If using Groq (Llama models)
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-### 4. Run the Backend Server
-
-Start the FastAPI application by executing `run.py` in the `backend/` folder:
-
-```bash
-python run.py
-```
-
-The backend API server will start at `http://127.0.0.1:8000`.
-
-### 5. Frontend Setup (React + Vite)
-
-Open a new terminal window, navigate to the `frontend` folder, install dependencies, and run the development server:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The frontend client will start running at `http://localhost:5173`.
-
-### 6. Access Cyris AI Assistant
-
-Open your web browser and navigate to `http://localhost:5173` to begin chatting.
-* Click the **Brain** icon in the header to view the memory dashboard.
-* Chat naturally, and Cyris will extract goals/struggles and automatically update your profile.
-* Use the **Checkmark-Circle** icon in the header to conclude sessions, summarize daily progress, and start a fresh thread.
-
----
+</details>
 
 ## Development History
 
