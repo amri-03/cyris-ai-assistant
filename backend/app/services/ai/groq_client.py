@@ -66,10 +66,38 @@ class GroqClient:
             )
 
             mood_context = self.continuity_memory.build_mood_context()
+            from app.services.ai.vector_memory_service import VectorMemoryService
+            from app.services.ai.productivity_service import ProductivityService
+            
+            try:
+                vm_service = VectorMemoryService()
+                semantic_results = vm_service.semantic_search(prompt, limit=3)
+                semantic_context = "\n".join([f"- {r['created_at']}: {r['content']}" for r in semantic_results]) if semantic_results else ""
+            except Exception:
+                semantic_context = ""
+
+            try:
+                prod_service = ProductivityService()
+                goals = prod_service.get_active_goals_with_tasks()
+                prod_context_lines = []
+                for g in goals:
+                    prod_context_lines.append(f"Goal: {g['title']} (Progress: {g['progress']}%)")
+                    for t in g['tasks']:
+                        status_str = "[x]" if t['is_completed'] else "[ ]"
+                        prod_context_lines.append(f"  {status_str} {t['description']}")
+                productivity_context = "\n".join(prod_context_lines)
+            except Exception:
+                productivity_context = ""
+
+            system_prompt = self.system_prompt_manager.build_system_prompt(
+                semantic_context=semantic_context, 
+                productivity_context=productivity_context
+            )
+            
             messages = [
                 {
                     "role": "system",
-                    "content": self.system_prompt_manager.build_system_prompt()
+                    "content": system_prompt
                 },
                 {
                     "role": "system",

@@ -50,10 +50,10 @@ def save_feedback(request: FeedbackRequest):
     # Update the feedback column for the most recent message with matching content and role = 'assistant'
     cursor.execute("""
         UPDATE messages
-        SET feedback = ?
+        SET feedback = %s
         WHERE id = (
             SELECT id FROM messages
-            WHERE role = 'assistant' AND content = ?
+            WHERE role = 'assistant' AND content = %s
             ORDER BY id DESC
             LIMIT 1
         )
@@ -136,7 +136,7 @@ def session_start():
     for row in context_rows:
         session_contexts.append(row["content"])
         cursor.execute(
-            "UPDATE user_continuity SET retired = 1, last_updated = ? WHERE identity = ?",
+            "UPDATE user_continuity SET retired = 1, last_updated = %s WHERE identity = %s",
             (timestamp_str, row["identity"])
         )
     conn.commit()
@@ -298,7 +298,8 @@ def conclude_session():
         
         cursor.execute("""
             INSERT INTO user_continuity (identity, type, content, importance, priority, retired, created_at, last_updated)
-            VALUES (?, ?, ?, ?, ?, 0, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, 0, %s, %s)
+            ON CONFLICT (identity) DO NOTHING
         """, (identity, "session_context", summary, "high", 5, timestamp_str, timestamp_str))
         conn.commit()
         conn.close()
@@ -371,6 +372,36 @@ def session_messages():
             
     return {"messages": messages}
 
+@app.get("/goals")
+def get_goals():
+    from app.services.ai.productivity_service import ProductivityService
+    service = ProductivityService()
+    return {"goals": service.get_active_goals_with_tasks()}
 
+class GoalRequest(BaseModel):
+    title: str
+    description: Optional[str] = ""
 
+@app.post("/goals")
+def create_goal(req: GoalRequest):
+    from app.services.ai.productivity_service import ProductivityService
+    service = ProductivityService()
+    goal_id = service.create_goal(req.title, req.description)
+    return {"status": "success", "goal_id": goal_id}
 
+class TaskRequest(BaseModel):
+    description: str
+
+@app.post("/goals/{goal_id}/tasks")
+def add_task(goal_id: int, req: TaskRequest):
+    from app.services.ai.productivity_service import ProductivityService
+    service = ProductivityService()
+    task_id = service.add_task_to_goal(goal_id, req.description)
+    return {"status": "success", "task_id": task_id}
+
+@app.post("/tasks/{task_id}/complete")
+def complete_task(task_id: int):
+    from app.services.ai.productivity_service import ProductivityService
+    service = ProductivityService()
+    service.complete_task(task_id)
+    return {"status": "success"}

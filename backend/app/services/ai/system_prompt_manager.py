@@ -3,11 +3,11 @@ from datetime import datetime
 class SystemPromptManager:
 
 
-    def build_system_prompt(self):
+    def build_system_prompt(self, semantic_context: str = "", productivity_context: str = ""):
         current_time = datetime.now()
         formatted_time = current_time.strftime("%A, %B %d, %Y %H:%M")
         
-        return f"""
+        prompt = f"""
         Current Date & Time: {formatted_time}
 
         You are Cyris.
@@ -107,3 +107,11 @@ class SystemPromptManager:
 
         CRITICAL: The conversation history messages may be prefixed with timestamps in square brackets like [YYYY-MM-DD HH:MM] for your chronological context. Do NOT copy, mimic, or prepend these timestamps, any dates, or times to your own responses. Never start your response with a timestamp in square brackets. Any internal reasoning, thoughts, self-corrections, planning, or strategies MUST be wrapped inside <thinking>...</thinking> tags. The user-facing response must start immediately after the closing </thinking> tag.
         """
+        
+        if semantic_context:
+            prompt += f"\n\nHistorical semantic context related to this conversation:\n{semantic_context}"
+            
+        if productivity_context:
+            prompt += f"\n\nActive Goals and Tasks:\n{productivity_context}"
+            
+        return prompt

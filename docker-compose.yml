@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=cyris
+      - POSTGRES_PASSWORD=cyris_password
+      - POSTGRES_DB=cyris
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

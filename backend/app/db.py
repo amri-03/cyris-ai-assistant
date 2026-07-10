@@ -1,26 +1,42 @@
-import sqlite3
-from pathlib import Path
+import os
+import psycopg2
+from psycopg2.extras import DictCursor
+from pgvector.psycopg2 import register_vector
+from dotenv import load_dotenv
 
-DB_FILE = Path(__file__).resolve().parent.parent / "data" / "cyris.db"
+load_dotenv()
+
+# We expect POSTGRES_URL in environment variables, or fallback to the local docker instance we setup
+DB_URL = os.getenv("POSTGRES_URL", "postgresql://cyris:cyris_password@localhost:5433/cyris")
 
 def get_db_connection():
-    DB_FILE.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(DB_URL, cursor_factory=DictCursor)
+    # Register pgvector type on connection
+    try:
+        register_vector(conn)
+    except psycopg2.ProgrammingError:
+        pass # vector extension might not be created yet during init
     return conn
 
 def init_db():
     conn = get_db_connection()
+    conn.commit()
+    conn.autocommit = True
     cursor = conn.cursor()
     
-    # Check if messages table exists to detect newly initialized DB
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='messages'")
-    db_new = cursor.fetchone() is None
+    # Check if messages table exists
+    cursor.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'messages');")
+    db_new = not cursor.fetchone()[0]
+
+    # Create vector extension for semantic search
+    cursor.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+    # Re-register vector since it might be just created
+    register_vector(conn)
     
-    # Create messages table (stores the complete history)
+    # Create messages table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             role TEXT NOT NULL,
             content TEXT NOT NULL,
             created_at TEXT NOT NULL,
@@ -29,13 +45,7 @@ def init_db():
         )
     """)
     
-    # Ensure feedback column exists
-    try:
-        cursor.execute("ALTER TABLE messages ADD COLUMN feedback TEXT")
-    except Exception:
-        pass
-    
-    # Create user_continuity table (stores long-term memories)
+    # Create user_continuity table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS user_continuity (
             identity TEXT PRIMARY KEY,
@@ -49,27 +59,60 @@ def init_db():
         )
     """)
     
-    # Create behavioral_signals table (stores timestamped mood/energy observations)
+    # Create behavioral_signals table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS behavioral_signals (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             signal_type TEXT NOT NULL,
             signal_value TEXT NOT NULL,
             context TEXT,
             created_at TEXT NOT NULL
         )
     """)
+
+    # Create goals table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS goals (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT,
+            status TEXT DEFAULT 'active',
+            progress INTEGER DEFAULT 0,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+    """)
+
+    # Create tasks table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS tasks (
+            id SERIAL PRIMARY KEY,
+            goal_id INTEGER REFERENCES goals(id) ON DELETE CASCADE,
+            description TEXT NOT NULL,
+            is_completed BOOLEAN DEFAULT FALSE,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+    """)
+
+    # Create message_embeddings table (Semantic Memory)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS message_embeddings (
+            id SERIAL PRIMARY KEY,
+            message_id INTEGER REFERENCES messages(id) ON DELETE CASCADE,
+            embedding vector(768) NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
     
-    conn.commit()
+    # Optional HNSW index for fast similarity search
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS message_embeddings_idx ON message_embeddings USING hnsw (embedding vector_cosine_ops);
+    """)
+
+    cursor.close()
     conn.close()
     
-    # Auto-migrate existing JSON data if the DB was just initialized
+    # Note: Auto-migration of old sqlite data is handled manually via the migrate script to prevent accidental destructive actions
     if db_new:
-        try:
-            import sys
-            # Add backend root directory to path if needed
-            sys.path.append(str(Path(__file__).parent.parent))
-            from migrate_json_to_sqlite import run_migration
-            run_migration()
-        except Exception as e:
-            print(f"Auto-migration failed: {e}")
+        print("Database initialized successfully.")

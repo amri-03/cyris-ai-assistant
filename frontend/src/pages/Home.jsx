@@ -12,8 +12,7 @@ export default function Home() {
     const [isConnected, setIsConnected] = useState ( true );
     const [isMemoryOpen, setIsMemoryOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [isReflectionOpen, setIsReflectionOpen] = useState(false);
-    const [reflectionSummary, setReflectionSummary] = useState(null);
+    const [reflectionState, setReflectionState] = useState(null); // 'confirm' | null
     const [memoryItems, setMemoryItems] = useState([]);
     const [theme, setTheme] = useState(() => {
         const saved = localStorage.getItem("cyris-theme");
@@ -26,6 +25,20 @@ export default function Home() {
         document.body.className = `${theme}-theme`;
         localStorage.setItem("cyris-theme", theme);
     }, [theme]);
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                setReflectionState(null);
+            }
+        };
+        if (reflectionState) {
+            window.addEventListener("keydown", handleKeyDown);
+        }
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [reflectionState]);
 
     const fetchMemoryItems = async () => {
         try {
@@ -154,14 +167,31 @@ export default function Home() {
         }
     };
 
+    const handleOpenConcludeConfirm = () => {
+        setReflectionState("confirm");
+    };
+
     const handleConcludeSession = async () => {
         setIsThinking(true);
         try {
             const response = await api.post("/session/conclude");
             if (response.data.status === "success") {
-                setReflectionSummary(response.data.summary);
-                setIsReflectionOpen(true);
-                setMessages([]);
+                // Pre-load the next session start greeting in the background
+                try {
+                    const startRes = await api.get("/session-start");
+                    const greeting = startRes.data.message;
+                    setMessages([
+                        {
+                            role: "assistant",
+                            content: greeting,
+                        }
+                    ]);
+                    fetchMemoryItems();
+                } catch (startErr) {
+                    console.error("Failed to pre-load next session greeting", startErr);
+                }
+                // Close modal immediately
+                setReflectionState(null);
             }
         } catch (error) {
             console.error("Failed to conclude session", error);
@@ -203,7 +233,7 @@ export default function Home() {
                         isConnected={isConnected}
                         onOpenMemory={() => setIsMemoryOpen(true)}
                         onOpenSettings={() => setIsSettingsOpen(true)}
-                        onConcludeSession={handleConcludeSession}
+                        onConcludeSession={handleOpenConcludeConfirm}
                     />
                 </div>
             </div>
@@ -286,8 +316,8 @@ export default function Home() {
                 onThemeChange={(newTheme) => setTheme(newTheme)}
             />
 
-            {/* REFLECTION OVERLAY MODAL */}
-            {isReflectionOpen && (
+            {/* REFLECTION CONFIRMATION MODAL */}
+            {reflectionState === "confirm" && (
                 <div
                     style={{
                         position: "fixed",
@@ -305,90 +335,110 @@ export default function Home() {
                 >
                     <div
                         style={{
+                            position: "relative",
                             background: "var(--bg-drawer)",
                             border: "1px solid var(--border-subtle)",
                             borderRadius: "var(--radius-lg)",
                             padding: "40px",
-                            maxWidth: "600px",
-                            width: "95%",
+                            maxWidth: "450px",
+                            width: "90%",
                             boxShadow: "var(--shadow-modal)",
                             textAlign: "center",
                             animation: "messageFadeIn 0.3s ease-out",
                         }}
                     >
+                        {/* Close button in top-right */}
+                        <button
+                            onClick={() => setReflectionState(null)}
+                            style={{
+                                position: "absolute",
+                                top: "20px",
+                                right: "20px",
+                                background: "transparent",
+                                border: "none",
+                                color: "var(--text-muted)",
+                                fontSize: "20px",
+                                cursor: "pointer",
+                                transition: "color var(--transition)"
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = "var(--text-primary)"}
+                            onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-muted)"}
+                        >
+                            &times;
+                        </button>
+
                         <h2
                             style={{
-                                fontSize: "22px",
+                                fontSize: "20px",
                                 fontWeight: 500,
-                                marginBottom: "20px",
+                                marginBottom: "16px",
                                 color: "var(--text-accent)",
                                 fontFamily: "var(--font-mono)",
                                 letterSpacing: "0.05em",
                             }}
                         >
-                            SESSION CONCLUDED
+                            CONCLUDE SESSION?
                         </h2>
-                        <div
+                        <p
                             style={{
                                 color: "var(--text-secondary)",
                                 fontSize: "14px",
-                                lineHeight: "1.7",
-                                textAlign: "left",
+                                lineHeight: "1.6",
                                 marginBottom: "30px",
-                                background: "var(--bg-base)",
-                                padding: "20px 24px",
-                                borderRadius: "var(--radius-md)",
-                                border: "1px solid var(--border-dim)",
                             }}
                         >
-                            <p style={{ fontWeight: 500, marginBottom: "12px", color: "var(--text-primary)" }}>
-                                Achievements & Commitments:
-                            </p>
-                            <div style={{ whiteSpace: "pre-line" }}>
-                                {reflectionSummary}
-                            </div>
+                            This will summarize your progress, archive the active chat history, and start a fresh session.
+                        </p>
+                        <div style={{ display: "flex", justifyContent: "center", gap: "16px" }}>
+                            <button
+                                onClick={handleConcludeSession}
+                                disabled={isThinking}
+                                style={{
+                                    background: "var(--accent-primary)",
+                                    color: "#ffffff",
+                                    border: "none",
+                                    borderRadius: "var(--radius-sm)",
+                                    padding: "12px 24px",
+                                    fontSize: "14px",
+                                    fontWeight: 500,
+                                    cursor: "pointer",
+                                    transition: "opacity var(--transition)",
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.opacity = 0.9}
+                                onMouseLeave={(e) => e.currentTarget.style.opacity = 1}
+                            >
+                                {isThinking ? "Starting..." : "Start a New Session"}
+                            </button>
+                            <button
+                                onClick={() => setReflectionState(null)}
+                                style={{
+                                    background: "transparent",
+                                    border: "1px solid var(--border-subtle)",
+                                    color: "var(--text-secondary)",
+                                    borderRadius: "var(--radius-sm)",
+                                    padding: "12px 28px",
+                                    fontSize: "14px",
+                                    fontWeight: 500,
+                                    cursor: "pointer",
+                                    transition: "all var(--transition)",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = "var(--user-border)";
+                                    e.currentTarget.style.color = "var(--text-primary)";
+                                    e.currentTarget.style.background = "var(--bg-elevated)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = "var(--border-subtle)";
+                                    e.currentTarget.style.color = "var(--text-secondary)";
+                                    e.currentTarget.style.background = "transparent";
+                                }}
+                            >
+                                Dismiss
+                            </button>
                         </div>
-                        <button
-                            onClick={async () => {
-                                setIsReflectionOpen(false);
-                                setReflectionSummary(null);
-                                try {
-                                    setIsThinking(true);
-                                    const response = await api.get("/session-start");
-                                    const message = response.data.message;
-                                    setMessages([
-                                        {
-                                            role: "assistant",
-                                            content: message,
-                                        }
-                                    ]);
-                                    fetchMemoryItems();
-                                } catch (err) {
-                                    console.error("Failed to load new session", err);
-                                } finally {
-                                    setIsThinking(false);
-                                }
-                            }}
-                            style={{
-                                background: "var(--accent-primary)",
-                                color: "#ffffff",
-                                border: "none",
-                                borderRadius: "var(--radius-sm)",
-                                padding: "12px 28px",
-                                fontSize: "14px",
-                                fontWeight: 500,
-                                cursor: "pointer",
-                                transition: "opacity var(--transition)",
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.opacity = 0.9}
-                            onMouseLeave={(e) => e.currentTarget.style.opacity = 1}
-                        >
-                            Start New Session
-                        </button>
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

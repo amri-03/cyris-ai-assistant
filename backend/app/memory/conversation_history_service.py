@@ -25,9 +25,10 @@ class ConversationHistoryService:
         
         # Insert new message
         cursor.execute(
-            "INSERT INTO messages (role, content, created_at, session_active) VALUES (?, ?, ?, 1)",
+            "INSERT INTO messages (role, content, created_at, session_active) VALUES (%s, %s, %s, 1) RETURNING id",
             (role, content, timestamp_str)
         )
+        message_id = cursor.fetchone()[0]
         
         # Enforce sliding window of 10 messages for active session
         cursor.execute("""
@@ -43,6 +44,20 @@ class ConversationHistoryService:
         
         conn.commit()
         conn.close()
+        
+        # Save vector embedding asynchronously
+        try:
+            import threading
+            from app.services.ai.vector_memory_service import VectorMemoryService
+            vm_service = VectorMemoryService()
+            thread = threading.Thread(
+                target=vm_service.store_message_embedding,
+                args=(message_id, content)
+            )
+            thread.daemon = True
+            thread.start()
+        except Exception as e:
+            print(f"Error starting vector memory thread: {e}")
 
     def get_messages(self):
         conn = get_db_connection()

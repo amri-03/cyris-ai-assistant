@@ -125,7 +125,7 @@ class MemoryReconciler:
             cursor = conn.cursor()
             
             # Retire all existing active items
-            cursor.execute("UPDATE user_continuity SET retired = 1, last_updated = ? WHERE retired = 0", (timestamp_str,))
+            cursor.execute("UPDATE user_continuity SET retired = 1, last_updated = %s WHERE retired = 0", (timestamp_str,))
             
             # Save newly extracted items
             for item in items_to_save:
@@ -151,7 +151,7 @@ class MemoryReconciler:
                     
                 cursor.execute("""
                     INSERT INTO user_continuity (identity, type, content, importance, priority, retired, created_at, last_updated)
-                    VALUES (?, ?, ?, ?, ?, 0, ?, ?)
+                    VALUES (%s, %s, %s, %s, %s, 0, %s, %s)
                     ON CONFLICT(identity) DO UPDATE SET 
                         type=excluded.type, content=excluded.content, importance=excluded.importance, 
                         priority=excluded.priority, retired=0, last_updated=excluded.last_updated

@@ -50,7 +50,7 @@ class ContinuityMemoryService:
                 
                 timestamp_str = datetime.now().isoformat()
                 cursor.execute(
-                    "UPDATE user_continuity SET retired = 1, last_updated = ? WHERE identity = ?",
+                    "UPDATE user_continuity SET retired = 1, last_updated = %s WHERE identity = %s",
                     (timestamp_str, identity)
                 )
                 
@@ -111,7 +111,7 @@ class ContinuityMemoryService:
                         for superseded_id in item_data["supersedes"]:
                             # Fetch superseded item
                             cursor.execute(
-                                "SELECT type, content FROM user_continuity WHERE identity = ? AND retired = 0",
+                                "SELECT type, content FROM user_continuity WHERE identity = %s AND retired = 0",
                                 (superseded_id,)
                             )
                             sup_row = cursor.fetchone()
@@ -121,13 +121,13 @@ class ContinuityMemoryService:
                                 if sup_row["type"] == item_data["type"] or superseded_id == identity:
                                     # Retire the superseded item
                                     cursor.execute(
-                                        "UPDATE user_continuity SET retired = 1, last_updated = ? WHERE identity = ?",
+                                        "UPDATE user_continuity SET retired = 1, last_updated = %s WHERE identity = %s",
                                         (timestamp_str, superseded_id)
                                     )
 
                     # Check if the target item already exists
                     cursor.execute(
-                        "SELECT priority, content FROM user_continuity WHERE identity = ?",
+                        "SELECT priority, content FROM user_continuity WHERE identity = %s",
                         (identity,)
                     )
                     existing_row = cursor.fetchone()
@@ -138,14 +138,14 @@ class ContinuityMemoryService:
                         
                         cursor.execute("""
                             UPDATE user_continuity 
-                            SET type = ?, content = ?, importance = ?, priority = ?, retired = 0, last_updated = ?
-                            WHERE identity = ?
+                            SET type = %s, content = %s, importance = %s, priority = %s, retired = 0, last_updated = %s
+                            WHERE identity = %s
                         """, (item_data["type"], item_data["content"], item_data["importance"], new_priority, timestamp_str, identity))
                     else:
                         priority = self.calculate_priority(item_data["type"], item_data["importance"])
                         cursor.execute("""
                             INSERT INTO user_continuity (identity, type, content, importance, priority, retired, created_at, last_updated)
-                            VALUES (?, ?, ?, ?, ?, 0, ?, ?)
+                            VALUES (%s, %s, %s, %s, %s, 0, %s, %s)
                         """, (identity, item_data["type"], item_data["content"], item_data["importance"], priority, timestamp_str, timestamp_str))
 
                 conn.commit()
@@ -164,12 +164,12 @@ class ContinuityMemoryService:
                         # Save mood signal
                         cursor.execute("""
                             INSERT INTO behavioral_signals (signal_type, signal_value, context, created_at)
-                            VALUES (?, ?, ?, ?)
+                            VALUES (%s, %s, %s, %s)
                         """, ("mood", mood_result["mood"], mood_result.get("context", ""), signal_timestamp))
                         # Save energy signal
                         cursor.execute("""
                             INSERT INTO behavioral_signals (signal_type, signal_value, context, created_at)
-                            VALUES (?, ?, ?, ?)
+                            VALUES (%s, %s, %s, %s)
                         """, ("energy", mood_result["energy"], mood_result.get("context", ""), signal_timestamp))
                         conn.commit()
                         conn.close()

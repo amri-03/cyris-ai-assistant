@@ -52,18 +52,20 @@ export default function Header({isConnected, onOpenMemory, onOpenSettings, onCon
                 {/* Conclude Session button */}
                 <button
                     onClick={onConcludeSession}
-                    title="Conclude Session"
+                    title="Conclude Current Session"
                     style={{
                         background: "transparent",
                         border: "1px solid var(--border-subtle)",
                         borderRadius: "var(--radius-sm)",
-                        padding: "8px 10px",
+                        padding: "8px 14px",
                         color: "var(--text-secondary)",
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center",
-                        lineHeight: 1,
+                        gap: "8px",
+                        fontSize: "13px",
+                        fontFamily: "var(--font-mono)",
+                        letterSpacing: "0.05em",
                         transition: "all var(--transition)",
                     }}
                     onMouseEnter={(e) => {
@@ -79,65 +81,19 @@ export default function Header({isConnected, onOpenMemory, onOpenSettings, onCon
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
+                        width="14"
+                        height="14"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="1.8"
+                        strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     >
                         <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
                         <path d="m9 12 2 2 4-4"/>
                     </svg>
-                </button>
-
-                {/* Memory panel button */}
-                <button
-                    onClick={onOpenMemory}
-                    title="Memory Profile"
-                    style={{
-                        background: "transparent",
-                        border: "1px solid var(--border-subtle)",
-                        borderRadius: "var(--radius-sm)",
-                        padding: "8px 10px",
-                        color: "var(--text-secondary)",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        lineHeight: 1,
-                        transition: "all var(--transition)",
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = "var(--user-border)";
-                        e.currentTarget.style.color = "var(--text-primary)";
-                        e.currentTarget.style.background = "var(--bg-elevated)";
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = "var(--border-subtle)";
-                        e.currentTarget.style.color = "var(--text-secondary)";
-                        e.currentTarget.style.background = "transparent";
-                    }}
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
-                        <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
-                        <path d="M12 5v14"/>
-                        <path d="M12 9h4"/>
-                        <path d="M12 14h-4"/>
-                    </svg>
+                    <span>Conclude</span>
                 </button>
 
                 {/* Settings button */}
