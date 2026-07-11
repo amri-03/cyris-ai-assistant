@@ -100,7 +100,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS message_embeddings (
             id SERIAL PRIMARY KEY,
             message_id INTEGER REFERENCES messages(id) ON DELETE CASCADE,
-            embedding vector(768) NOT NULL,
+            embedding vector(3072) NOT NULL,
             created_at TEXT NOT NULL
         )
     """)

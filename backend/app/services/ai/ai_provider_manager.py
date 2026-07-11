@@ -35,7 +35,6 @@ class AIProviderManager:
                     "client": GroqClient(api_key=key),
                     "capabilities": ["fast_chat", "coding"]
                 })
-        # Backwards compatibility
         legacy_groq = os.getenv("GROQ_API_KEY")
         if legacy_groq and not any(p["client"].api_key == legacy_groq for p in self.providers):
             self.providers.append({
@@ -61,6 +60,34 @@ class AIProviderManager:
                 "capabilities": ["complex_reasoning", "general"]
             })
 
+        # Load Cohere keys (Specialty: general, embeddings)
+        try:
+            from app.services.ai.cohere_client import CohereClient
+            for i in range(1, 4):
+                key = os.getenv(f"COHERE_API_KEY_{i}")
+                if key:
+                    self.providers.append({
+                        "name": "cohere",
+                        "client": CohereClient(api_key=key),
+                        "capabilities": ["general", "general_chat", "embeddings"]
+                    })
+        except ImportError:
+            print("Cohere SDK not installed.")
+            
+        # Load Mistral keys (Specialty: coding, fast_chat)
+        try:
+            from app.services.ai.mistral_client import MistralClient
+            for i in range(1, 4):
+                key = os.getenv(f"MISTRAL_API_KEY_{i}")
+                if key:
+                    self.providers.append({
+                        "name": "mistral",
+                        "client": MistralClient(api_key=key),
+                        "capabilities": ["coding", "fast_chat"]
+                    })
+        except ImportError:
+            print("Mistral SDK not installed.")
+
         self.normalizer = ResponseNormalizer()
         self.response_coordinator = ResponseCoordinator()
         self.response_cleaner = ResponseCleaner()
@@ -70,14 +97,14 @@ class AIProviderManager:
         if not self.providers:
             return []
             
-        # Determine primary capability based on prompt context
         prompt_lower = prompt.lower()
         if len(prompt) > 1000 or "analyze" in prompt_lower or "reason" in prompt_lower:
             primary_tag = "complex_reasoning"
+        elif "code" in prompt_lower or "python" in prompt_lower or "debug" in prompt_lower or "function" in prompt_lower:
+            primary_tag = "coding"
         else:
             primary_tag = "fast_chat"
             
-        # Sort providers: ones matching primary_tag first
         return sorted(
             self.providers, 
             key=lambda p: 0 if primary_tag in p["capabilities"] else 1
