@@ -17,8 +17,8 @@ from app.memory.conversation_history_service import (
 
 class GeminiClient:
 
-    def __init__(self):
-        self.api_key = os.getenv(
+    def __init__(self, api_key: str = None):
+        self.api_key = api_key or os.getenv(
             "GEMINI_API_KEY"
         )
 

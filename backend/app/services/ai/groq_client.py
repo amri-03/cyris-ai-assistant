@@ -16,8 +16,8 @@ from app.memory.conversation_history_service import (
 
 class GroqClient:
 
-    def __init__(self):
-        self.api_key = os.getenv(
+    def __init__(self, api_key: str = None):
+        self.api_key = api_key or os.getenv(
             "GROQ_API_KEY"
         )
 
