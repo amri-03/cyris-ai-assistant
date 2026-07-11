@@ -105,10 +105,7 @@ def init_db():
         )
     """)
     
-    # Optional HNSW index for fast similarity search
-    cursor.execute("""
-        CREATE INDEX IF NOT EXISTS message_embeddings_idx ON message_embeddings USING hnsw (embedding vector_cosine_ops);
-    """)
+    # Note: HNSW index omitted because 3072 dimensions exceeds pgvector HNSW default limit of 2000
 
     cursor.close()
     conn.close()
