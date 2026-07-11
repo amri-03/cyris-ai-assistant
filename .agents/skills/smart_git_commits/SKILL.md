@@ -13,6 +13,7 @@ When asked to commit changes to a repository, you MUST adhere strictly to the fo
 
 * **Focus on the Big Picture**: Commit messages must summarize the core architectural upgrades, feature implementations, or major bug fixes.
 * **Ignore the Trivial in the Message**: Do NOT mention minor, one-off cleanups in the commit message. If a commit contains a major feature alongside trivial cleanups (e.g., deleting temporary test files, moving a scratch script, fixing whitespace, correcting a typo in a comment), **omit the trivial changes from the commit message entirely**. The diff will show them, but they do not belong in the high-level summary.
+* **Commit Part-by-Part (No Giant Squash Commits)**: If changes span multiple distinct components (e.g. database schema alterations, backend API changes, client components, and utility scripts), do NOT squash them into a single commit. Commit them sequentially in independent, logically grouped parts.
 * **Keep it Professional**: Avoid overly verbose, emotional, or "lame" descriptions. Use clear, objective, and actionable language.
 
 ## 2. Conventional Commits Specification
@@ -98,8 +99,8 @@ the context state in Header.jsx.
 
 When instructed to commit changes, you will:
 1. Run `git status` to review the staged and unstaged changes.
-2. Group logical changes together mentally.
-3. Identify the core feature, fix, or refactor.
-4. Identify any trivial files (scratch scripts, temporary data, etc.) that were modified or deleted.
-5. Formulate a commit message that adheres to the rules above, deliberately omitting any mention of the trivial files.
-6. Execute the commit using `git commit -m "<subject>" -m "<body>"`.
+2. Group changes into distinct logical parts (e.g., database configs, embedding updates, router API adjustments, and scripts).
+3. Stage each logical group separately using `git add <files>`.
+4. Formulate a concise conventional commit message for that group, omitting any minor/trivial cleanups from the message.
+5. Commit each group independently.
+6. Repeat until the working tree is clean, then push the commits.
