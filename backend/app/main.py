@@ -174,63 +174,27 @@ def session_start():
             "message": default_greeting
         }
 
-    formatted_items = []
+    # Look for the user's name in continuity items
+    user_name = None
     for item in items:
-        formatted_items.append(f"- {item.get('content')} ({item.get('type')})")
-    items_str = "\n".join(formatted_items)
-
-    # Get recent mood context for the greeting
-    mood_context_str = continuity_memory.build_mood_context()
-    mood_instruction = ""
-    if mood_context_str:
-        mood_instruction = f"""
-The following is behavioral context from recent sessions. Use it to subtly adapt your greeting tone — do NOT mention mood detection or analysis to the user. Just naturally adjust warmth and energy:
-{mood_context_str}
-"""
-
-    # Build gap and stale instructions
-    gap_instruction = ""
-    if gap_days > 0:
-        gap_instruction += f"\nIt has been {gap_days} days since the user's last session. Subtly acknowledge the gap if it is long (e.g. 3+ days) without being dramatic."
-        
-    if session_contexts:
-        contexts_str = "\n".join([f"- {c}" for c in session_contexts])
-        gap_instruction += f"\nHere is context/reflection from the end of their last session. Reference these commitments or progress naturally:\n{contexts_str}"
-        
-    if stale_items:
-        stale_str = "\n".join(stale_items)
-        gap_instruction += f"\nThese active goals/projects haven't been discussed in over a week. If appropriate, gently ask the user for an update on one of them:\n{stale_str}"
-
-    prompt = f"""
-    You are Cyris, a calm, intelligent, and context-aware AI assistant.
-    The user is starting a new session. Generate a brief, warm, and natural welcome-back greeting.
-    Reference 1 or 2 of their active continuity areas naturally so they feel you remember them, but keep it calm, light, and concise (1-2 sentences). Do not use robotic phrasing like "Welcome back! I see you are..." or be overly enthusiastic.
-    {mood_instruction}
-    {gap_instruction}
-    
-    CRITICAL: Wrap any internal reasoning, thoughts, or planning inside a <thinking>...</thinking> block before your final response. The user-facing response must start immediately after the </thinking> tag and contain ONLY the greeting text itself.
-    
-    Active continuity profile:
-    {items_str}
-    
-    Greeting:
-    """
-
-    try:
-        response = ai_provider.generate_ai_response(prompt, add_to_history=False)
-        if isinstance(response, dict):
-            greeting = response.get("response") or response.get("content") or str(response)
-            if isinstance(greeting, dict):
-                greeting = greeting.get("response") or greeting.get("content") or str(greeting)
-        else:
-            greeting = str(response)
-
-        greeting = greeting.strip()
-    except Exception:
-        # Fallback to template if LLM call fails
-        latest = items[-1]
-        content = latest.get("content", "something important")
-        greeting = f"Welcome back. Last time we were discussing {content}. Would you like to continue from there?"
+        content = item.get("content", "")
+        if "name is" in content.lower() or "call me" in content.lower():
+            words = content.split()
+            if "is" in words:
+                idx = words.index("is")
+                if idx + 1 < len(words):
+                    user_name = words[idx + 1].strip('.')
+            elif "me" in words:
+                idx = words.index("me")
+                if idx + 1 < len(words):
+                    user_name = words[idx + 1].strip('.')
+            if user_name:
+                break
+                
+    if user_name:
+        greeting = f"Hello {user_name}! How can I help you today?"
+    else:
+        greeting = "Hello! How can I help you today?"
 
     # Reset history for the new session and append the greeting
     history_service.save_history({"messages": []})
