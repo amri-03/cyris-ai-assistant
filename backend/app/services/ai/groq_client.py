@@ -44,7 +44,8 @@ class GroqClient:
             self,
             prompt: str,
             model="llama-3.3-70b-versatile",
-            add_to_history: bool = True
+            add_to_history: bool = True,
+            session_id: str = None
     ):
         if not self.client:
             return {
@@ -62,7 +63,7 @@ class GroqClient:
 
             history = (
                 self.history_service
-                .get_messages()
+                .get_messages(session_id)
             )
 
             mood_context = self.continuity_memory.build_mood_context()
@@ -71,7 +72,7 @@ class GroqClient:
             
             try:
                 vm_service = VectorMemoryService()
-                semantic_results = vm_service.semantic_search(prompt, limit=3)
+                semantic_results = vm_service.semantic_search(prompt, limit=3, exclude_session_id=session_id)
                 semantic_context = "\n".join([f"- {r['created_at']}: {r['content']}" for r in semantic_results]) if semantic_results else ""
             except Exception:
                 semantic_context = ""

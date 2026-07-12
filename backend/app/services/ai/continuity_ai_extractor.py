@@ -51,6 +51,7 @@ class ContinuityAIExtractor:
         - academic_context
         - career_direction
         - user_preference
+        - user_profile
         - mood_signal
         - behavioral_pattern
         - energy_pattern
@@ -69,6 +70,9 @@ class ContinuityAIExtractor:
         - "Remember that I..."
         - "Store in memory..."
         - "Keep in mind..."
+        - "My name is..."
+        - "I am [Name]..."
+        - "Call me [Name]..."
 
         Existing known continuity items for this user:
         {existing_items_str}

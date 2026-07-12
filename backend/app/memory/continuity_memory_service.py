@@ -280,6 +280,7 @@ class ContinuityMemoryService:
     def calculate_priority(self, continuity_type, importance):
         priority_map = {
             "career_direction": 5,
+            "user_profile": 5,
             "goal": 4,
             "focus_area": 4,
             "project": 4,

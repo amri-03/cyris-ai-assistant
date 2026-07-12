@@ -42,7 +42,8 @@ class GeminiClient:
     def generate_response(
             self,
             prompt: str,
-            add_to_history: bool = True
+            add_to_history: bool = True,
+            session_id: str = None
     ):
         if not self.api_key or not self.client:
             return {
@@ -61,7 +62,7 @@ class GeminiClient:
 
             history = (
                 self.history_service
-                .get_messages()
+                .get_messages(session_id)
             )
 
             # Recreate system instructions dynamically
@@ -70,7 +71,7 @@ class GeminiClient:
             
             try:
                 vm_service = VectorMemoryService()
-                semantic_results = vm_service.semantic_search(prompt, limit=3)
+                semantic_results = vm_service.semantic_search(prompt, limit=3, exclude_session_id=session_id)
                 semantic_context = "\n".join([f"- {r['created_at']}: {r['content']}" for r in semantic_results]) if semantic_results else ""
             except Exception:
                 semantic_context = ""

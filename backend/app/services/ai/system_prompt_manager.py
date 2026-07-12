@@ -109,7 +109,7 @@ class SystemPromptManager:
         """
         
         if semantic_context:
-            prompt += f"\n\nHistorical semantic context related to this conversation:\n{semantic_context}"
+            prompt += f"\n\nHere are some relevant context snippets retrieved from older/archived conversations with the user (do not treat them as part of the current active conversation unless they naturally fit, and do not say 'you mentioned earlier today' unless the timestamps confirm it was indeed today):\n{semantic_context}"
             
         if productivity_context:
             prompt += f"\n\nActive Goals and Tasks:\n{productivity_context}"

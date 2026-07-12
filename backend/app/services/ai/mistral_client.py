@@ -19,7 +19,7 @@ class MistralClient:
         if self.api_key:
             self.client = Mistral(api_key=self.api_key)
 
-    def generate_response(self, prompt: str, add_to_history: bool = True):
+    def generate_response(self, prompt: str, add_to_history: bool = True, session_id: str = None):
         if not self.api_key or not self.client:
             return {
                 "status": "failure",
@@ -28,14 +28,14 @@ class MistralClient:
 
         try:
             memory_context = self.continuity_memory.build_priority_briefing()
-            history = self.history_service.get_messages()
+            history = self.history_service.get_messages(session_id)
 
             from app.services.ai.vector_memory_service import VectorMemoryService
             from app.services.ai.productivity_service import ProductivityService
             
             try:
                 vm_service = VectorMemoryService()
-                semantic_results = vm_service.semantic_search(prompt, limit=3)
+                semantic_results = vm_service.semantic_search(prompt, limit=3, exclude_session_id=session_id)
                 semantic_context = "\n".join([f"- {r['created_at']}: {r['content']}" for r in semantic_results]) if semantic_results else ""
             except Exception:
                 semantic_context = ""

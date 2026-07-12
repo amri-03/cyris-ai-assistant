@@ -1,6 +1,7 @@
 import os
 from typing import List, Dict, Any
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from app.db import get_db_connection
 
 class VectorMemoryService:
@@ -23,13 +24,15 @@ class VectorMemoryService:
             
         for attempt in range(len(self.api_keys)):
             try:
-                genai.configure(api_key=self.api_keys[self.current_key_idx])
-                result = genai.embed_content(
+                client = genai.Client(api_key=self.api_keys[self.current_key_idx])
+                result = client.models.embed_content(
                     model=self.model_name,
-                    content=text,
-                    task_type="retrieval_document"
+                    contents=text,
+                    config=types.EmbedContentConfig(
+                        output_dimensionality=768
+                    )
                 )
-                return result['embedding']
+                return result.embeddings[0].values
             except Exception as e:
                 err_str = str(e).lower()
                 if "429" in err_str or "quota" in err_str or "credits" in err_str or "400" in err_str:
@@ -60,7 +63,7 @@ class VectorMemoryService:
         except Exception as e:
             print(f"Error storing embedding: {e}")
 
-    def semantic_search(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+    def semantic_search(self, query: str, limit: int = 5, exclude_session_id: str = None) -> List[Dict[str, Any]]:
         query_embedding = self.generate_embedding(query)
         if not query_embedding:
             return []
@@ -68,16 +71,26 @@ class VectorMemoryService:
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            # <=>: cosine distance, <->: L2 distance, <#>: inner product
-            # pgvector allows querying by cosine distance using <=>
-            cursor.execute("""
-                SELECT m.id, m.role, m.content, m.created_at, 
-                       (me.embedding <=> %s::vector) as distance
-                FROM message_embeddings me
-                JOIN messages m ON me.message_id = m.id
-                ORDER BY distance ASC
-                LIMIT %s
-            """, (query_embedding, limit))
+            
+            if exclude_session_id:
+                cursor.execute("""
+                    SELECT m.id, m.role, m.content, m.created_at, 
+                           (me.embedding <=> %s::vector) as distance
+                    FROM message_embeddings me
+                    JOIN messages m ON me.message_id = m.id
+                    WHERE m.session_id IS DISTINCT FROM %s
+                    ORDER BY distance ASC
+                    LIMIT %s
+                """, (query_embedding, exclude_session_id, limit))
+            else:
+                cursor.execute("""
+                    SELECT m.id, m.role, m.content, m.created_at, 
+                           (me.embedding <=> %s::vector) as distance
+                    FROM message_embeddings me
+                    JOIN messages m ON me.message_id = m.id
+                    ORDER BY distance ASC
+                    LIMIT %s
+                """, (query_embedding, limit))
             
             results = []
             for row in cursor.fetchall():

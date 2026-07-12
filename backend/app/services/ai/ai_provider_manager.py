@@ -113,7 +113,8 @@ class AIProviderManager:
     def generate_ai_response(
             self,
             prompt: str,
-            add_to_history: bool = True
+            add_to_history: bool = True,
+            session_id: str = None
     ):
         ordered_providers = self._route_providers(prompt)
         if not ordered_providers:
@@ -125,7 +126,7 @@ class AIProviderManager:
             client = provider_info["client"]
             self.ai_client = client # Set current active client for thread callbacks
             
-            raw_response = client.generate_response(prompt, add_to_history=False)
+            raw_response = client.generate_response(prompt, add_to_history=False, session_id=session_id)
             
             if isinstance(raw_response, dict) and raw_response.get("status") == "failure":
                 print(f"Provider {provider_info['name']} failed. Attempting next provider...")
@@ -183,8 +184,8 @@ class AIProviderManager:
             history_service = ConversationHistoryService()
             continuity_memory = ContinuityMemoryService()
             
-            history_service.add_message("user", prompt)
-            history_service.add_message("assistant", cleaned_response)
+            history_service.add_message("user", prompt, session_id=session_id)
+            history_service.add_message("assistant", cleaned_response, session_id=session_id)
             
             import threading
             client_instance = getattr(self.ai_client, "client", None)

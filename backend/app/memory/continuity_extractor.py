@@ -14,6 +14,8 @@ class ContinuityExtractor:
         "python", "java", "javascript", "js", "typescript", "ts", "rust", "go", "golang", "cpp", "c++", "react", "nextjs", "node", "nodejs", "sql", "database", "databases", "git", "github", "docker", "aws", "cloud", "ai", "ml", "machine learning",
         # Location & Study Specific Keywords
         "campus", "location", "study", "track",
+        # Identity & Personal Details
+        "name", "call me", "i am", "my name", "myself", "years old", "hobbies", "hobby", "favorite", "prefer", "preference", "preferences", "live in", "born in",
         # Struggles & Behaviors
         "struggle", "struggles", "struggling", "motivate", "motivation", "motivated", "distract", "distraction", "distractions", "consistent", "consistency", "inconsistent", "drift", "drifting", "overwhelm", "overwhelmed", "lazy", "laziness", "procrastinate", "procrastinating", "procrastination", "tired", "burnout", "stress", "stressed", "anxious", "anxiety", "fear", "stuck", "confused", "confusion", "fail", "failed", "failure",
         # Mood & Energy Signals

@@ -7,7 +7,8 @@ class ConversationHistoryService:
     def add_message(
             self,
             role: str,
-            content: str
+            content: str,
+            session_id: str = None
     ):
         # Clean assistant messages before database insertion to prevent thinking trace leaks
         if role == "assistant":
@@ -25,8 +26,8 @@ class ConversationHistoryService:
         
         # Insert new message
         cursor.execute(
-            "INSERT INTO messages (role, content, created_at, session_active) VALUES (%s, %s, %s, 1) RETURNING id",
-            (role, content, timestamp_str)
+            "INSERT INTO messages (session_id, role, content, created_at, session_active) VALUES (%s, %s, %s, %s, 1) RETURNING id",
+            (session_id, role, content, timestamp_str)
         )
         message_id = cursor.fetchone()[0]
         
@@ -59,13 +60,29 @@ class ConversationHistoryService:
         except Exception as e:
             print(f"Error starting vector memory thread: {e}")
 
-    def get_messages(self):
+    def get_messages(self, session_id: str = None):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        cursor.execute(
-            "SELECT role, content, created_at, feedback FROM messages WHERE session_active = 1 ORDER BY id ASC"
-        )
+        if session_id:
+            cursor.execute(
+                """
+                SELECT role, content, created_at, feedback 
+                FROM (
+                    SELECT * FROM messages 
+                    WHERE session_id = %s 
+                    ORDER BY id DESC 
+                    LIMIT 10
+                ) sub
+                ORDER BY id ASC
+                """,
+                (session_id,)
+            )
+        else:
+            cursor.execute(
+                "SELECT role, content, created_at, feedback FROM messages WHERE session_active = 1 ORDER BY id ASC"
+            )
+        
         rows = cursor.fetchall()
         
         conn.close()
