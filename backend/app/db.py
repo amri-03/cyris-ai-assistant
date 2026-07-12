@@ -33,10 +33,21 @@ def init_db():
     # Re-register vector since it might be just created
     register_vector(conn)
     
+    # Create sessions table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS sessions (
+            id VARCHAR(36) PRIMARY KEY,
+            title TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+    """)
+    
     # Create messages table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS messages (
             id SERIAL PRIMARY KEY,
+            session_id VARCHAR(36) REFERENCES sessions(id) ON DELETE CASCADE,
             role TEXT NOT NULL,
             content TEXT NOT NULL,
             created_at TEXT NOT NULL,
@@ -100,16 +111,32 @@ def init_db():
         CREATE TABLE IF NOT EXISTS message_embeddings (
             id SERIAL PRIMARY KEY,
             message_id INTEGER REFERENCES messages(id) ON DELETE CASCADE,
-            embedding vector(3072) NOT NULL,
+            embedding vector(768) NOT NULL,
             created_at TEXT NOT NULL
         )
     """)
     
-    # Note: HNSW index omitted because 3072 dimensions exceeds pgvector HNSW default limit of 2000
+    # Create HNSW index for fast semantic search (now possible because 768 < 2000)
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS message_embeddings_hnsw_idx 
+        ON message_embeddings USING hnsw (embedding vector_cosine_ops);
+    """)
 
+    cursor.execute("SELECT COUNT(*) FROM messages")
+    is_empty = cursor.fetchone()[0] == 0
+    
     cursor.close()
     conn.close()
     
     # Note: Auto-migration of old sqlite data is handled manually via the migrate script to prevent accidental destructive actions
     if db_new:
         print("Database initialized successfully.")
+        
+    if is_empty:
+        # Auto-healing mechanism: If the database is completely empty (e.g. wiped or new container), 
+        # attempt to instantly restore from the JSON backup.
+        try:
+            from app.services.backup_service import BackupService
+            BackupService().restore_from_json()
+        except ImportError:
+            pass

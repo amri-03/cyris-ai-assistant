@@ -34,6 +34,7 @@ def root():
 
 class PromptRequest(BaseModel):
     prompt: str
+    session_id: Optional[str] = None
 
 
 class FeedbackRequest(BaseModel):
@@ -65,11 +66,55 @@ def save_feedback(request: FeedbackRequest):
     return {"status": "success"}
 
 
+@app.get("/sessions")
+def get_sessions():
+    from app.services.session_service import SessionService
+    return {"sessions": SessionService.get_all_sessions()}
+
+@app.post("/sessions")
+def create_session():
+    from app.services.session_service import SessionService
+    return SessionService.create_session()
+
+@app.get("/sessions/{session_id}/messages")
+def get_session_messages(session_id: str):
+    from app.services.session_service import SessionService
+    return {"messages": SessionService.get_session_messages(session_id)}
+
+@app.delete("/sessions/{session_id}")
+def delete_session(session_id: str):
+    from app.services.session_service import SessionService
+    SessionService.delete_session(session_id)
+    return {"status": "success"}
+
 @app.post("/chat")
 def chat(request: PromptRequest):
+    session_id = request.session_id
+    from app.db import get_db_connection
+    from datetime import datetime
+    import threading
+    from app.services.session_service import SessionService
+    
+    is_first_message = False
+    
+    if not session_id:
+        session = SessionService.create_session()
+        session_id = session["id"]
+        is_first_message = True
+    else:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM messages WHERE session_id = %s", (session_id,))
+        is_first_message = cur.fetchone()[0] == 0
+        now = datetime.now().isoformat()
+        cur.execute("UPDATE sessions SET updated_at = %s WHERE id = %s", (now, session_id))
+        conn.commit()
+        conn.close()
+
     ai_response = (
         ai_provider.generate_ai_response(
-            request.prompt
+            request.prompt,
+            session_id=session_id
         )
     )
 
@@ -90,193 +135,51 @@ def chat(request: PromptRequest):
 
         content = ai_response
 
+    # Trigger real-time shadow backup
+    from app.services.backup_service import BackupService
+    thread = threading.Thread(target=BackupService().backup_to_json)
+    thread.daemon = True
+    thread.start()
+    
+    if is_first_message:
+        def generate_title():
+            try:
+                title_prompt = f"Generate a short title (max 5 words) for this conversation based on the user's first message: '{request.prompt}'. Do not use quotes or prefixes."
+                title_response = ai_provider.generate_ai_response(title_prompt, add_to_history=False)
+                if isinstance(title_response, dict):
+                    title = title_response.get("response") or title_response.get("content") or str(title_response)
+                else:
+                    title = str(title_response)
+                
+                title = title.replace('"', '').replace("'", "").strip()
+                if title:
+                    conn = get_db_connection()
+                    cur = conn.cursor()
+                    cur.execute("UPDATE sessions SET title = %s WHERE id = %s", (title, session_id))
+                    conn.commit()
+                    conn.close()
+            except Exception as e:
+                print(f"Error generating title: {e}")
+                
+        t = threading.Thread(target=generate_title)
+        t.daemon = True
+        t.start()
+
     return {
         "response": str(content),
-        "session_id": "default-session"
+        "session_id": session_id
     }
 
 
-@app.get("/session-start")
+@app.get("/session-start", deprecated=True)
 def session_start():
-    from datetime import datetime
-    from app.memory.conversation_history_service import ConversationHistoryService
-    history_service = ConversationHistoryService()
+    # Deprecated: Frontend should create a new session via POST /sessions or POST /chat directly
+    return {"message": "Hello! How can I help you today?"}
 
-    continuity = (
-        continuity_memory
-        .load_memory()
-    )
-
-    items = [item for item in continuity.get("continuity_items", []) if not item.get("retired", False)]
-
-    # 1. Calculate time gap since last session
-    from app.db import get_db_connection
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT created_at FROM messages ORDER BY id DESC LIMIT 1")
-    last_msg_row = cursor.fetchone()
-    
-    gap_days = 0
-    if last_msg_row:
-        try:
-            last_time = datetime.fromisoformat(last_msg_row["created_at"])
-            delta = datetime.now() - last_time
-            gap_days = delta.days
-        except Exception:
-            pass
-
-    # 2. Retrieve and consume any active next_session_context
-    cursor.execute(
-        "SELECT identity, content FROM user_continuity WHERE type = 'session_context' AND retired = 0"
-    )
-    context_rows = cursor.fetchall()
-    
-    session_contexts = []
-    timestamp_str = datetime.now().isoformat()
-    for row in context_rows:
-        session_contexts.append(row["content"])
-        cursor.execute(
-            "UPDATE user_continuity SET retired = 1, last_updated = %s WHERE identity = %s",
-            (timestamp_str, row["identity"])
-        )
-    conn.commit()
-
-    # 3. Scan for stale goals/projects/focus areas (last updated > 7 days ago)
-    cursor.execute("""
-        SELECT content, type, last_updated 
-        FROM user_continuity 
-        WHERE retired = 0 AND type IN ('goal', 'focus_area', 'project')
-    """)
-    continuity_rows = cursor.fetchall()
-    
-    stale_items = []
-    now = datetime.now()
-    for row in continuity_rows:
-        try:
-            last_updated = datetime.fromisoformat(row["last_updated"])
-            delta = now - last_updated
-            if delta.days >= 7:
-                stale_items.append(f"- {row['content']} ({row['type']})")
-        except Exception:
-            pass
-            
-    conn.close()
-
-    if not items:
-        default_greeting = (
-            "Hello. I'm Cyris. "
-            "Tell me a little about yourself "
-            "and what matters to you right now."
-        )
-        history_service.save_history({"messages": []})
-        history_service.add_message("assistant", default_greeting)
-        return {
-            "message": default_greeting
-        }
-
-    # Look for the user's name in continuity items
-    user_name = None
-    for item in items:
-        content = item.get("content", "")
-        if "name is" in content.lower() or "call me" in content.lower():
-            words = content.split()
-            if "is" in words:
-                idx = words.index("is")
-                if idx + 1 < len(words):
-                    user_name = words[idx + 1].strip('.')
-            elif "me" in words:
-                idx = words.index("me")
-                if idx + 1 < len(words):
-                    user_name = words[idx + 1].strip('.')
-            if user_name:
-                break
-                
-    if user_name:
-        greeting = f"Hello {user_name}! How can I help you today?"
-    else:
-        greeting = "Hello! How can I help you today?"
-
-    # Reset history for the new session and append the greeting
-    history_service.save_history({"messages": []})
-    history_service.add_message("assistant", greeting)
-
-    return {
-        "message": greeting
-    }
-
-
-@app.post("/session/conclude")
+@app.post("/session/conclude", deprecated=True)
 def conclude_session():
-    from datetime import datetime
-    from app.memory.conversation_history_service import ConversationHistoryService
-    history_service = ConversationHistoryService()
-    messages = history_service.get_messages()
-
-    if not messages or len(messages) <= 1:
-        # If there's no chat, or only the start greeting, just clear and return
-        history_service.clear_history()
-        return {"status": "success", "summary": "Session concluded with no active conversation."}
-
-    # Format history for summarization
-    formatted_chat = []
-    for msg in messages:
-        role = "User" if msg["role"] == "user" else "Assistant"
-        formatted_chat.append(f"{role}: {msg['content']}")
-    chat_history_str = "\n".join(formatted_chat)
-
-    prompt = f"""
-    You are Cyris, a supportive and context-aware assistant.
-    The user is ending their current session. Summarize the session and extract key commitments/next steps.
-    Format your response in a supportive, concise, and calm manner (maximum 3 bullet points, keep sentences very short and direct).
-    Focus strictly on:
-    - What was discussed/accomplished.
-    - Commitments or next steps the user planned.
-    
-    CRITICAL: Wrap any internal reasoning, thoughts, or planning inside a <thinking>...</thinking> block before your final response. The user-facing summary text must start immediately after the </thinking> tag.
-    
-    Session Chat History:
-    {chat_history_str}
-    
-    Summary:
-    """
-
-    try:
-        response = ai_provider.generate_ai_response(prompt, add_to_history=False)
-        if isinstance(response, dict):
-            summary = response.get("response") or response.get("content") or str(response)
-            if isinstance(summary, dict):
-                summary = summary.get("response") or summary.get("content") or str(summary)
-        else:
-            summary = str(response)
-        summary = summary.strip()
-    except Exception:
-        summary = "Session concluded. Let's resume progress next time."
-
-    # Save to user_continuity table
-    try:
-        from app.db import get_db_connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        timestamp_str = datetime.now().isoformat()
-        identity = f"session_context_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        
-        cursor.execute("""
-            INSERT INTO user_continuity (identity, type, content, importance, priority, retired, created_at, last_updated)
-            VALUES (%s, %s, %s, %s, %s, 0, %s, %s)
-            ON CONFLICT (identity) DO NOTHING
-        """, (identity, "session_context", summary, "high", 5, timestamp_str, timestamp_str))
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        print(f"Failed to save session context: {e}")
-
-    # Set active session messages to inactive
-    history_service.clear_history()
-
-    return {
-        "status": "success",
-        "summary": summary
-    }
+    # Deprecated
+    return {"status": "success", "summary": "Session concluded."}
 
 
 
@@ -317,24 +220,9 @@ def reconcile_memory():
         return {"status": "error", "message": str(e)}
 
 
-@app.get("/session-messages")
+@app.get("/session-messages", deprecated=True)
 def session_messages():
-    from app.memory.conversation_history_service import ConversationHistoryService
-    history_service = ConversationHistoryService()
-    messages = history_service.get_messages()
-    
-    if messages:
-        try:
-            from datetime import datetime
-            # Check if the last message is from a different calendar day
-            last_msg_time = datetime.fromisoformat(messages[-1]["created_at"])
-            if last_msg_time.date() != datetime.now().date():
-                history_service.clear_history()
-                messages = []
-        except Exception as e:
-            print(f"Error checking session messages date: {e}")
-            
-    return {"messages": messages}
+    return {"messages": []}
 
 @app.get("/goals")
 def get_goals():
