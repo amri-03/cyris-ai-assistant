@@ -15,20 +15,20 @@ function CodeBlock({ language, code }) {
             style={{
                 background: "var(--bg-code-block)",
                 border: "1px solid var(--border-code)",
-                borderRadius: "8px",
+                borderRadius: "var(--radius-md)",
                 overflow: "hidden",
-                margin: "12px 0 16px",
+                margin: "18px 0 24px",
                 display: "flex",
                 flexDirection: "column",
                 maxWidth: "100%",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"
+                boxShadow: "0 8px 30px rgba(0, 0, 0, 0.2)"
             }}
         >
             {/* Header bar */}
             <div 
                 style={{
                     background: "var(--bg-code-header)",
-                    padding: "8px 16px",
+                    padding: "10px 18px",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -79,7 +79,7 @@ function CodeBlock({ language, code }) {
             <pre 
                 style={{
                     margin: 0,
-                    padding: "16px",
+                    padding: "18px 20px",
                     overflowX: "auto",
                     fontFamily: "var(--font-mono)",
                     fontSize: "13.5px",
@@ -150,7 +150,7 @@ const renderParagraphs = (text, partIndex) => {
                 <Tag 
                     key={`list-${elements.length}`} 
                     style={{ 
-                        margin: "12px 0 16px", 
+                        margin: "16px 0", 
                         paddingLeft: "24px",
                         display: "flex",
                         flexDirection: "column",
@@ -209,7 +209,7 @@ const renderParagraphs = (text, partIndex) => {
                     key={`li-${i}`} 
                     style={{ 
                         fontFamily: "var(--font-sans)",
-                        fontSize: "16px", 
+                        fontSize: "15px", 
                         lineHeight: "1.7", 
                         color: "var(--text-primary)" 
                     }}
@@ -234,7 +234,7 @@ const renderParagraphs = (text, partIndex) => {
                     key={`li-${i}`} 
                     style={{ 
                         fontFamily: "var(--font-sans)",
-                        fontSize: "16px", 
+                        fontSize: "15px", 
                         lineHeight: "1.7", 
                         color: "var(--text-primary)" 
                     }}
@@ -259,10 +259,10 @@ const renderParagraphs = (text, partIndex) => {
                 key={`p-${i}`} 
                 style={{ 
                     fontFamily: "var(--font-sans)",
-                    fontSize: "16px", 
+                    fontSize: "15px", 
                     lineHeight: "1.7", 
                     color: "var(--text-primary)",
-                    marginBottom: "12px" 
+                    marginBottom: "16px" 
                 }}
             >
                 {renderInlineSpans(line)}
@@ -414,16 +414,17 @@ export default function MessageBubble({ role, content, isLatest, onScrollToBotto
                     style={{
                         maxWidth: "80%",
                         padding: "12px 18px",
-                        borderRadius: "18px",
+                        borderRadius: "18px 18px 4px 18px",
                         background: "var(--user-bubble)",
                         border: "1px solid var(--user-border)",
                         color: "var(--text-primary)",
                         fontFamily: "var(--font-sans)",
-                        fontSize: "16px",
+                        fontSize: "15px",
                         lineHeight: "1.6",
                         fontWeight: 400,
                         whiteSpace: "pre-wrap",
                         wordBreak: "break-word",
+                        boxShadow: "0 2px 12px rgba(0, 0, 0, 0.08)",
                     }}
                 >
                     {safeContent}
@@ -434,7 +435,7 @@ export default function MessageBubble({ role, content, isLatest, onScrollToBotto
                         style={{
                             color: "var(--text-primary)",
                             fontFamily: "var(--font-sans)",
-                            fontSize: "16px",
+                            fontSize: "15px",
                             lineHeight: "1.7",
                             fontWeight: 400,
                             wordBreak: "break-word",

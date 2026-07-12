@@ -1,43 +1,42 @@
-export default function Header({isConnected, onOpenMemory, onOpenSettings, onConcludeSession}) {
+export default function Header({isConnected, onOpenSettings, onConcludeSession, activeSessionTitle}) {
     return (
         <div
             style={{
-                paddingTop: "28px",
-                paddingBottom: "20px",
+                paddingTop: "18px",
+                paddingBottom: "18px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                borderBottom: "1px solid var(--border-dim)",
                 position: "relative",
                 zIndex: 1,
                 flexShrink: 0,
             }}
         >
-            {/* Wordmark */}
-            <div style={{display: "flex", alignItems: "baseline", gap: "10px"}}>
+            {/* Left side spacer / placeholder */}
+            <div style={{ minWidth: "1px", height: "1px" }} />
+
+            {/* Center: Session Title */}
+            <div style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                display: "flex",
+                alignItems: "center",
+                pointerEvents: "none"
+            }}>
                 <span
                     style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "22px",
+                        fontFamily: "var(--font-sans)",
+                        fontSize: "14px",
                         fontWeight: 500,
-                        letterSpacing: "0.12em",
-                        textTransform: "uppercase",
-                        color: "var(--text-primary)",
+                        color: "var(--text-secondary)",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        maxWidth: "400px"
                     }}
                 >
-                    Cyris
-                </span>
-                <span
-                    style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "12px",
-                        fontWeight: 300,
-                        letterSpacing: "0.15em",
-                        textTransform: "uppercase",
-                        color: "var(--text-muted)",
-                    }}
-                >
-                    adaptive
+                    {activeSessionTitle || ""}
                 </span>
             </div>
 
@@ -46,7 +45,7 @@ export default function Header({isConnected, onOpenMemory, onOpenSettings, onCon
                 style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "16px",
+                    gap: "12px",
                 }}
             >
                 {/* Conclude Session button */}
@@ -69,9 +68,9 @@ export default function Header({isConnected, onOpenMemory, onOpenSettings, onCon
                         transition: "all var(--transition)",
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = "#4ade80";
-                        e.currentTarget.style.color = "#4ade80";
-                        e.currentTarget.style.background = "var(--bg-elevated)";
+                        e.currentTarget.style.borderColor = "var(--accent-primary)";
+                        e.currentTarget.style.color = "var(--accent-primary)";
+                        e.currentTarget.style.background = "var(--accent-glow)";
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.borderColor = "var(--border-subtle)";
@@ -86,7 +85,7 @@ export default function Header({isConnected, onOpenMemory, onOpenSettings, onCon
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="2.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     >
@@ -114,9 +113,9 @@ export default function Header({isConnected, onOpenMemory, onOpenSettings, onCon
                         transition: "all var(--transition)",
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = "var(--user-border)";
-                        e.currentTarget.style.color = "var(--text-primary)";
-                        e.currentTarget.style.background = "var(--bg-elevated)";
+                        e.currentTarget.style.borderColor = "var(--accent-primary)";
+                        e.currentTarget.style.color = "var(--accent-primary)";
+                        e.currentTarget.style.background = "var(--accent-glow)";
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.borderColor = "var(--border-subtle)";

@@ -2,6 +2,7 @@ import {useState, useRef} from "react";
 
 export default function MessageInput({onSend, isDisabled}) {
     const [value, setValue] = useState ( "" );
+    const [isFocused, setIsFocused] = useState(false);
     const textareaRef = useRef ( null );
 
     const handleSend = () => {
@@ -49,16 +50,22 @@ export default function MessageInput({onSend, isDisabled}) {
                     alignItems: "center",
                     gap: "12px",
                     background: "var(--bg-input)",
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
                     border: `1px solid ${
-                        canSend
+                        isFocused
+                            ? "var(--accent-primary)"
+                            : canSend
                             ? "var(--accent-dim)"
                             : "var(--border-subtle)"
                     }`,
                     borderRadius: "var(--radius-xl)",
                     padding: "13px 18px",
-                    transition: "border-color var(--transition)",
-                    boxShadow: canSend
-                        ? "0 0 24px rgba(123, 108, 255, 0.08)"
+                    transition: "all var(--transition)",
+                    boxShadow: isFocused
+                        ? "0 0 0 3px var(--accent-glow), 0 8px 24px rgba(0, 0, 0, 0.12)"
+                        : canSend
+                        ? "0 0 20px rgba(99, 102, 241, 0.08)"
                         : "none",
                     cursor: "text",
                 }}
@@ -68,6 +75,8 @@ export default function MessageInput({onSend, isDisabled}) {
                     value={value}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
                     placeholder="Message Cyris..."
                     rows={1}
                     style={{
