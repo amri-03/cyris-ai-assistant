@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../services/api";
 
 function CodeBlock({ language, code }) {
@@ -11,84 +11,29 @@ function CodeBlock({ language, code }) {
     };
 
     return (
-        <div 
-            style={{
-                background: "var(--bg-code-block)",
-                border: "1px solid var(--border-code)",
-                borderRadius: "var(--radius-md)",
-                overflow: "hidden",
-                margin: "18px 0 24px",
-                display: "flex",
-                flexDirection: "column",
-                maxWidth: "100%",
-                boxShadow: "0 8px 30px rgba(0, 0, 0, 0.2)"
-            }}
-        >
-            {/* Header bar */}
-            <div 
-                style={{
-                    background: "var(--bg-code-header)",
-                    padding: "10px 18px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    borderBottom: "1px solid var(--border-code)",
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "13px",
-                    color: "var(--text-secondary)"
-                }}
-            >
-                <span style={{ fontWeight: 500, textTransform: "lowercase", fontFamily: "var(--font-mono)", fontSize: "12px" }}>{language}</span>
-                <button 
-                    onClick={handleCopy}
-                    style={{
-                        background: "transparent",
-                        border: "none",
-                        color: "var(--text-secondary)",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        fontSize: "12px",
-                        fontFamily: "var(--font-sans)",
-                        transition: "color var(--transition)"
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = "var(--text-primary)"}
-                    onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-secondary)"}
-                >
+        <div className="code-block-container">
+            <div className="code-block-header">
+                <span className="code-block-lang">{language}</span>
+                <button onClick={handleCopy} className="code-copy-btn">
                     {copied ? (
                         <>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                <polyline points="20 6 9 17 4 12"></polyline>
+                                <polyline points="20 6 9 17 4 12" />
                             </svg>
                             <span>Copied</span>
                         </>
                     ) : (
                         <>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                             </svg>
                             <span>Copy code</span>
                         </>
                     )}
                 </button>
             </div>
-            
-            {/* Code content */}
-            <pre 
-                style={{
-                    margin: 0,
-                    padding: "18px 20px",
-                    overflowX: "auto",
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "13.5px",
-                    lineHeight: "1.55",
-                    color: "var(--text-code)",
-                    whiteSpace: "pre",
-                    wordBreak: "normal"
-                }}
-            >
+            <pre className="code-block-pre">
                 <code>{code}</code>
             </pre>
         </div>
@@ -103,19 +48,7 @@ const renderInlineSpans = (text) => {
         const isInlineCode = codeIndex % 2 === 1;
         if (isInlineCode) {
             return (
-                <code 
-                    key={`code-${codeIndex}`}
-                    style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "13.5px",
-                        background: "var(--bg-elevated)",
-                        border: "1px solid var(--border-subtle)",
-                        borderRadius: "4px",
-                        padding: "2px 6px",
-                        color: "var(--text-accent)",
-                        wordBreak: "break-word"
-                    }}
-                >
+                <code key={`code-${codeIndex}`} className="inline-code">
                     {codePart}
                 </code>
             );
@@ -125,7 +58,7 @@ const renderInlineSpans = (text) => {
                 const isBold = boldIndex % 2 === 1;
                 if (isBold) {
                     return (
-                        <strong key={`bold-${boldIndex}`} style={{ fontWeight: 600, color: "var(--text-primary)" }}>
+                        <strong key={`bold-${boldIndex}`} className="markdown-strong">
                             {boldPart}
                         </strong>
                     );
@@ -147,16 +80,7 @@ const renderParagraphs = (text, partIndex) => {
         if (currentList) {
             const Tag = listType === "ol" ? "ol" : "ul";
             elements.push(
-                <Tag 
-                    key={`list-${elements.length}`} 
-                    style={{ 
-                        margin: "16px 0", 
-                        paddingLeft: "24px",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "8px"
-                    }}
-                >
+                <Tag key={`list-${elements.length}`} className="markdown-list">
                     {currentList}
                 </Tag>
             );
@@ -167,35 +91,26 @@ const renderParagraphs = (text, partIndex) => {
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        
-        // Headers (e.g. "### Title" or "## Title")
+
+        // Heading match
         const headingMatch = line.match(/^(#{1,6})\s+(.*)$/);
         if (headingMatch) {
             pushCurrentList();
             const level = headingMatch[1].length;
             const content = headingMatch[2];
-            const Tag = `h${level}`;
-            const headingStyle = {
-                fontFamily: "var(--font-sans)",
-                fontWeight: 600,
-                color: "var(--text-primary)",
-                marginTop: level === 1 ? "24px" : "18px",
-                marginBottom: "10px",
-                lineHeight: "1.4",
-            };
-            if (level === 1) headingStyle.fontSize = "22px";
-            else if (level === 2) headingStyle.fontSize = "18px";
-            else headingStyle.fontSize = "16.5px";
+            const className = level === 1 ? "markdown-h1" : level === 2 ? "markdown-h2" : "markdown-h3";
 
-            elements.push(
-                <Tag key={`h-${i}`} style={headingStyle}>
-                    {renderInlineSpans(content)}
-                </Tag>
-            );
+            if (level === 1) {
+                elements.push(<h1 key={`h1-${i}`} className={className}>{renderInlineSpans(content)}</h1>);
+            } else if (level === 2) {
+                elements.push(<h2 key={`h2-${i}`} className={className}>{renderInlineSpans(content)}</h2>);
+            } else {
+                elements.push(<h3 key={`h3-${i}`} className={className}>{renderInlineSpans(content)}</h3>);
+            }
             continue;
         }
 
-        // Ordered list (e.g. "1. Item")
+        // Ordered list
         const olMatch = line.match(/^(\d+)\.\s+(.*)$/);
         if (olMatch) {
             if (listType !== "ol") {
@@ -205,23 +120,15 @@ const renderParagraphs = (text, partIndex) => {
             }
             const content = olMatch[2];
             currentList.push(
-                <li 
-                    key={`li-${i}`} 
-                    style={{ 
-                        fontFamily: "var(--font-sans)",
-                        fontSize: "15px", 
-                        lineHeight: "1.7", 
-                        color: "var(--text-primary)" 
-                    }}
-                >
+                <li key={`li-${i}`} className="markdown-li">
                     {renderInlineSpans(content)}
                 </li>
             );
             continue;
         }
 
-        // Unordered list (e.g. "* Item" or "- Item")
-        const ulMatch = line.match(/^([*\-])\s+(.*)$/);
+        // Unordered list
+        const ulMatch = line.match(/^([*-])\s+(.*)$/);
         if (ulMatch) {
             if (listType !== "ul") {
                 pushCurrentList();
@@ -230,41 +137,24 @@ const renderParagraphs = (text, partIndex) => {
             }
             const content = ulMatch[2];
             currentList.push(
-                <li 
-                    key={`li-${i}`} 
-                    style={{ 
-                        fontFamily: "var(--font-sans)",
-                        fontSize: "15px", 
-                        lineHeight: "1.7", 
-                        color: "var(--text-primary)" 
-                    }}
-                >
+                <li key={`li-${i}`} className="markdown-li">
                     {renderInlineSpans(content)}
                 </li>
             );
             continue;
         }
 
-        // Blank lines
+        // Blank line
         if (line.trim() === "") {
             pushCurrentList();
-            elements.push(<div key={`space-${i}`} style={{ height: "8px" }} />);
+            elements.push(<div key={`space-${i}`} className="markdown-spacer" />);
             continue;
         }
 
-        // Regular paragraph line
+        // Paragraph
         pushCurrentList();
         elements.push(
-            <p 
-                key={`p-${i}`} 
-                style={{ 
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "15px", 
-                    lineHeight: "1.7", 
-                    color: "var(--text-primary)",
-                    marginBottom: "16px" 
-                }}
-            >
+            <p key={`p-${i}`} className="markdown-p">
                 {renderInlineSpans(line)}
             </p>
         );
@@ -286,9 +176,7 @@ const renderFormattedText = (text) => {
             const language = firstLine || "code";
             const code = lines.slice(1).join("\n").replace(/\n$/, "");
 
-            return (
-                <CodeBlock key={index} language={language} code={code} />
-            );
+            return <CodeBlock key={index} language={language} code={code} />;
         } else {
             return renderParagraphs(part, index);
         }
@@ -296,7 +184,6 @@ const renderFormattedText = (text) => {
 };
 
 export default function MessageBubble({ role, content, isLatest, onScrollToBottom, animate, feedback: initialFeedback }) {
-    const ref = useRef(null);
     const isUser = role === "user";
     const shouldAnimate = !isUser && animate === true;
     const [displayedContent, setDisplayedContent] = useState(shouldAnimate ? "" : content);
@@ -304,9 +191,18 @@ export default function MessageBubble({ role, content, isLatest, onScrollToBotto
     const [copied, setCopied] = useState(false);
     const [feedback, setFeedback] = useState(initialFeedback || null);
 
-    useEffect(() => {
+    const [prevInitialFeedback, setPrevInitialFeedback] = useState(initialFeedback);
+    if (initialFeedback !== prevInitialFeedback) {
         setFeedback(initialFeedback || null);
-    }, [initialFeedback]);
+        setPrevInitialFeedback(initialFeedback);
+    }
+
+    const [prevContent, setPrevContent] = useState(content);
+    if (content !== prevContent) {
+        setPrevContent(content);
+        setDisplayedContent(shouldAnimate ? "" : content);
+        setIsTypingComplete(!shouldAnimate);
+    }
 
     const isLatestRef = useRef(isLatest);
     const onScrollToBottomRef = useRef(onScrollToBottom);
@@ -317,25 +213,11 @@ export default function MessageBubble({ role, content, isLatest, onScrollToBotto
     }, [isLatest, onScrollToBottom]);
 
     useEffect(() => {
-        if (ref.current) {
-            ref.current.style.animation = "none";
-            void ref.current.offsetHeight;
-            ref.current.style.animation = "messageFadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards";
-        }
-    }, []);
-
-    useEffect(() => {
-        if (!shouldAnimate) {
-            setIsTypingComplete(true);
-            setDisplayedContent(content);
-            return;
-        }
+        if (!shouldAnimate) return;
 
         const safeContent = typeof content === "string" ? content : JSON.stringify(content);
         const words = safeContent.split(" ");
         let index = 0;
-        setDisplayedContent("");
-        setIsTypingComplete(false);
 
         const interval = setInterval(() => {
             setDisplayedContent(words.slice(0, index + 1).join(" "));
@@ -382,203 +264,52 @@ export default function MessageBubble({ role, content, isLatest, onScrollToBotto
     };
 
     return (
-        <div
-            ref={ref}
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: isUser ? "flex-end" : "flex-start",
-                gap: "6px",
-                opacity: 0,
-                animation: "messageFadeIn 0.35s cubic-bezier(0.4,0,0.2,1) forwards",
-            }}
-        >
-            <span
-                style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "11.5px",
-                    fontWeight: 600,
-                    letterSpacing: "0.05em",
-                    textTransform: "uppercase",
-                    color: isUser ? "var(--text-accent)" : "var(--text-muted)",
-                    paddingLeft: isUser ? 0 : "2px",
-                    paddingRight: isUser ? "2px" : 0,
-                    marginBottom: "2px"
-                }}
-            >
+        <div className={`msg-wrapper ${isUser ? "msg-wrapper-user" : "msg-wrapper-assistant"}`}>
+            <span className={`msg-role-label ${isUser ? "msg-role-label-user" : "msg-role-label-assistant"}`}>
                 {isUser ? "You" : "Cyris"}
             </span>
 
             {isUser ? (
-                <div
-                    style={{
-                        maxWidth: "80%",
-                        padding: "12px 18px",
-                        borderRadius: "18px 18px 4px 18px",
-                        background: "var(--user-bubble)",
-                        border: "1px solid var(--user-border)",
-                        color: "var(--text-primary)",
-                        fontFamily: "var(--font-sans)",
-                        fontSize: "15px",
-                        lineHeight: "1.6",
-                        fontWeight: 400,
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                        boxShadow: "0 2px 12px rgba(0, 0, 0, 0.08)",
-                    }}
-                >
-                    {safeContent}
-                </div>
+                <div className="user-bubble-box">{safeContent}</div>
             ) : (
-                <div style={{ width: "100%" }}>
-                    <div
-                        style={{
-                            color: "var(--text-primary)",
-                            fontFamily: "var(--font-sans)",
-                            fontSize: "15px",
-                            lineHeight: "1.7",
-                            fontWeight: 400,
-                            wordBreak: "break-word",
-                            paddingLeft: "2px",
-                        }}
-                    >
-                        {renderFormattedText(displayedContent)}
-                    </div>
+                <div className="assistant-text-box">
+                    <div>{renderFormattedText(displayedContent)}</div>
 
-                    {!isUser && isTypingComplete && (
-                        <div 
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                marginTop: "12px",
-                                opacity: 0,
-                                animation: "messageFadeIn 0.3s ease-out forwards",
-                            }}
-                        >
-                            {/* Thumbs Up Button */}
+                    {isTypingComplete && (
+                        <div className="msg-action-bar">
                             <button
                                 onClick={() => handleFeedback("like")}
                                 title="Like response"
-                                style={{
-                                    background: "transparent",
-                                    border: "1px solid " + (feedback === "like" ? "var(--accent-primary)" : "var(--border-subtle)"),
-                                    color: feedback === "like" ? "var(--accent-primary)" : "var(--text-secondary)",
-                                    cursor: "pointer",
-                                    padding: "6px",
-                                    borderRadius: "var(--radius-sm)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    width: "28px",
-                                    height: "28px",
-                                    transition: "all var(--transition)",
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = feedback === "like" ? "var(--accent-primary)" : "var(--text-primary)";
-                                    e.currentTarget.style.borderColor = feedback === "like" ? "var(--accent-primary)" : "var(--user-border)";
-                                    e.currentTarget.style.background = "var(--bg-elevated)";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = feedback === "like" ? "var(--accent-primary)" : "var(--text-secondary)";
-                                    e.currentTarget.style.borderColor = feedback === "like" ? "var(--accent-primary)" : "var(--border-subtle)";
-                                    e.currentTarget.style.background = "transparent";
-                                }}
+                                className={`msg-action-btn ${feedback === "like" ? "liked" : ""}`}
                             >
-                                <svg 
-                                    width="14" 
-                                    height="14" 
-                                    viewBox="0 0 24 24" 
-                                    fill={feedback === "like" ? "currentColor" : "none"} 
-                                    stroke="currentColor" 
-                                    strokeWidth="2" 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round"
-                                >
-                                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill={feedback === "like" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
                                 </svg>
                             </button>
 
-                            {/* Thumbs Down Button */}
                             <button
                                 onClick={() => handleFeedback("dislike")}
                                 title="Dislike response"
-                                style={{
-                                    background: "transparent",
-                                    border: "1px solid " + (feedback === "dislike" ? "#ef4444" : "var(--border-subtle)"),
-                                    color: feedback === "dislike" ? "#ef4444" : "var(--text-secondary)",
-                                    cursor: "pointer",
-                                    padding: "6px",
-                                    borderRadius: "var(--radius-sm)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    width: "28px",
-                                    height: "28px",
-                                    transition: "all var(--transition)",
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = feedback === "dislike" ? "#ef4444" : "var(--text-primary)";
-                                    e.currentTarget.style.borderColor = feedback === "dislike" ? "#ef4444" : "var(--user-border)";
-                                    e.currentTarget.style.background = "var(--bg-elevated)";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = feedback === "dislike" ? "#ef4444" : "var(--text-secondary)";
-                                    e.currentTarget.style.borderColor = feedback === "dislike" ? "#ef4444" : "var(--border-subtle)";
-                                    e.currentTarget.style.background = "transparent";
-                                }}
+                                className={`msg-action-btn ${feedback === "dislike" ? "disliked" : ""}`}
                             >
-                                <svg 
-                                    width="14" 
-                                    height="14" 
-                                    viewBox="0 0 24 24" 
-                                    fill={feedback === "dislike" ? "currentColor" : "none"} 
-                                    stroke="currentColor" 
-                                    strokeWidth="2" 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round"
-                                >
-                                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill={feedback === "dislike" ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3" />
                                 </svg>
                             </button>
 
-                            {/* Copy Button */}
                             <button
                                 onClick={handleCopy}
                                 title={copied ? "Copied!" : "Copy response"}
-                                style={{
-                                    background: "transparent",
-                                    border: "1px solid var(--border-subtle)",
-                                    color: copied ? "var(--accent-primary)" : "var(--text-secondary)",
-                                    cursor: "pointer",
-                                    padding: "6px",
-                                    borderRadius: "var(--radius-sm)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    width: "28px",
-                                    height: "28px",
-                                    transition: "all var(--transition)",
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = "var(--text-primary)";
-                                    e.currentTarget.style.borderColor = "var(--user-border)";
-                                    e.currentTarget.style.background = "var(--bg-elevated)";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = copied ? "var(--accent-primary)" : "var(--text-secondary)";
-                                    e.currentTarget.style.borderColor = "var(--border-subtle)";
-                                    e.currentTarget.style.background = "transparent";
-                                }}
+                                className={`msg-action-btn ${copied ? "copied" : ""}`}
                             >
                                 {copied ? (
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                        <polyline points="20 6 9 17 4 12" />
                                     </svg>
                                 ) : (
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                                     </svg>
                                 )}
                             </button>
