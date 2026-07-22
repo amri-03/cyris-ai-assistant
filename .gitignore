@@ -233,3 +233,9 @@ core_implementation_plan.md
 architects_sync.md
 
 docs/project_audit*.md
+
+# Subagent run directories
+.agents/*
+!.agents/AGENTS.md
+!.agents/skills/
+
