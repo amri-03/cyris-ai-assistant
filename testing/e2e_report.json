@@ -1,0 +1,395 @@
+{
+  "build_status": "PASSED",
+  "decoupling_status": "PASSED",
+  "styling_status": "FAILED",
+  "api_integrity_status": "PASSED",
+  "inline_style_audit_status": "PASSED",
+  "total_tests": 64,
+  "passed_tests": 43,
+  "results": [
+    {
+      "id": "TC-FEAT-001",
+      "name": "Sidebar width transitions smoothly between open and closed",
+      "status": "FAILED",
+      "reason": "Pattern 'sidebar toggle state' not found in Home.jsx (Regex: isSidebarOpen)"
+    },
+    {
+      "id": "TC-FEAT-002",
+      "name": "Sidebar date grouping (Today, Previous 7 Days, Older)",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-003",
+      "name": "Select active session loads message history",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-004",
+      "name": "Delete session action triggers DELETE call",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-005",
+      "name": "Active session title centered in header absolutely",
+      "status": "FAILED",
+      "reason": "className 'header-breadcrumb' missing in Header.jsx"
+    },
+    {
+      "id": "TC-FEAT-006",
+      "name": "Connection status indicator dot changes color",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-007",
+      "name": "Settings toggle button opens Settings modal panel",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-008",
+      "name": "Conclude session button resets chat viewport",
+      "status": "FAILED",
+      "reason": "Pattern 'conclude session trigger' not found in Home.jsx (Regex: onConcludeSession)"
+    },
+    {
+      "id": "TC-FEAT-009",
+      "name": "Textarea typing displays characters in sans-serif",
+      "status": "FAILED",
+      "reason": "Pattern 'textarea font-sans styling' not found in MessageInput.jsx (Regex: fontFamily:\\s*(\\\"|\\')var\\(--font-sans\\)(\\\"|\\'))"
+    },
+    {
+      "id": "TC-FEAT-010",
+      "name": "MessageInput textarea auto-resizes to max height",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-011",
+      "name": "MessageInput triggers handleSend on Enter key",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-012",
+      "name": "MessageInput allows newline insertion with Shift+Enter",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-013",
+      "name": "User message bubble styling (background/border)",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-014",
+      "name": "Assistant message bubble layout (transparent/no-border)",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-015",
+      "name": "Typographic headings font size/margin styles",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-016",
+      "name": "Inline markdown bold and code formatting",
+      "status": "FAILED",
+      "reason": "Pattern 'code span variable background' not found in MessageBubble.jsx (Regex: var\\(--bg-elevated\\))"
+    },
+    {
+      "id": "TC-FEAT-017",
+      "name": "Markdown list spacing and padding styles",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-018",
+      "name": "Code block renders syntax header and copy button",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-019",
+      "name": "AI Typing animations auto-scroll thread container",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-020",
+      "name": "Thumbs feedback submit updates style and routes",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-021",
+      "name": "SettingsPanel sliding overlay dialog styles",
+      "status": "FAILED",
+      "reason": "Pattern 'Settings overlay overlay' not found in SettingsPanel.jsx (Regex: memory-overlay)"
+    },
+    {
+      "id": "TC-FEAT-022",
+      "name": "SettingsPanel toggles theme configuration base",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-023",
+      "name": "Theme setting persists via LocalStorage on reload",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-FEAT-024",
+      "name": "Empty State starter card grid layout renders prompts",
+      "status": "FAILED",
+      "reason": "Pattern 'starter cards definitions' not found in Home.jsx (Regex: starterCards)"
+    },
+    {
+      "id": "TC-BOUND-001",
+      "name": "Extremely long session titles truncate with ellipsis",
+      "status": "FAILED",
+      "reason": "Pattern 'ellipsis text-overflow in sidebar' not found in Sidebar.jsx (Regex: textOverflow:\\s*(\\'|\\\")ellipsis(\\'|\\\"))"
+    },
+    {
+      "id": "TC-BOUND-002",
+      "name": "Sidebar displays fallback message when sessions empty",
+      "status": "FAILED",
+      "reason": "Pattern 'empty sessions notice' not found in Sidebar.jsx (Regex: No previous chats found)"
+    },
+    {
+      "id": "TC-BOUND-003",
+      "name": "Rapid session deletion indexes alignment safety",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-BOUND-004",
+      "name": "Header title text truncates with ellipsis at bounds",
+      "status": "FAILED",
+      "reason": "Pattern 'max width on header title' not found in global.css (Regex: max-width:\\s*300px)"
+    },
+    {
+      "id": "TC-BOUND-005",
+      "name": "Server connection status dot toggles to offline mode",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-BOUND-006",
+      "name": "Sidebar mobile collapse toggle hidden on desktop layout",
+      "status": "FAILED",
+      "reason": "Pattern 'sidebar closed toggle check' not found in Home.jsx (Regex: !isSidebarOpen)"
+    },
+    {
+      "id": "TC-BOUND-007",
+      "name": "Whitespace-only message send triggers are blocked",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-BOUND-008",
+      "name": "Mass clipboard paste textarea height limit boundary",
+      "status": "FAILED",
+      "reason": "Pattern 'maxHeight configuration' not found in MessageInput.jsx (Regex: maxHeight:\\s*(\\'|\\\")200px(\\'|\\\"))"
+    },
+    {
+      "id": "TC-BOUND-009",
+      "name": "Input textarea locked and style changed on thinking",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-BOUND-010",
+      "name": "Gigantic assistant bubble words wrap without overflow",
+      "status": "FAILED",
+      "reason": "Pattern 'word break logic on bubble' not found in MessageBubble.jsx (Regex: wordBreak:\\s*(\\'|\\\")normal(\\'|\\\"))"
+    },
+    {
+      "id": "TC-BOUND-011",
+      "name": "Malformed markdown code syntax renders safely",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-BOUND-012",
+      "name": "Stops running typing intervals on session switch",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-BOUND-013",
+      "name": "Fallback default theme load on corrupt LocalStorage",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-BOUND-014",
+      "name": "Visual layout variables sync on rapid theme toggles",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-BOUND-015",
+      "name": "Clicking backdrop overlay closes Settings panel",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-BOUND-016",
+      "name": "Empty view starter cards clicks trigger send handler",
+      "status": "FAILED",
+      "reason": "Pattern 'card click handler triggers handleSend' not found in Home.jsx (Regex: onClick=\\{\\(\\)\\s*=>\\s*handleSend\\(card\\.prompt\\)\\})"
+    },
+    {
+      "id": "TC-BOUND-017",
+      "name": "First-time launch database collections render safely",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-BOUND-018",
+      "name": "Server offline starter card clicks show error bubble",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-CROSS-001",
+      "name": "Bubble styles and contrast updates on theme toggle",
+      "status": "FAILED",
+      "reason": "Pattern 'user-bubble contrast definition dark' not found in global.css (Regex: --user-bubble:\\s*#1b202c)"
+    },
+    {
+      "id": "TC-CROSS-002",
+      "name": "Sidebar closes automatically when selecting in mobile",
+      "status": "FAILED",
+      "reason": "Pattern 'mobile width check threshold' not found in Home.jsx (Regex: window\\.innerWidth\\s*<\\s*768)"
+    },
+    {
+      "id": "TC-CROSS-003",
+      "name": "Generated chat titles update in header and sidebar list",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-CROSS-004",
+      "name": "Focus control on overlay backdrop blurs input text",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-CROSS-005",
+      "name": "Deleting active session returns display to Empty State",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-CROSS-006",
+      "name": "Resetting session clears thinking states and API loads",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-CROSS-007",
+      "name": "Container autoscrolls as complex markdown is printed",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-CROSS-008",
+      "name": "Starter card click resets input container dimensions",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-CROSS-009",
+      "name": "Layout reflow remains jitter-free on toggle reflows",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-CROSS-010",
+      "name": "Code blocks syntax highlights adapt to selected theme",
+      "status": "FAILED",
+      "reason": "Pattern 'code background dark mode' not found in global.css (Regex: --bg-code-block:\\s*#0c0d12)"
+    },
+    {
+      "id": "TC-CROSS-011",
+      "name": "Status indicator turns gray on socket send error modes",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-CROSS-012",
+      "name": "Sidebar option menu dropdown absolute scrolls in list",
+      "status": "FAILED",
+      "reason": "Pattern 'options menu state toggling' not found in Sidebar.jsx (Regex: setMenuOpenForId)"
+    },
+    {
+      "id": "TC-REAL-001",
+      "name": "Theme and active session history restore on page reload",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-REAL-002",
+      "name": "API recovery changes dot color and restores sending",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-REAL-003",
+      "name": "Textarea keypress events disabled during thinking locks",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-REAL-004",
+      "name": "Independent copy buttons for multiple bubbles codes",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-REAL-005",
+      "name": "Interactive states replaced with custom primary focus",
+      "status": "FAILED",
+      "reason": "Pattern 'focus borders variable check' not found in MessageInput.jsx (Regex: var\\(--accent-primary\\))"
+    },
+    {
+      "id": "TC-REAL-006",
+      "name": "Sidebar hides/reveals seamlessly on window resizes",
+      "status": "FAILED",
+      "reason": "Pattern 'mobile viewport transition check' not found in Home.jsx (Regex: window\\.innerWidth\\s*<\\s*768)"
+    },
+    {
+      "id": "TC-REAL-007",
+      "name": "User scrolling upward pauses thread autoscrolling hook",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-REAL-008",
+      "name": "Colors maintain a contrast above AA requirements",
+      "status": "FAILED",
+      "reason": "Pattern 'base background Obsidian color' not found in global.css (Regex: #090b0f)"
+    },
+    {
+      "id": "TC-REAL-009",
+      "name": "Chat switch aborts and discards outdated API returns",
+      "status": "PASSED",
+      "reason": ""
+    },
+    {
+      "id": "TC-REAL-010",
+      "name": "Build files validation and git status backend audits",
+      "status": "PASSED",
+      "reason": ""
+    }
+  ]
+}
