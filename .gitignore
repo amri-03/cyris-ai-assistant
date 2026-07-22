@@ -239,3 +239,9 @@ docs/project_audit*.md
 !.agents/AGENTS.md
 !.agents/skills/
 
+# Agent task documentation and test runner notes
+ORIGINAL_REQUEST.md
+TEST_INFRA.md
+TEST_READY.md
+
+
