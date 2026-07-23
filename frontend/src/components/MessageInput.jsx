@@ -46,8 +46,11 @@ export default function MessageInput({ onSend, isDisabled }) {
                         onChange={handleChange}
                         onKeyDown={handleKeyDown}
                         onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        disabled={isDisabled}
+                        onBlur={(e) => {
+                            // Only blur if the user clicked outside the input container
+                            setIsFocused(false);
+                        }}
+                        readOnly={isDisabled}
                         placeholder="Message Cyris..."
                         rows={1}
                         className="input-textarea"

@@ -1,11 +1,11 @@
 {
   "build_status": "PASSED",
-  "decoupling_status": "PASSED",
+  "decoupling_status": "FAILED",
   "styling_status": "FAILED",
   "api_integrity_status": "PASSED",
-  "inline_style_audit_status": "PASSED",
+  "inline_style_audit_status": "FAILED",
   "total_tests": 64,
-  "passed_tests": 43,
+  "passed_tests": 42,
   "results": [
     {
       "id": "TC-FEAT-001",
@@ -202,8 +202,8 @@
     {
       "id": "TC-BOUND-009",
       "name": "Input textarea locked and style changed on thinking",
-      "status": "PASSED",
-      "reason": ""
+      "status": "FAILED",
+      "reason": "Pattern 'disabled thinking binding' not found in MessageInput.jsx (Regex: disabled=\\{isDisabled\\})"
     },
     {
       "id": "TC-BOUND-010",
