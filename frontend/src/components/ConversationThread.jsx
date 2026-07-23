@@ -36,6 +36,47 @@ const starterCards = [
     }
 ];
 
+function formatDateDivider(dateStr) {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return null;
+
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+
+    const timeStr = date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    if (isToday) {
+        return `Today at ${timeStr}`;
+    } else if (isYesterday) {
+        return `Yesterday at ${timeStr}`;
+    } else {
+        const dayName = date.toLocaleDateString([], { weekday: 'short' });
+        const monthName = date.toLocaleDateString([], { month: 'short' });
+        const dayNum = date.getDate();
+        return `${dayName}, ${monthName} ${dayNum} at ${timeStr}`;
+    }
+}
+
+function shouldShowDivider(prevMsg, currMsg) {
+    if (!currMsg || !currMsg.created_at) return false;
+    if (!prevMsg || !prevMsg.created_at) return true;
+
+    const prevDate = new Date(prevMsg.created_at);
+    const currDate = new Date(currMsg.created_at);
+
+    if (isNaN(prevDate.getTime()) || isNaN(currDate.getTime())) return false;
+
+    const isDifferentDay = prevDate.toDateString() !== currDate.toDateString();
+    const diffHours = (currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60);
+
+    return isDifferentDay || diffHours >= 4;
+}
+
 export default function ConversationThread({ messages, isThinking, onScrollToBottom, onSendStarter }) {
     const isEmpty = messages.length === 0 && !isThinking;
 
@@ -82,17 +123,29 @@ export default function ConversationThread({ messages, isThinking, onScrollToBot
                 </div>
             ) : (
                 <>
-                    {messages.map((msg, index) => (
-                        <MessageBubble
-                            key={index}
-                            role={msg.role}
-                            content={msg.content}
-                            isLatest={index === messages.length - 1}
-                            onScrollToBottom={onScrollToBottom}
-                            animate={msg.animate}
-                            feedback={msg.feedback}
-                        />
-                    ))}
+                    {messages.map((msg, index) => {
+                        const prevMsg = index > 0 ? messages[index - 1] : null;
+                        const showDivider = shouldShowDivider(prevMsg, msg);
+                        const dividerLabel = showDivider ? formatDateDivider(msg.created_at) : null;
+
+                        return (
+                            <div key={index} className="thread-message-wrapper">
+                                {showDivider && dividerLabel && (
+                                    <div className="thread-date-divider">
+                                        <span>{dividerLabel}</span>
+                                    </div>
+                                )}
+                                <MessageBubble
+                                    role={msg.role}
+                                    content={msg.content}
+                                    isLatest={index === messages.length - 1}
+                                    onScrollToBottom={onScrollToBottom}
+                                    animate={msg.animate}
+                                    feedback={msg.feedback}
+                                />
+                            </div>
+                        );
+                    })}
 
                     {isThinking && <ThinkingIndicator />}
                 </>

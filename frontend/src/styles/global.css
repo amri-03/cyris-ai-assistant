@@ -219,6 +219,32 @@ body {
     min-height: 100%;
 }
 
+.thread-date-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 16px 0 24px;
+    user-select: none;
+}
+
+.thread-message-wrapper {
+    width: 100%;
+}
+
+.thread-date-divider span {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    padding: 4px 12px;
+    border-radius: var(--radius-xl);
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
 /* -------------------------------------------------------------------------- */
 /* Header Component Classes                                                   */
 /* -------------------------------------------------------------------------- */

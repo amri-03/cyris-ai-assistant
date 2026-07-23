@@ -74,7 +74,8 @@ export default function Home() {
     }, []);
 
     const handleSend = async (text) => {
-        const userMessage = { role: "user", content: text };
+        const nowIso = new Date().toISOString();
+        const userMessage = { role: "user", content: text, created_at: nowIso };
         setMessages((prev) => [...prev, userMessage]);
         setIsThinking(true);
 
@@ -90,7 +91,7 @@ export default function Home() {
 
             setMessages((prev) => [
                 ...prev,
-                { role: "assistant", content, animate: true }
+                { role: "assistant", content, animate: true, created_at: new Date().toISOString() }
             ]);
 
             if (returnedSessionId && returnedSessionId !== activeSessionId) {
@@ -105,7 +106,8 @@ export default function Home() {
                 ...prev,
                 {
                     role: "assistant",
-                    content: "I wasn't able to reach the backend server. Please check that the server is running."
+                    content: "I wasn't able to reach the backend server. Please check that the server is running.",
+                    created_at: new Date().toISOString()
                 }
             ]);
             setIsConnected(false);
