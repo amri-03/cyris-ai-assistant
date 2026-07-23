@@ -94,9 +94,25 @@ class GeminiClient:
                 productivity_context=productivity_context
             )
             mood_context = self.continuity_memory.build_mood_context()
-            full_system_prompt = f"{system_prompt}\n\nImportant continuity context:\n{memory_context}"
             if mood_context:
                 full_system_prompt += f"\n\n{mood_context}"
+
+            if history:
+                last_msg = history[-1]
+                if last_msg.get("created_at"):
+                    try:
+                        from datetime import datetime
+                        last_dt = datetime.fromisoformat(last_msg["created_at"])
+                        now_dt = datetime.now()
+                        if last_dt.date() < now_dt.date():
+                            days_diff = (now_dt.date() - last_dt.date()).days
+                            full_system_prompt += (
+                                f"\n\n[Temporal Gap Note: The previous message in this session was sent {days_diff} day(s) ago on {last_dt.strftime('%A, %B %d, %Y')}. "
+                                f"Be implicitly aware of this time gap so you do not assume yesterday's active discussion or unfinished task is occurring right now in real time. "
+                                f"Do NOT explicitly announce or greet about the calendar day transition unless relevant to the user's prompt.]"
+                            )
+                    except Exception:
+                        pass
             
             model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 
